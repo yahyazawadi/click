@@ -3,13 +3,12 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * SceneRotator — Incremental Trackball Controller.
+ * SceneRotator — Incremental Trackball Controller with Page Load Spinup.
  *
  * Solves Euler axis-fighting by applying incremental rotations in screen space.
- * - Drag Horizontal (X) → rotates around World Y (Screen Vertical axis).
- * - Drag Vertical (Y)   → rotates around World X (Screen Horizontal axis).
- *
- * Guarantees intuitive rotation in ALL directions at ALL angles.
+ * - Intro animation: Executes a smooth 540° (180 + 360) spinup on page refresh.
+ * - Drag Horizontal (X) → rotates around World Y.
+ * - Drag Vertical (Y)   → rotates around World X.
  */
 export function SceneRotator({ children, disabled = false }) {
   const { gl, size } = useThree();
@@ -18,6 +17,10 @@ export function SceneRotator({ children, disabled = false }) {
   // Target orientation quaternion & current display quaternion
   const targetQuaternion = useRef(new THREE.Quaternion());
 
+  // Intro spinup animation state (540 degrees total = 1.5 * Math.PI * 2)
+  const isIntroSpinning = useRef(true);
+  const introProgress = useRef(0);
+
   // Drag velocity for smooth inertia
   const velocity = useRef({ x: 0, y: 0 });
 
@@ -25,7 +28,6 @@ export function SceneRotator({ children, disabled = false }) {
   const dragging = useRef(false);
   const lastX = useRef(0);
   const lastY = useRef(0);
-  const lastMoveTime = useRef(0);
 
   // Accumulate mouse deltas between frames
   const mouseDelta = useRef({ x: 0, y: 0 });
@@ -43,6 +45,7 @@ export function SceneRotator({ children, disabled = false }) {
 
     const onPointerDown = (e) => {
       if (disabled || touchCount.current >= 2) return;
+      isIntroSpinning.current = false; // User interaction cancels intro spin immediately
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
@@ -87,23 +90,41 @@ export function SceneRotator({ children, disabled = false }) {
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
 
+    // Intro Spinup (540 deg total: 180 + 360)
+    if (isIntroSpinning.current) {
+      // Ease out spin over ~1.8 seconds
+      introProgress.current += delta * 0.75;
+      if (introProgress.current >= 1) {
+        introProgress.current = 1;
+        isIntroSpinning.current = false;
+      }
+
+      // Smooth step easing curve
+      const t = Math.min(1, introProgress.current);
+      const easeT = 1 - Math.pow(1 - t, 3); // Cubic ease out
+      const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
+      const currentAngle = easeT * totalSpin;
+
+      // Apply initial spin around Y-axis
+      const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), currentAngle);
+      targetQuaternion.current.copy(qSpin);
+      groupRef.current.quaternion.copy(targetQuaternion.current);
+      return;
+    }
+
     if (dragging.current) {
       // 1. Process accumulated mouse movements for this frame
       const sensitivity = 2.2;
-      
-      // Clamp max single-frame delta to prevent crazy teleportation jumps on ultra-fast swipes
-      const maxStep = 0.25; // ~14 degrees per frame max
+      const maxStep = 0.25;
       const rawAngleX = (mouseDelta.current.x / size.width) * Math.PI * sensitivity;
       const rawAngleY = (mouseDelta.current.y / size.height) * Math.PI * sensitivity;
 
       const angleX = THREE.MathUtils.clamp(rawAngleX, -maxStep, maxStep);
       const angleY = THREE.MathUtils.clamp(rawAngleY, -maxStep, maxStep);
 
-      // Reset accumulator for the next frame
       mouseDelta.current = { x: 0, y: 0 };
 
-      // 2. Smoothly track velocity using an Exponential Moving Average (EMA)
-      // Clamp max momentum speed so super fast flicks don't launch the solar system into hyper-speed
+      // 2. Smoothly track velocity
       const maxVel = 0.08;
       const nextVelX = velocity.current.x * 0.5 + angleX * 0.5;
       const nextVelY = velocity.current.y * 0.5 + angleY * 0.5;
@@ -118,7 +139,7 @@ export function SceneRotator({ children, disabled = false }) {
         targetQuaternion.current.premultiply(qX).premultiply(qY);
       }
 
-      // 4. INSTANT 1:1 tracking during active drag (zero lag, zero slerp freeze)
+      // 4. INSTANT 1:1 tracking during active drag
       groupRef.current.quaternion.copy(targetQuaternion.current);
     } else {
       // Apply inertia & smooth damping when let go
@@ -128,7 +149,6 @@ export function SceneRotator({ children, disabled = false }) {
 
         targetQuaternion.current.premultiply(qX).premultiply(qY);
 
-        // Friction / damping
         velocity.current.x *= 0.93;
         velocity.current.y *= 0.93;
       }
@@ -140,3 +160,4 @@ export function SceneRotator({ children, disabled = false }) {
 
   return <group ref={groupRef}>{children}</group>;
 }
+
