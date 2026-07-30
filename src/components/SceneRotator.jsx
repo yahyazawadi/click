@@ -27,6 +27,9 @@ export function SceneRotator({ children, disabled = false }) {
   const lastY = useRef(0);
   const lastMoveTime = useRef(0);
 
+  // Accumulate mouse deltas between frames
+  const mouseDelta = useRef({ x: 0, y: 0 });
+
   useEffect(() => {
     const canvas = gl.domElement;
 
@@ -35,6 +38,7 @@ export function SceneRotator({ children, disabled = false }) {
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
+      mouseDelta.current = { x: 0, y: 0 };
       velocity.current = { x: 0, y: 0 };
       canvas.style.cursor = 'grabbing';
     };
@@ -42,34 +46,16 @@ export function SceneRotator({ children, disabled = false }) {
     const onPointerMove = (e) => {
       if (!dragging.current || disabled) return;
 
-      const dx = e.clientX - lastX.current;
-      const dy = e.clientY - lastY.current;
+      mouseDelta.current.x += e.clientX - lastX.current;
+      mouseDelta.current.y += e.clientY - lastY.current;
+      
       lastX.current = e.clientX;
       lastY.current = e.clientY;
-
-      const sensitivity = 2.5;
-      // Convert pixel deltas into rotation angles in radians
-      const angleX = (dx / size.width) * Math.PI * sensitivity;
-      const angleY = (dy / size.height) * Math.PI * sensitivity;
-
-      velocity.current = { x: angleX, y: angleY };
-      lastMoveTime.current = performance.now();
-
-      // Apply immediate incremental rotation to target quaternion
-      const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleX);
-      const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angleY);
-
-      // Premultiply applies rotation in WORLD/SCREEN space
-      targetQuaternion.current.premultiply(qX).premultiply(qY);
     };
 
     const onPointerUp = () => {
       dragging.current = false;
       canvas.style.cursor = 'grab';
-      // If the user stops moving the mouse for >50ms before releasing, kill the momentum
-      if (performance.now() - lastMoveTime.current > 50) {
-        velocity.current = { x: 0, y: 0 };
-      }
     };
 
     const onPointerLeave = () => {
@@ -89,21 +75,44 @@ export function SceneRotator({ children, disabled = false }) {
       window.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointerleave', onPointerLeave);
     };
-  }, [gl, size, disabled]);
+  }, [gl, disabled]);
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
 
-    // Apply inertia when let go
-    if (!dragging.current && (Math.abs(velocity.current.x) > 0.0001 || Math.abs(velocity.current.y) > 0.0001)) {
-      const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), velocity.current.x);
-      const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), velocity.current.y);
+    if (dragging.current) {
+      // 1. Process accumulated mouse movements for this frame
+      const sensitivity = 2.5;
+      const angleX = (mouseDelta.current.x / size.width) * Math.PI * sensitivity;
+      const angleY = (mouseDelta.current.y / size.height) * Math.PI * sensitivity;
 
-      targetQuaternion.current.premultiply(qX).premultiply(qY);
+      // Reset accumulator for the next frame
+      mouseDelta.current = { x: 0, y: 0 };
 
-      // Friction / damping
-      velocity.current.x *= 0.95;
-      velocity.current.y *= 0.95;
+      // 2. Smoothly track velocity using an Exponential Moving Average (EMA)
+      // This perfectly fixes the "release jump" by ignoring single-event polling spikes
+      // and naturally killing momentum if you pause before letting go!
+      velocity.current.x = velocity.current.x * 0.5 + angleX * 0.5;
+      velocity.current.y = velocity.current.y * 0.5 + angleY * 0.5;
+
+      // 3. Apply immediate incremental rotation
+      if (Math.abs(angleX) > 0 || Math.abs(angleY) > 0) {
+        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleX);
+        const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angleY);
+        targetQuaternion.current.premultiply(qX).premultiply(qY);
+      }
+    } else {
+      // Apply inertia when let go
+      if (Math.abs(velocity.current.x) > 0.0001 || Math.abs(velocity.current.y) > 0.0001) {
+        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), velocity.current.x);
+        const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), velocity.current.y);
+
+        targetQuaternion.current.premultiply(qX).premultiply(qY);
+
+        // Friction / damping
+        velocity.current.x *= 0.95;
+        velocity.current.y *= 0.95;
+      }
     }
 
     // Smoothly slerp current group orientation toward target quaternion
