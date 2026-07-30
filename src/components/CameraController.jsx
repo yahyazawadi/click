@@ -23,9 +23,10 @@ export function CameraController({ selectedTarget, targetPosition }) {
     if (!selectedTarget) {
       // DEFAULT OVERVIEW: Pull straight back to radius 14 at the locked angle
       const radius = 14;
+      // Disable mouse parallax on mobile so dragging perfectly spins the system without sliding the camera
       targetCamPos.set(
-        Math.cos(macroAngle.current) * radius + pointer.x * 2.5,
-        6 + pointer.y * 2.0,
+        Math.cos(macroAngle.current) * radius + (isMobile ? 0 : pointer.x * 2.5),
+        6 + (isMobile ? 0 : pointer.y * 2.0),
         Math.sin(macroAngle.current) * radius
       );
       targetLookAt.set(0, 0, 0);

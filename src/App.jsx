@@ -1,12 +1,12 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { PresentationControls } from '@react-three/drei';
 import { SYSTEM_CONFIG } from './config';
 import { CosmicBackground } from './components/CosmicBackground';
 import { SystemCore } from './components/SystemCore';
 import { OrbitalPath } from './components/OrbitalPath';
 import { PlanetNode } from './components/PlanetNode';
 import { CameraController } from './components/CameraController';
+import { SceneRotator } from './components/SceneRotator';
 import { UIOverlay } from './components/UIOverlay';
 
 export default function App() {
@@ -120,16 +120,8 @@ export default function App() {
             {/* Background Stars */}
             <CosmicBackground />
 
-            {/* Manual Drag & Spin Wrapper for the Solar System */}
-            <PresentationControls
-              global={true} // Allow dragging anywhere on the screen (even empty space)
-              cursor={true}
-              snap={false} // Keep rotation when let go
-              speed={1.5}
-              zoom={1}
-              polar={[-Math.PI / 4, Math.PI / 4]} // Vertical tilt limits
-              azimuth={[-Infinity, Infinity]} // Endless horizontal spinning
-            >
+            {/* Manual Drag & Spin — SceneRotator uses spherical coords, no euler fighting */}
+            <SceneRotator disabled={!!selectedTarget}>
               {/* Central Sphere Core */}
               <SystemCore onSelect={handleSelect} />
 
@@ -154,7 +146,7 @@ export default function App() {
                   />
                 );
               })}
-            </PresentationControls>
+            </SceneRotator>
 
             {/* Camera Zoom & Motion Controller */}
             <CameraController selectedTarget={selectedTarget} targetPosition={targetPlanetPos} />
