@@ -99,15 +99,19 @@ export function SceneRotator({ children, disabled = false }) {
         isIntroSpinning.current = false;
       }
 
-      // Smooth step easing curve (spin from +540 degrees down to 0 degrees for true counter-spin)
-      const t = Math.min(1, introProgress.current);
-      const easeT = 1 - Math.pow(1 - t, 3); // Cubic ease out
-      const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
-      const currentAngle = (1 - easeT) * totalSpin; // Starts at +540° (+3pi) and decreases to 0°
+      // Calculate incremental rotation angle for this specific frame
+      const tPrev = Math.max(0, introProgress.current - delta * 0.75);
+      const tCurr = Math.min(1, introProgress.current);
 
-      // Apply spin around Y-axis
-      const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), currentAngle);
-      targetQuaternion.current.copy(qSpin);
+      const easePrev = 1 - Math.pow(1 - tPrev, 3);
+      const easeCurr = 1 - Math.pow(1 - tCurr, 3);
+
+      const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
+      // Negative delta forces rotation to spin counter-clockwise (opposite to positive drag X)
+      const frameDelta = -(easeCurr - easePrev) * totalSpin;
+
+      const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), frameDelta);
+      targetQuaternion.current.premultiply(qSpin);
       groupRef.current.quaternion.copy(targetQuaternion.current);
       return;
     }
