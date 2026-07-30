@@ -3,29 +3,28 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 /**
- * SceneRotator — replaces PresentationControls.
+ * SceneRotator — Incremental Trackball Controller.
  *
- * Instead of applying Euler deltas in body space (which fights itself after
- * any rotation), we store the scene's orientation as two spherical angles
- * (azimuth θ and polar φ) in WORLD space, then build a clean quaternion each
- * frame.  Drag right → scene turns right.  Drag down → scene tilts down. ✓
+ * Solves Euler axis-fighting by applying incremental rotations in screen space.
+ * - Drag Horizontal (X) → rotates around World Y (Screen Vertical axis).
+ * - Drag Vertical (Y)   → rotates around World X (Screen Horizontal axis).
+ *
+ * Guarantees intuitive rotation in ALL directions at ALL angles.
  */
 export function SceneRotator({ children, disabled = false }) {
   const { gl, size } = useThree();
   const groupRef = useRef();
 
-  // Spherical orbit angles (world-space, never accumulate Euler gimbal)
-  const azimuth = useRef(0);   // horizontal — Y axis
-  const polar   = useRef(0);   // vertical   — X axis
+  // Target orientation quaternion & current display quaternion
+  const targetQuaternion = useRef(new THREE.Quaternion());
 
-  // Smooth display values (lerped toward the target)
-  const displayAz = useRef(0);
-  const displayPol = useRef(0);
+  // Drag velocity for smooth inertia
+  const velocity = useRef({ x: 0, y: 0 });
 
-  // Drag state
-  const dragging  = useRef(false);
-  const lastX     = useRef(0);
-  const lastY     = useRef(0);
+  // Drag state tracking
+  const dragging = useRef(false);
+  const lastX = useRef(0);
+  const lastY = useRef(0);
 
   useEffect(() => {
     const canvas = gl.domElement;
@@ -35,6 +34,7 @@ export function SceneRotator({ children, disabled = false }) {
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
+      velocity.current = { x: 0, y: 0 };
       canvas.style.cursor = 'grabbing';
     };
 
@@ -46,16 +46,19 @@ export function SceneRotator({ children, disabled = false }) {
       lastX.current = e.clientX;
       lastY.current = e.clientY;
 
-      // Map pixel deltas → radians
-      // Divide by viewport so speed is viewport-independent
       const sensitivity = 2.5;
-      // Drag RIGHT  → azimuth increases (scene rotates right visually)   ← fixed direction
-      // Drag DOWN   → polar increases (scene tilts down visually)         ← fixed direction
-      azimuth.current += (dx / size.width)  * Math.PI * sensitivity;
-      polar.current   += (dy / size.height) * Math.PI * sensitivity;
+      // Convert pixel deltas into rotation angles in radians
+      const angleX = (dx / size.width) * Math.PI * sensitivity;
+      const angleY = (dy / size.height) * Math.PI * sensitivity;
 
-      // Clamp polar so we never flip upside down completely
-      polar.current = THREE.MathUtils.clamp(polar.current, -Math.PI * 0.48, Math.PI * 0.48);
+      velocity.current = { x: angleX, y: angleY };
+
+      // Apply immediate incremental rotation to target quaternion
+      const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleX);
+      const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angleY);
+
+      // Premultiply applies rotation in WORLD/SCREEN space
+      targetQuaternion.current.premultiply(qX).premultiply(qY);
     };
 
     const onPointerUp = () => {
@@ -85,17 +88,20 @@ export function SceneRotator({ children, disabled = false }) {
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
 
-    // Smooth lerp display angles toward target
-    const lerpFactor = 1 - Math.pow(0.02, delta);
-    displayAz.current  += (azimuth.current  - displayAz.current)  * lerpFactor;
-    displayPol.current += (polar.current    - displayPol.current) * lerpFactor;
+    // Apply inertia when let go
+    if (!dragging.current && (Math.abs(velocity.current.x) > 0.0001 || Math.abs(velocity.current.y) > 0.0001)) {
+      const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), velocity.current.x);
+      const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), velocity.current.y);
 
-    // Build rotation from two independent world-space angles.
-    // Y-axis rotation first (azimuth), then X-axis (polar).
-    // This is effectively a "turntable" rotation — no gimbal lock.
-    const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), displayAz.current);
-    const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), displayPol.current);
-    groupRef.current.quaternion.copy(qY).multiply(qX);
+      targetQuaternion.current.premultiply(qX).premultiply(qY);
+
+      // Friction / damping
+      velocity.current.x *= 0.92;
+      velocity.current.y *= 0.92;
+    }
+
+    // Smoothly slerp current group orientation toward target quaternion
+    groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(0.001, delta));
   });
 
   return <group ref={groupRef}>{children}</group>;
