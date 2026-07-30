@@ -96,8 +96,11 @@ export function SceneRotator({ children, disabled = false }) {
         const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angleY);
         targetQuaternion.current.premultiply(qX).premultiply(qY);
       }
+
+      // 4. INSTANT 1:1 tracking during active drag (zero lag, zero slerp freeze)
+      groupRef.current.quaternion.copy(targetQuaternion.current);
     } else {
-      // Apply inertia when let go
+      // Apply inertia & smooth damping when let go
       if (Math.abs(velocity.current.x) > 0.0001 || Math.abs(velocity.current.y) > 0.0001) {
         const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), velocity.current.x);
         const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), velocity.current.y);
@@ -105,15 +108,13 @@ export function SceneRotator({ children, disabled = false }) {
         targetQuaternion.current.premultiply(qX).premultiply(qY);
 
         // Friction / damping
-        velocity.current.x *= 0.95;
-        velocity.current.y *= 0.95;
+        velocity.current.x *= 0.94;
+        velocity.current.y *= 0.94;
       }
-    }
 
-    // Smoothly slerp current group orientation toward target quaternion
-    // Use a much tighter tracking speed during drag to prevent 180-degree slerp flip (stuttering)
-    const trackingSpeed = dragging.current ? 0.0000001 : 0.001; 
-    groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(trackingSpeed, delta));
+      // Smoothly slerp to target quaternion during inertia release
+      groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(0.001, delta));
+    }
   });
 
   return <group ref={groupRef}>{children}</group>;
