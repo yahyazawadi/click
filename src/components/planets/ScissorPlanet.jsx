@@ -99,8 +99,8 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Upper Connecting Handle Shank (Angled downward across offset) */}
-        <mesh position={[-bladeLen * 0.2, -size * 0.25, size * 0.04]} rotation={[0, 0, -Math.PI / 10]}>
+        {/* Upper Straight Handle Shank */}
+        <mesh position={[-bladeLen * 0.22, 0, size * 0.04]}>
           <boxGeometry args={[bladeLen * 0.45, size * 0.14, size * 0.08]} />
           <meshStandardMaterial
             color="#00152B"
@@ -111,8 +111,8 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop (Flipped to -size * 0.48) */}
-        <group position={[-bladeLen * 0.45, -size * 0.48, size * 0.05]} rotation={[0, 0, -Math.PI / 12]}>
+        {/* Dark Blue Handle Finger Loop (Centered along handle axis Y = 0) */}
+        <group position={[-bladeLen * 0.45, 0, size * 0.05]}>
           <mesh>
             <torusGeometry args={[size * 0.36, size * 0.1, 24, 48]} />
             <meshStandardMaterial
@@ -161,8 +161,8 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Lower Connecting Handle Shank (Angled upward across offset) */}
-        <mesh position={[-bladeLen * 0.2, size * 0.25, -size * 0.04]} rotation={[0, 0, Math.PI / 10]}>
+        {/* Lower Straight Handle Shank */}
+        <mesh position={[-bladeLen * 0.22, 0, -size * 0.04]}>
           <boxGeometry args={[bladeLen * 0.45, size * 0.14, size * 0.08]} />
           <meshStandardMaterial
             color="#00152B"
@@ -173,8 +173,8 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop (Flipped to +size * 0.48) */}
-        <group position={[-bladeLen * 0.45, size * 0.48, -size * 0.05]} rotation={[0, 0, Math.PI / 12]}>
+        {/* Dark Blue Handle Finger Loop (Centered along handle axis Y = 0) */}
+        <group position={[-bladeLen * 0.45, 0, -size * 0.05]}>
           <mesh>
             <torusGeometry args={[size * 0.36, size * 0.1, 24, 48]} />
             <meshStandardMaterial
