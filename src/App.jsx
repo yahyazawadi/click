@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { SYSTEM_CONFIG } from './config';
 import { CosmicBackground } from './components/CosmicBackground';
@@ -52,9 +52,11 @@ export default function App() {
     const onTouchMove = (e) => {
       if (e.touches.length === 2 && initialDist && initialDist > 0) {
         const currentDist = getTouchDist(e.touches);
+        if (!currentDist || currentDist <= 0) return;
         // Ratio > 1 means fingers moved closer (pinch inward = zoom out)
         // Ratio < 1 means fingers moved apart (pinch outward = zoom in)
         const ratio = initialDist / currentDist;
+        if (!isFinite(ratio)) return;
 
         // Pinching inward while a planet/core is focused automatically zooms out to overview
         if (ratio > 1.2) {
@@ -64,7 +66,9 @@ export default function App() {
 
         // Adjust camera zoom distance (range 0.4x zoom-in to 2.5x zoom-out)
         const newZoom = Math.min(Math.max(startZoom * ratio, 0.4), 2.5);
-        setZoomFactor(newZoom);
+        if (isFinite(newZoom)) {
+          setZoomFactor(newZoom);
+        }
       }
     };
 
