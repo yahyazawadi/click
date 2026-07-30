@@ -99,10 +99,22 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop (Z = +size * 0.05) */}
-        <group position={[-bladeLen * 0.38, size * 0.18, size * 0.05]}>
+        {/* Upper Connecting Handle Shank */}
+        <mesh position={[-bladeLen * 0.2, size * 0.25, size * 0.04]} rotation={[0, 0, Math.PI / 10]}>
+          <boxGeometry args={[bladeLen * 0.45, size * 0.14, size * 0.08]} />
+          <meshStandardMaterial
+            color="#00152B"
+            metalness={0.8}
+            roughness={0.2}
+            emissive="#002244"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* Dark Blue Handle Finger Loop (Offset Outward along Y-axis to size * 0.48) */}
+        <group position={[-bladeLen * 0.45, size * 0.48, size * 0.05]} rotation={[0, 0, Math.PI / 12]}>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.1, 24, 48]} />
+            <torusGeometry args={[size * 0.36, size * 0.1, 24, 48]} />
             <meshStandardMaterial
               color="#00152B"
               emissive="#002244"
@@ -112,7 +124,7 @@ export function ScissorPlanet({ color, size }) {
             />
           </mesh>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.025, 16, 32]} />
+            <torusGeometry args={[size * 0.36, size * 0.025, 16, 32]} />
             <meshStandardMaterial
               color="#005580"
               emissive="#00BAE3"
@@ -149,10 +161,22 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop (Z = -size * 0.05) */}
-        <group position={[-bladeLen * 0.38, -size * 0.18, -size * 0.05]}>
+        {/* Lower Connecting Handle Shank */}
+        <mesh position={[-bladeLen * 0.2, -size * 0.25, -size * 0.04]} rotation={[0, 0, -Math.PI / 10]}>
+          <boxGeometry args={[bladeLen * 0.45, size * 0.14, size * 0.08]} />
+          <meshStandardMaterial
+            color="#00152B"
+            metalness={0.8}
+            roughness={0.2}
+            emissive="#002244"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
+
+        {/* Dark Blue Handle Finger Loop (Offset Outward along Y-axis to -size * 0.48) */}
+        <group position={[-bladeLen * 0.45, -size * 0.48, -size * 0.05]} rotation={[0, 0, -Math.PI / 12]}>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.1, 24, 48]} />
+            <torusGeometry args={[size * 0.36, size * 0.1, 24, 48]} />
             <meshStandardMaterial
               color="#00152B"
               emissive="#002244"
@@ -162,7 +186,7 @@ export function ScissorPlanet({ color, size }) {
             />
           </mesh>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.025, 16, 32]} />
+            <torusGeometry args={[size * 0.36, size * 0.025, 16, 32]} />
             <meshStandardMaterial
               color="#005580"
               emissive="#00BAE3"
