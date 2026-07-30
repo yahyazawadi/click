@@ -25,6 +25,7 @@ export function SceneRotator({ children, disabled = false }) {
   const dragging = useRef(false);
   const lastX = useRef(0);
   const lastY = useRef(0);
+  const lastMoveTime = useRef(0);
 
   useEffect(() => {
     const canvas = gl.domElement;
@@ -52,6 +53,7 @@ export function SceneRotator({ children, disabled = false }) {
       const angleY = (dy / size.height) * Math.PI * sensitivity;
 
       velocity.current = { x: angleX, y: angleY };
+      lastMoveTime.current = performance.now();
 
       // Apply immediate incremental rotation to target quaternion
       const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleX);
@@ -64,6 +66,10 @@ export function SceneRotator({ children, disabled = false }) {
     const onPointerUp = () => {
       dragging.current = false;
       canvas.style.cursor = 'grab';
+      // If the user stops moving the mouse for >50ms before releasing, kill the momentum
+      if (performance.now() - lastMoveTime.current > 50) {
+        velocity.current = { x: 0, y: 0 };
+      }
     };
 
     const onPointerLeave = () => {
@@ -96,12 +102,14 @@ export function SceneRotator({ children, disabled = false }) {
       targetQuaternion.current.premultiply(qX).premultiply(qY);
 
       // Friction / damping
-      velocity.current.x *= 0.92;
-      velocity.current.y *= 0.92;
+      velocity.current.x *= 0.95;
+      velocity.current.y *= 0.95;
     }
 
     // Smoothly slerp current group orientation toward target quaternion
-    groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(0.001, delta));
+    // Use a much tighter tracking speed during drag to prevent 180-degree slerp flip (stuttering)
+    const trackingSpeed = dragging.current ? 0.0000001 : 0.001; 
+    groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(trackingSpeed, delta));
   });
 
   return <group ref={groupRef}>{children}</group>;
