@@ -59,11 +59,15 @@ export function SceneRotator({ children, disabled = false }) {
       
       lastX.current = e.clientX;
       lastY.current = e.clientY;
+      lastMoveTime.current = performance.now();
     };
 
     const onPointerUp = () => {
       dragging.current = false;
       canvas.style.cursor = 'grab';
+      if (performance.now() - lastMoveTime.current > 50) {
+        velocity.current = { x: 0, y: 0 };
+      }
     };
 
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
