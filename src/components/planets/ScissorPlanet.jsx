@@ -66,7 +66,7 @@ export function ScissorPlanet({ color, size }) {
 
       {/* Outer Raised Pivot Cap Ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[size * 0.35, size * 0.35, size * 0.6, 32]} />
+        <cylinderGeometry args={[size * 0.35, size * 0.35, size * 0.15, 32]} />
         <meshStandardMaterial
           color="#00152B"
           metalness={0.9}
