@@ -99,11 +99,11 @@ export function SceneRotator({ children, disabled = false }) {
         isIntroSpinning.current = false;
       }
 
-      // Smooth step easing curve (spin from -540 degrees back to 0 degrees)
+      // Smooth step easing curve (spin from +540 degrees down to 0 degrees for true counter-spin)
       const t = Math.min(1, introProgress.current);
       const easeT = 1 - Math.pow(1 - t, 3); // Cubic ease out
       const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
-      const currentAngle = (easeT - 1) * totalSpin; // Starts at -540° (-3pi) and ends at 0°
+      const currentAngle = (1 - easeT) * totalSpin; // Starts at +540° (+3pi) and decreases to 0°
 
       // Apply spin around Y-axis
       const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), currentAngle);
