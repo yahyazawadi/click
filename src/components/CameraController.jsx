@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function CameraController({ selectedTarget, targetPosition }) {
+export function CameraController({ selectedTarget, targetPosition, zoomFactor = 1.0 }) {
   const { camera, pointer } = useThree();
   const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
   
@@ -21,12 +21,12 @@ export function CameraController({ selectedTarget, targetPosition }) {
     }
 
     if (!selectedTarget) {
-      // DEFAULT OVERVIEW: Pull straight back to radius 14 at the locked angle
-      const radius = 14;
+      // DEFAULT OVERVIEW: Pull straight back to radius 14 * zoomFactor at the locked angle
+      const radius = 14 * zoomFactor;
       // Disable mouse parallax on mobile so dragging perfectly spins the system without sliding the camera
       targetCamPos.set(
         Math.cos(macroAngle.current) * radius + (isMobile ? 0 : pointer.x * 2.5),
-        6 + (isMobile ? 0 : pointer.y * 2.0),
+        6 * zoomFactor + (isMobile ? 0 : pointer.y * 2.0),
         Math.sin(macroAngle.current) * radius
       );
       targetLookAt.set(0, 0, 0);

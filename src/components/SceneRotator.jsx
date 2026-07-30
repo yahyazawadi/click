@@ -29,12 +29,20 @@ export function SceneRotator({ children, disabled = false }) {
 
   // Accumulate mouse deltas between frames
   const mouseDelta = useRef({ x: 0, y: 0 });
+  const touchCount = useRef(0);
 
   useEffect(() => {
     const canvas = gl.domElement;
 
+    const onTouchStart = (e) => {
+      touchCount.current = e.touches.length;
+    };
+    const onTouchEnd = (e) => {
+      touchCount.current = e.touches.length;
+    };
+
     const onPointerDown = (e) => {
-      if (disabled) return;
+      if (disabled || touchCount.current >= 2) return;
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
@@ -44,7 +52,7 @@ export function SceneRotator({ children, disabled = false }) {
     };
 
     const onPointerMove = (e) => {
-      if (!dragging.current || disabled) return;
+      if (!dragging.current || disabled || touchCount.current >= 2) return;
 
       mouseDelta.current.x += e.clientX - lastX.current;
       mouseDelta.current.y += e.clientY - lastY.current;
@@ -58,6 +66,8 @@ export function SceneRotator({ children, disabled = false }) {
       canvas.style.cursor = 'grab';
     };
 
+    canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
     canvas.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
@@ -65,6 +75,8 @@ export function SceneRotator({ children, disabled = false }) {
     canvas.style.cursor = 'grab';
 
     return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
       canvas.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);

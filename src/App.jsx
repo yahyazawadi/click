@@ -13,6 +13,7 @@ export default function App() {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [targetPlanetPos, setTargetPlanetPos] = useState(null);
   const [activeTitles, setActiveTitles] = useState([]);
+  const [zoomFactor, setZoomFactor] = useState(1.0);
 
   // Prevent double-click zoom across window
   useEffect(() => {
@@ -22,6 +23,59 @@ export default function App() {
     window.addEventListener('dblclick', handleDblClick, { passive: false });
     return () => window.removeEventListener('dblclick', handleDblClick);
   }, []);
+
+  // 2-Finger Touch Pinch to Zoom (Touch devices only)
+  useEffect(() => {
+    let initialDist = null;
+    let initialZoom = 1.0;
+
+    const getTouchDist = (touches) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+
+    const onTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        initialDist = getTouchDist(e.touches);
+        initialZoom = zoomFactor;
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (e.touches.length === 2 && initialDist !== null) {
+        const currentDist = getTouchDist(e.touches);
+        // Ratio > 1 means pinched inward (fingers moved closer = zoom out)
+        const ratio = initialDist / currentDist;
+
+        // Pinching inward while a planet/core is focused automatically zooms out to overview
+        if (selectedTarget && ratio > 1.15) {
+          setSelectedTarget(null);
+          setTargetPlanetPos(null);
+        }
+
+        // Adjust camera zoom distance (range 0.75x to 2.2x overview distance)
+        const newZoom = Math.min(Math.max(initialZoom * ratio, 0.75), 2.2);
+        setZoomFactor(newZoom);
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (e.touches.length < 2) {
+        initialDist = null;
+      }
+    };
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [selectedTarget, zoomFactor]);
 
   // Randomly select 1 or 2 planet titles to display every few seconds
   useEffect(() => {
@@ -149,7 +203,7 @@ export default function App() {
             </SceneRotator>
 
             {/* Camera Zoom & Motion Controller */}
-            <CameraController selectedTarget={selectedTarget} targetPosition={targetPlanetPos} />
+            <CameraController selectedTarget={selectedTarget} targetPosition={targetPlanetPos} zoomFactor={zoomFactor} />
           </Suspense>
         </Canvas>
       </div>
