@@ -24,10 +24,17 @@ export default function App() {
     return () => window.removeEventListener('dblclick', handleDblClick);
   }, []);
 
+  const zoomFactorRef = useRef(1.0);
+
+  // Keep zoomFactorRef in sync
+  useEffect(() => {
+    zoomFactorRef.current = zoomFactor;
+  }, [zoomFactor]);
+
   // 2-Finger Touch Pinch to Zoom (Touch devices only)
   useEffect(() => {
     let initialDist = null;
-    let initialZoom = 1.0;
+    let startZoom = 1.0;
 
     const getTouchDist = (touches) => {
       const dx = touches[0].clientX - touches[1].clientX;
@@ -38,24 +45,25 @@ export default function App() {
     const onTouchStart = (e) => {
       if (e.touches.length === 2) {
         initialDist = getTouchDist(e.touches);
-        initialZoom = zoomFactor;
+        startZoom = zoomFactorRef.current;
       }
     };
 
     const onTouchMove = (e) => {
-      if (e.touches.length === 2 && initialDist !== null) {
+      if (e.touches.length === 2 && initialDist && initialDist > 0) {
         const currentDist = getTouchDist(e.touches);
-        // Ratio > 1 means pinched inward (fingers moved closer = zoom out)
+        // Ratio > 1 means fingers moved closer (pinch inward = zoom out)
+        // Ratio < 1 means fingers moved apart (pinch outward = zoom in)
         const ratio = initialDist / currentDist;
 
         // Pinching inward while a planet/core is focused automatically zooms out to overview
-        if (selectedTarget && ratio > 1.15) {
+        if (ratio > 1.2) {
           setSelectedTarget(null);
           setTargetPlanetPos(null);
         }
 
         // Adjust camera zoom distance (range 0.4x zoom-in to 2.5x zoom-out)
-        const newZoom = Math.min(Math.max(initialZoom * ratio, 0.4), 2.5);
+        const newZoom = Math.min(Math.max(startZoom * ratio, 0.4), 2.5);
         setZoomFactor(newZoom);
       }
     };
@@ -75,7 +83,7 @@ export default function App() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [selectedTarget, zoomFactor]);
+  }, []); // Empty dependency array keeps listeners mounted throughout pinch gesture!
 
   // Randomly select 1 or 2 planet titles to display every few seconds
   useEffect(() => {
