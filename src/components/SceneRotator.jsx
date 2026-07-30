@@ -58,22 +58,17 @@ export function SceneRotator({ children, disabled = false }) {
       canvas.style.cursor = 'grab';
     };
 
-    const onPointerLeave = () => {
-      dragging.current = false;
-      canvas.style.cursor = 'grab';
-    };
-
     canvas.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
-    canvas.addEventListener('pointerleave', onPointerLeave);
+    window.addEventListener('pointercancel', onPointerUp);
     canvas.style.cursor = 'grab';
 
     return () => {
       canvas.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointerleave', onPointerLeave);
+      window.removeEventListener('pointercancel', onPointerUp);
     };
   }, [gl, disabled]);
 
