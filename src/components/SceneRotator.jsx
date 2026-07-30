@@ -77,18 +77,27 @@ export function SceneRotator({ children, disabled = false }) {
 
     if (dragging.current) {
       // 1. Process accumulated mouse movements for this frame
-      const sensitivity = 2.5;
-      const angleX = (mouseDelta.current.x / size.width) * Math.PI * sensitivity;
-      const angleY = (mouseDelta.current.y / size.height) * Math.PI * sensitivity;
+      const sensitivity = 2.2;
+      
+      // Clamp max single-frame delta to prevent crazy teleportation jumps on ultra-fast swipes
+      const maxStep = 0.25; // ~14 degrees per frame max
+      const rawAngleX = (mouseDelta.current.x / size.width) * Math.PI * sensitivity;
+      const rawAngleY = (mouseDelta.current.y / size.height) * Math.PI * sensitivity;
+
+      const angleX = THREE.MathUtils.clamp(rawAngleX, -maxStep, maxStep);
+      const angleY = THREE.MathUtils.clamp(rawAngleY, -maxStep, maxStep);
 
       // Reset accumulator for the next frame
       mouseDelta.current = { x: 0, y: 0 };
 
       // 2. Smoothly track velocity using an Exponential Moving Average (EMA)
-      // This perfectly fixes the "release jump" by ignoring single-event polling spikes
-      // and naturally killing momentum if you pause before letting go!
-      velocity.current.x = velocity.current.x * 0.5 + angleX * 0.5;
-      velocity.current.y = velocity.current.y * 0.5 + angleY * 0.5;
+      // Clamp max momentum speed so super fast flicks don't launch the solar system into hyper-speed
+      const maxVel = 0.08;
+      const nextVelX = velocity.current.x * 0.5 + angleX * 0.5;
+      const nextVelY = velocity.current.y * 0.5 + angleY * 0.5;
+
+      velocity.current.x = THREE.MathUtils.clamp(nextVelX, -maxVel, maxVel);
+      velocity.current.y = THREE.MathUtils.clamp(nextVelY, -maxVel, maxVel);
 
       // 3. Apply immediate incremental rotation
       if (Math.abs(angleX) > 0 || Math.abs(angleY) > 0) {
@@ -108,8 +117,8 @@ export function SceneRotator({ children, disabled = false }) {
         targetQuaternion.current.premultiply(qX).premultiply(qY);
 
         // Friction / damping
-        velocity.current.x *= 0.94;
-        velocity.current.y *= 0.94;
+        velocity.current.x *= 0.93;
+        velocity.current.y *= 0.93;
       }
 
       // Smoothly slerp to target quaternion during inertia release
