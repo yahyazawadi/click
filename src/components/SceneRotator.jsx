@@ -106,8 +106,8 @@ export function SceneRotator({ children, disabled = false }) {
       const easePrev = 1 - Math.pow(1 - tPrev, 3);
       const easeCurr = 1 - Math.pow(1 - tCurr, 3);
 
-      const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
-      // Negative delta forces rotation to spin counter-clockwise (opposite to positive drag X)
+      const totalSpin = 0.75 * Math.PI * 2; // 270 degrees
+      // Negative delta forces rotation to spin counter-clockwise
       const frameDelta = -(easeCurr - easePrev) * totalSpin;
 
       const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), frameDelta);
