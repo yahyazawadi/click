@@ -54,8 +54,8 @@ export default function App() {
           setTargetPlanetPos(null);
         }
 
-        // Adjust camera zoom distance (range 0.75x to 2.2x overview distance)
-        const newZoom = Math.min(Math.max(initialZoom * ratio, 0.75), 2.2);
+        // Adjust camera zoom distance (range 0.4x zoom-in to 2.5x zoom-out)
+        const newZoom = Math.min(Math.max(initialZoom * ratio, 0.4), 2.5);
         setZoomFactor(newZoom);
       }
     };

@@ -32,11 +32,12 @@ export function CameraController({ selectedTarget, targetPosition, zoomFactor = 
       targetLookAt.set(0, 0, 0);
     } else if (selectedTarget === 'core') {
       // CORE FOCUS: Zoom into central sphere
-      targetCamPos.set(0, isMobile ? -1.5 : 0, isMobile ? 7.0 : 4.8);
+      const coreZ = (isMobile ? 7.0 : 4.8) * zoomFactor;
+      targetCamPos.set(0, isMobile ? -1.5 : 0, coreZ);
       targetLookAt.set(0, isMobile ? -1.5 : 0, 0);
     } else if (targetPosition) {
       // PLANET FOCUS: Fly camera directly to front of selected planet
-      const distOffset = isMobile ? 5.2 : 3.2;
+      const distOffset = (isMobile ? 5.2 : 3.2) * zoomFactor;
       const normal = targetPosition.clone().normalize();
       targetCamPos.copy(targetPosition).add(normal.multiplyScalar(distOffset)).add(new THREE.Vector3(0, 0.5, 0));
       targetLookAt.copy(targetPosition);
