@@ -102,7 +102,7 @@ export function SceneRotator({ children, disabled = false }) {
       // Smooth step easing curve
       const t = Math.min(1, introProgress.current);
       const easeT = 1 - Math.pow(1 - t, 3); // Cubic ease out
-      const totalSpin = 1.5 * Math.PI * 2; // 540 degrees
+      const totalSpin = -1.5 * Math.PI * 2; // -540 degrees (opposite direction)
       const currentAngle = easeT * totalSpin;
 
       // Apply initial spin around Y-axis
