@@ -121,19 +121,11 @@ function ProceduralPlanetMesh({ type, color, size }) {
   );
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, onUpdatePosition }) {
+export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, onUpdatePosition }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
-  const [showPulseTitle, setShowPulseTitle] = useState(false);
 
   const angleRef = useRef(project.startAngle || 0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowPulseTitle((prev) => !prev);
-    }, 5000 + Math.random() * 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   useFrame((state, delta) => {
     if (!ring) return;
@@ -188,7 +180,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
       {/* Floating HTML Title Label (Hidden when any planet is focused) */}
       {!hasSelection && (
         <Html distanceFactor={15} center style={{ pointerEvents: 'none' }}>
-          <div className={`planet-label ${hovered || showPulseTitle ? 'pulse' : ''}`}>
+          <div className={`planet-label ${hovered || showTitle ? 'visible pulse' : ''}`}>
             {project.title}
           </div>
         </Html>

@@ -12,6 +12,7 @@ import { UIOverlay } from './components/UIOverlay';
 export default function App() {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const [targetPlanetPos, setTargetPlanetPos] = useState(null);
+  const [activeTitles, setActiveTitles] = useState([]);
 
   // Prevent double-click zoom across window
   useEffect(() => {
@@ -20,6 +21,18 @@ export default function App() {
     };
     window.addEventListener('dblclick', handleDblClick, { passive: false });
     return () => window.removeEventListener('dblclick', handleDblClick);
+  }, []);
+
+  // Randomly select 1 or 2 planet titles to display every few seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const allIds = SYSTEM_CONFIG.projects.map(p => p.id);
+      const numTitles = Math.floor(Math.random() * 2) + 1; // Pick 1 or 2
+      const shuffled = allIds.sort(() => 0.5 - Math.random());
+      setActiveTitles(shuffled.slice(0, numTitles));
+    }, 4500); // Change every 4.5 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Detect manual dragging to break focus ON RELEASE
@@ -91,7 +104,7 @@ export default function App() {
       {/* 3D WebGL Canvas Layer */}
       <div className="canvas-container">
         <Canvas
-          camera={{ position: [0, 6, 14], fov: 45 }}
+          camera={{ position: [0, 25, 55], fov: 45 }}
           gl={{ antialias: true, alpha: false }}
           onDoubleClick={(e) => e.preventDefault()}
           onPointerMissed={handleReturn}
@@ -136,6 +149,7 @@ export default function App() {
                     onSelect={handleSelect}
                     isSelected={selectedTarget === proj.id}
                     hasSelection={!!selectedTarget}
+                    showTitle={activeTitles.includes(proj.id)}
                     onUpdatePosition={(pos) => setTargetPlanetPos(pos)}
                   />
                 );

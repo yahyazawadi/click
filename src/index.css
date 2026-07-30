@@ -244,8 +244,12 @@ html, body, #root {
   pointer-events: none;
   box-shadow: 0 0 10px rgba(0, 186, 227, 0.3);
   transform: translate(-50%, -140%);
-  opacity: 0.85;
-  transition: opacity 0.3s ease;
+  opacity: 0; /* Invisible by default */
+  transition: opacity 1s ease, box-shadow 1s ease, border-color 1s ease;
+}
+
+.planet-label.visible {
+  opacity: 0.85; /* Soft fade in when randomly selected */
 }
 
 /* Subtle Orbit Title Pulse */
