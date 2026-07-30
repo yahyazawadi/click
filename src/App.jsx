@@ -17,17 +17,23 @@ export default function App() {
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
 
-  // Total indices = 1 (Core) + 8 Projects = 9 total positions
-  const totalIndices = 1 + SYSTEM_CONFIG.projects.length;
+  // Total indices = 1 (Overview) + 1 (Core) + 8 Projects = 10 total positions
+  const totalIndices = 2 + SYSTEM_CONFIG.projects.length;
 
   // Sync scroll index change from Lenis / Wheel
+  // Index 0: Overview Orbit
+  // Index 1: System Core Focused
+  // Index 2..N: Planet Projects
   const handleScrollIndexChange = (index) => {
     setCurrentScrollIndex(index);
     if (index === 0) {
       setSelectedTarget(null);
       setTargetPlanetPos(null);
+    } else if (index === 1) {
+      setSelectedTarget('core');
+      setTargetPlanetPos(null);
     } else {
-      const proj = SYSTEM_CONFIG.projects[index - 1];
+      const proj = SYSTEM_CONFIG.projects[index - 2];
       if (proj) {
         setSelectedTarget(proj.id);
       }
@@ -173,13 +179,13 @@ export default function App() {
       scrollToPlanetIndex(0);
     } else if (id === 'core') {
       setSelectedTarget('core');
-      scrollToPlanetIndex(0);
+      scrollToPlanetIndex(1); // Core is Index 1
     } else {
       // Planet selected -> find index and scroll to it smoothly via Lenis
       setSelectedTarget(id);
       const index = SYSTEM_CONFIG.projects.findIndex((p) => p.id === id);
       if (index !== -1) {
-        scrollToPlanetIndex(index + 1); // Index 0 is Core overview, Projects start at index 1
+        scrollToPlanetIndex(index + 2); // Index 0 = Overview, Index 1 = Core, Projects start at Index 2
       }
     }
   };
