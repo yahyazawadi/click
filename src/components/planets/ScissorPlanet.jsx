@@ -76,10 +76,10 @@ export function ScissorPlanet({ color, size }) {
         />
       </mesh>
 
-      {/* UPPER SHARP 3D SHEAR BLADE & MOULDED HANDLE (Z-Plane Offset: +size * 0.28) */}
+      {/* UPPER SHARP 3D SHEAR BLADE & MOULDED HANDLE (Z-Plane Offset: +size * 0.04) */}
       <group ref={blade1Ref}>
         {/* Tapered Razor Sharp 3D Blade Mesh */}
-        <mesh geometry={sharpBladeGeometry} position={[size * 0.15, 0, size * 0.26]}>
+        <mesh geometry={sharpBladeGeometry} position={[size * 0.15, 0, size * 0.02]}>
           <meshStandardMaterial
             color="#E6F7FF"
             metalness={0.98}
@@ -90,8 +90,8 @@ export function ScissorPlanet({ color, size }) {
         </mesh>
 
         {/* Razor Edge White Glowing Edge Highlight */}
-        <mesh position={[bladeLen * 0.55, -size * 0.05, size * 0.29]} rotation={[0, 0, -Math.PI / 36]}>
-          <boxGeometry args={[bladeLen * 0.85, size * 0.02, size * 0.06]} />
+        <mesh position={[bladeLen * 0.55, -size * 0.05, size * 0.05]} rotation={[0, 0, -Math.PI / 36]}>
+          <boxGeometry args={[bladeLen * 0.85, size * 0.02, size * 0.05]} />
           <meshStandardMaterial
             color="#FCFCFC"
             emissive="#FCFCFC"
@@ -99,10 +99,10 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop - Offset to top layer (Z = +size * 0.30) */}
-        <group position={[-bladeLen * 0.38, size * 0.22, size * 0.30]}>
+        {/* Dark Blue Handle Finger Loop (Z = +size * 0.05) */}
+        <group position={[-bladeLen * 0.38, size * 0.18, size * 0.05]}>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.11, 24, 48]} />
+            <torusGeometry args={[size * 0.38, size * 0.1, 24, 48]} />
             <meshStandardMaterial
               color="#00152B"
               emissive="#002244"
@@ -122,12 +122,12 @@ export function ScissorPlanet({ color, size }) {
         </group>
       </group>
 
-      {/* LOWER SHARP 3D SHEAR BLADE & MOULDED HANDLE (Z-Plane Offset: -size * 0.28) */}
+      {/* LOWER SHARP 3D SHEAR BLADE & MOULDED HANDLE (Z-Plane Offset: -size * 0.05) */}
       <group ref={blade2Ref}>
         {/* Tapered Razor Sharp 3D Blade Mesh (Flipped) */}
         <mesh
           geometry={sharpBladeGeometry}
-          position={[size * 0.15, 0, -size * 0.31]}
+          position={[size * 0.15, 0, -size * 0.07]}
           rotation={[Math.PI, 0, 0]}
         >
           <meshStandardMaterial
@@ -140,8 +140,8 @@ export function ScissorPlanet({ color, size }) {
         </mesh>
 
         {/* Razor Edge White Glowing Edge Highlight */}
-        <mesh position={[bladeLen * 0.55, size * 0.05, -size * 0.29]} rotation={[0, 0, Math.PI / 36]}>
-          <boxGeometry args={[bladeLen * 0.85, size * 0.02, size * 0.06]} />
+        <mesh position={[bladeLen * 0.55, size * 0.05, -size * 0.05]} rotation={[0, 0, Math.PI / 36]}>
+          <boxGeometry args={[bladeLen * 0.85, size * 0.02, size * 0.05]} />
           <meshStandardMaterial
             color="#FCFCFC"
             emissive="#FCFCFC"
@@ -149,10 +149,10 @@ export function ScissorPlanet({ color, size }) {
           />
         </mesh>
 
-        {/* Dark Blue Handle Finger Loop - Offset to bottom layer (Z = -size * 0.30) */}
-        <group position={[-bladeLen * 0.38, -size * 0.22, -size * 0.30]}>
+        {/* Dark Blue Handle Finger Loop (Z = -size * 0.05) */}
+        <group position={[-bladeLen * 0.38, -size * 0.18, -size * 0.05]}>
           <mesh>
-            <torusGeometry args={[size * 0.38, size * 0.11, 24, 48]} />
+            <torusGeometry args={[size * 0.38, size * 0.1, 24, 48]} />
             <meshStandardMaterial
               color="#00152B"
               emissive="#002244"
