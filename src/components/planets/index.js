@@ -7,6 +7,7 @@ import { VortexShellPlanet } from './VortexShellPlanet';
 import { HyperCubePlanet } from './HyperCubePlanet';
 import { BinaryMoonPlanet } from './BinaryMoonPlanet';
 import { ScissorPlanet } from './ScissorPlanet';
+import { NodePlanet } from './NodePlanet';
 
 export {
   SaturnPlanet,
@@ -18,4 +19,5 @@ export {
   HyperCubePlanet,
   BinaryMoonPlanet,
   ScissorPlanet,
+  NodePlanet,
 };

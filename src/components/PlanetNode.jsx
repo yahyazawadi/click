@@ -13,11 +13,12 @@ import {
   HyperCubePlanet,
   BinaryMoonPlanet,
   ScissorPlanet,
+  NodePlanet,
 } from './planets';
 
 // Central mesh dispatcher mapping shapeIndex to dedicated component files
 function ProceduralPlanetMesh({ type, color, size }) {
-  const nodeType = typeof type === 'number' ? Math.abs(type) % 9 : 0;
+  const nodeType = typeof type === 'number' ? Math.abs(type) % 10 : 0;
 
   switch (nodeType) {
     case 0:
@@ -37,8 +38,10 @@ function ProceduralPlanetMesh({ type, color, size }) {
     case 7:
       return <HyperCubePlanet color={color} size={size} />;
     case 8:
-    default:
       return <BinaryMoonPlanet color={color} size={size} />;
+    case 9:
+    default:
+      return <NodePlanet color={color} size={size} />;
   }
 }
 

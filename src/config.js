@@ -182,6 +182,24 @@ export const SYSTEM_CONFIG = {
         'Concurrency: 10,000 Concurrent Streams',
         'Latency: < 10ms Overhead'
       ]
+    },
+    {
+      id: 'proj-9',
+      title: 'QUANTUM NODE MATRIX',
+      ringIndex: 0,
+      shapeIndex: 9,
+      startAngle: 2.0,
+      size: 0.65,
+      color: '#00E5FF',
+      category: 'SPATIAL GEOMETRY',
+      shortDesc: 'Multi-node geodesic lattice with pulsating vertex anchors and quantum energy core.',
+      fullDesc: 'Interactive spatial node planet built with an icosahedral outer lattice, dual counter-rotating interior core, pulsating emissive vertex nodes, and an equatorial energy ring.',
+      tags: ['THREE.JS', 'GEODESIC LATTICE', 'GLSL SHADERS', 'REACT THREE FIBER'],
+      specs: [
+        'Lattice: Icosahedron Wireframe Shell',
+        'Nodes: Independent Pulsating Emissive Spheres',
+        'Core: Counter-Rotating Quantum Octahedron'
+      ]
     }
   ]
 };

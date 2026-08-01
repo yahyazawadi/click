@@ -204,8 +204,9 @@ export default function App() {
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
+            dpr={[1, 1.5]}
             camera={{ position: [0, 25, 55], fov: 45 }}
-            gl={{ antialias: true, alpha: false }}
+            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >
