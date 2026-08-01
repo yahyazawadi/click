@@ -9,15 +9,22 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
   const instancedNodesRef = useRef();
   const instancedHalosRef = useRef();
   const instancedTrisRef = useRef();
+  const instancedDiamondsRef = useRef();
+  const instancedRingsRef = useRef();
 
   const electricBlue = '#0077FF';
   const cyanGlow = '#00E5FF';
+  const brightTurquoise = '#00FFD1';
 
-  // 1. Shared Geometries (memoized ONCE to eliminate duplicate GPU memory allocation)
+  // 1. Shared Geometries (memoized ONCE for zero duplicate memory allocations)
   const pyramidGeom = useMemo(() => new THREE.TetrahedronGeometry(size, 0), [size]);
   const nodeSphereGeom = useMemo(() => new THREE.SphereGeometry(size * 0.18, 12, 12), [size]);
   const haloGeom = useMemo(() => new THREE.SphereGeometry(size * 0.28, 10, 10), [size]);
+  
+  // Floating shapes geometries
   const miniTriGeom = useMemo(() => new THREE.TetrahedronGeometry(1, 0), []);
+  const miniDiamondGeom = useMemo(() => new THREE.OctahedronGeometry(1, 0), []);
+  const miniRingGeom = useMemo(() => new THREE.TorusGeometry(1, 0.15, 8, 24), []);
 
   // Automatic GPU memory cleanup on unmount
   useEffect(() => {
@@ -26,8 +33,10 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
       nodeSphereGeom.dispose();
       haloGeom.dispose();
       miniTriGeom.dispose();
+      miniDiamondGeom.dispose();
+      miniRingGeom.dispose();
     };
-  }, [pyramidGeom, nodeSphereGeom, haloGeom, miniTriGeom]);
+  }, [pyramidGeom, nodeSphereGeom, haloGeom, miniTriGeom, miniDiamondGeom, miniRingGeom]);
 
   // Extract 4 corner vertices
   const cornerVertices = useMemo(() => {
@@ -60,15 +69,15 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
     }
   }, [cornerVertices]);
 
-  // Mini floating triangles data
-  const miniTriangles = useMemo(() => {
+  // Helper generator for orbiting shapes
+  const createOrbitalSwarm = (count, minR, maxR, scaleMin, scaleMax) => {
     const list = [];
-    for (let i = 0; i < 10; i++) {
-      const radius = size * (1.3 + Math.random() * 0.7);
+    for (let i = 0; i < count; i++) {
+      const radius = size * (minR + Math.random() * (maxR - minR));
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
-      const scale = size * (0.08 + Math.random() * 0.06);
-      const speed = 0.4 + Math.random() * 0.6;
+      const scale = size * (scaleMin + Math.random() * (scaleMax - scaleMin));
+      const speed = 0.3 + Math.random() * 0.7;
       const axis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
 
       list.push({
@@ -84,14 +93,19 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
       });
     }
     return list;
-  }, [size]);
+  };
+
+  // Swarms of shapes
+  const miniTriangles = useMemo(() => createOrbitalSwarm(8, 1.2, 1.8, 0.07, 0.12), [size]);
+  const miniDiamonds = useMemo(() => createOrbitalSwarm(6, 1.5, 2.2, 0.06, 0.11), [size]);
+  const miniRings = useMemo(() => createOrbitalSwarm(4, 1.8, 2.5, 0.08, 0.14), [size]);
 
   // Orbiting Sparkles Buffer Geometry
   const sparkPoints = useMemo(() => {
-    const count = 25; // Lightweight particle count
+    const count = 30;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      const r = size * (1.2 + Math.random() * 0.8);
+      const r = size * (1.1 + Math.random() * 1.4);
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
@@ -103,7 +117,7 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
     return geometry;
   }, [size]);
 
-  const dummyTri = useMemo(() => new THREE.Object3D(), []);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -125,22 +139,29 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
       particlesRef.current.rotation.y += delta * 0.15;
     }
 
-    // Animate mini floating triangles via single InstancedMesh (Zero garbage collection!)
-    if (instancedTrisRef.current) {
-      miniTriangles.forEach((tri, i) => {
-        tri.pos.applyAxisAngle(tri.axis, delta * tri.speed);
-        tri.rot.x += delta * 1.2;
-        tri.rot.y += delta * 0.9;
+    // Helper animator for instanced swarms
+    const animateSwarm = (ref, list) => {
+      if (ref.current) {
+        list.forEach((item, i) => {
+          item.pos.applyAxisAngle(item.axis, delta * item.speed);
+          item.rot.x += delta * 1.4;
+          item.rot.y += delta * 1.0;
 
-        dummyTri.position.copy(tri.pos);
-        dummyTri.rotation.copy(tri.rot);
-        dummyTri.scale.setScalar(tri.scale);
-        dummyTri.updateMatrix();
+          dummy.position.copy(item.pos);
+          dummy.rotation.copy(item.rot);
+          dummy.scale.setScalar(item.scale);
+          dummy.updateMatrix();
 
-        instancedTrisRef.current.setMatrixAt(i, dummyTri.matrix);
-      });
-      instancedTrisRef.current.instanceMatrix.needsUpdate = true;
-    }
+          ref.current.setMatrixAt(i, dummy.matrix);
+        });
+        ref.current.instanceMatrix.needsUpdate = true;
+      }
+    };
+
+    // Animate all 3 shape swarms cleanly
+    animateSwarm(instancedTrisRef, miniTriangles);
+    animateSwarm(instancedDiamondsRef, miniDiamonds);
+    animateSwarm(instancedRingsRef, miniRings);
   });
 
   return (
@@ -170,7 +191,7 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
           />
         </mesh>
 
-        {/* 4 Corner Nodes (1 Single InstancedMesh for zero memory bloat) */}
+        {/* 4 Corner Nodes (Single InstancedMesh) */}
         <instancedMesh
           ref={instancedNodesRef}
           args={[nodeSphereGeom, undefined, 4]}
@@ -184,7 +205,7 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
           />
         </instancedMesh>
 
-        {/* Corner Halos (1 Single InstancedMesh) */}
+        {/* Corner Halos (Single InstancedMesh) */}
         <instancedMesh
           ref={instancedHalosRef}
           args={[haloGeom, undefined, 4]}
@@ -208,7 +229,7 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
         </mesh>
       </group>
 
-      {/* Mini Floating Triangles (1 Single InstancedMesh) */}
+      {/* 1. Mini Floating Triangles Swarm */}
       <instancedMesh
         ref={instancedTrisRef}
         args={[miniTriGeom, undefined, miniTriangles.length]}
@@ -216,10 +237,39 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
         <meshStandardMaterial
           color={cyanGlow}
           emissive={cyanGlow}
-          emissiveIntensity={1.0}
+          emissiveIntensity={1.2}
           wireframe
           transparent
-          opacity={0.8}
+          opacity={0.85}
+        />
+      </instancedMesh>
+
+      {/* 2. Mini Floating Octahedron Diamonds Swarm */}
+      <instancedMesh
+        ref={instancedDiamondsRef}
+        args={[miniDiamondGeom, undefined, miniDiamonds.length]}
+      >
+        <meshStandardMaterial
+          color={brightTurquoise}
+          emissive={brightTurquoise}
+          emissiveIntensity={1.4}
+          roughness={0.2}
+          metalness={0.8}
+        />
+      </instancedMesh>
+
+      {/* 3. Mini Floating Spinning Torus Rings Swarm */}
+      <instancedMesh
+        ref={instancedRingsRef}
+        args={[miniRingGeom, undefined, miniRings.length]}
+      >
+        <meshStandardMaterial
+          color={electricBlue}
+          emissive={electricBlue}
+          emissiveIntensity={1.5}
+          wireframe
+          transparent
+          opacity={0.7}
         />
       </instancedMesh>
 
