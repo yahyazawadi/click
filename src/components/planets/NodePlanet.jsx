@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
+export function NodePlanet({ color = '#00E5FF', size = 0.6, isFocused = false }) {
   const pyramidRef = useRef();
   const innerCoreRef = useRef();
   const particlesRef = useRef();
@@ -132,9 +132,16 @@ export function NodePlanet({ color = '#00E5FF', size = 0.6 }) {
         tri.rot.x += delta * 1.2;
         tri.rot.y += delta * 0.9;
 
+        const targetScale = isFocused ? tri.scale : 0;
+        if (tri.currentScale === undefined) {
+          tri.currentScale = targetScale;
+        }
+        // Use a much slower lerp factor for a gradual fade in/out
+        tri.currentScale = THREE.MathUtils.lerp(tri.currentScale, targetScale, delta * 1.5);
+
         dummyTri.position.copy(tri.pos);
         dummyTri.rotation.copy(tri.rot);
-        dummyTri.scale.setScalar(tri.scale);
+        dummyTri.scale.setScalar(tri.currentScale);
         dummyTri.updateMatrix();
 
         instancedTrisRef.current.setMatrixAt(i, dummyTri.matrix);

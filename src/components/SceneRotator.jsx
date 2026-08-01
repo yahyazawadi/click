@@ -33,6 +33,13 @@ export function SceneRotator({ children, disabled = false }) {
   const mouseDelta = useRef({ x: 0, y: 0 });
   const touchCount = useRef(0);
 
+  // Pre-allocate objects for rotation math
+  const qY = useRef(new THREE.Quaternion());
+  const qX = useRef(new THREE.Quaternion());
+  const qSpin = useRef(new THREE.Quaternion());
+  const axisY = useRef(new THREE.Vector3(0, 1, 0));
+  const axisX = useRef(new THREE.Vector3(1, 0, 0));
+
   useEffect(() => {
     const canvas = gl.domElement;
 
@@ -110,8 +117,8 @@ export function SceneRotator({ children, disabled = false }) {
       // Negative delta forces rotation to spin counter-clockwise
       const frameDelta = -(easeCurr - easePrev) * totalSpin;
 
-      const qSpin = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), frameDelta);
-      targetQuaternion.current.premultiply(qSpin);
+      qSpin.current.setFromAxisAngle(axisY.current, frameDelta);
+      targetQuaternion.current.premultiply(qSpin.current);
       groupRef.current.quaternion.copy(targetQuaternion.current);
       return;
     }
@@ -138,9 +145,9 @@ export function SceneRotator({ children, disabled = false }) {
 
       // 3. Apply immediate incremental rotation
       if (Math.abs(angleX) > 0 || Math.abs(angleY) > 0) {
-        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angleX);
-        const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angleY);
-        targetQuaternion.current.premultiply(qX).premultiply(qY);
+        qY.current.setFromAxisAngle(axisY.current, angleX);
+        qX.current.setFromAxisAngle(axisX.current, angleY);
+        targetQuaternion.current.premultiply(qX.current).premultiply(qY.current);
       }
 
       // 4. INSTANT 1:1 tracking during active drag
@@ -148,10 +155,10 @@ export function SceneRotator({ children, disabled = false }) {
     } else {
       // Apply inertia & smooth damping when let go
       if (Math.abs(velocity.current.x) > 0.0001 || Math.abs(velocity.current.y) > 0.0001) {
-        const qY = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), velocity.current.x);
-        const qX = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), velocity.current.y);
+        qY.current.setFromAxisAngle(axisY.current, velocity.current.x);
+        qX.current.setFromAxisAngle(axisX.current, velocity.current.y);
 
-        targetQuaternion.current.premultiply(qX).premultiply(qY);
+        targetQuaternion.current.premultiply(qX.current).premultiply(qY.current);
 
         velocity.current.x *= 0.93;
         velocity.current.y *= 0.93;

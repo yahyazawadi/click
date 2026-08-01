@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import { SYSTEM_CONFIG } from './config';
 import { CosmicBackground } from './components/CosmicBackground';
@@ -12,7 +13,7 @@ import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScro
 
 export default function App() {
   const [selectedTarget, setSelectedTarget] = useState(null);
-  const [targetPlanetPos, setTargetPlanetPos] = useState(null);
+  const targetPlanetPosRef = useRef(new THREE.Vector3());
   const [activeTitles, setActiveTitles] = useState([]);
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
@@ -28,10 +29,8 @@ export default function App() {
     setCurrentScrollIndex(index);
     if (index === 0) {
       setSelectedTarget(null);
-      setTargetPlanetPos(null);
     } else if (index === 1) {
       setSelectedTarget('core');
-      setTargetPlanetPos(null);
     } else {
       const proj = SYSTEM_CONFIG.projects[index - 2];
       if (proj) {
@@ -83,7 +82,6 @@ export default function App() {
 
         if (ratio > 1.2) {
           setSelectedTarget(null);
-          setTargetPlanetPos(null);
           scrollToPlanetIndex(0);
         }
 
@@ -154,7 +152,6 @@ export default function App() {
         const dy = Math.abs(currentY - startY);
         if (dx > 25 || dy > 25) {
           setSelectedTarget(null);
-          setTargetPlanetPos(null);
           scrollToPlanetIndex(0);
         }
       }
@@ -175,7 +172,6 @@ export default function App() {
     if (selectedTarget === id) {
       // Toggle back to system overview (Index 0)
       setSelectedTarget(null);
-      setTargetPlanetPos(null);
       scrollToPlanetIndex(0);
     } else if (id === 'core') {
       setSelectedTarget('core');
@@ -192,7 +188,6 @@ export default function App() {
 
   const handleReturn = () => {
     setSelectedTarget(null);
-    setTargetPlanetPos(null);
     scrollToPlanetIndex(0);
   };
 
@@ -243,14 +238,14 @@ export default function App() {
                       isSelected={selectedTarget === proj.id}
                       hasSelection={!!selectedTarget}
                       showTitle={activeTitles.includes(proj.id)}
-                      onUpdatePosition={(pos) => setTargetPlanetPos(pos)}
+                      targetPlanetPosRef={targetPlanetPosRef}
                     />
                   );
                 })}
               </SceneRotator>
 
               {/* Camera Zoom & Motion Controller */}
-              <CameraController selectedTarget={selectedTarget} targetPosition={targetPlanetPos} zoomFactor={zoomFactor} />
+              <CameraController selectedTarget={selectedTarget} targetPlanetPosRef={targetPlanetPosRef} zoomFactor={zoomFactor} />
             </Suspense>
           </Canvas>
         </div>

@@ -17,7 +17,7 @@ import {
 } from './planets';
 
 // Central mesh dispatcher mapping shapeIndex to dedicated component files
-function ProceduralPlanetMesh({ type, color, size }) {
+function ProceduralPlanetMesh({ type, color, size, isSelected }) {
   const nodeType = typeof type === 'number' ? Math.abs(type) % 10 : 0;
 
   switch (nodeType) {
@@ -41,15 +41,20 @@ function ProceduralPlanetMesh({ type, color, size }) {
       return <BinaryMoonPlanet color={color} size={size} />;
     case 9:
     default:
-      return <NodePlanet color={color} size={size} />;
+      return <NodePlanet color={color} size={size} isFocused={isSelected} />;
   }
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, onUpdatePosition }) {
+export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
 
   const angleRef = useRef(project.startAngle || 0);
+
+  // Pre-allocate objects to prevent Garbage Collection pauses
+  const localPos = useRef(new THREE.Vector3());
+  const euler = useRef(new THREE.Euler());
+  const worldPos = useRef(new THREE.Vector3());
 
   useFrame((state, delta) => {
     if (!ring) return;
@@ -59,17 +64,16 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
     const theta = angleRef.current;
     const r = ring.radius;
 
-    const localPos = new THREE.Vector3(Math.cos(theta) * r, 0, Math.sin(theta) * r);
-    const euler = new THREE.Euler(ring.tiltX || 0, ring.tiltY || 0, ring.tiltZ || 0);
-    localPos.applyEuler(euler);
+    localPos.current.set(Math.cos(theta) * r, 0, Math.sin(theta) * r);
+    euler.current.set(ring.tiltX || 0, ring.tiltY || 0, ring.tiltZ || 0);
+    localPos.current.applyEuler(euler.current);
 
     if (groupRef.current) {
-      groupRef.current.position.copy(localPos);
+      groupRef.current.position.copy(localPos.current);
 
-      if (isSelected && onUpdatePosition) {
-        const worldPos = new THREE.Vector3();
-        groupRef.current.getWorldPosition(worldPos);
-        onUpdatePosition(worldPos);
+      if (isSelected && targetPlanetPosRef) {
+        groupRef.current.getWorldPosition(worldPos.current);
+        targetPlanetPosRef.current.copy(worldPos.current);
       }
     }
   });
@@ -99,6 +103,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
         type={shapeIndex}
         color={planetColor}
         size={project.size || 0.5}
+        isSelected={isSelected}
       />
 
       {/* Floating HTML Title Label */}
