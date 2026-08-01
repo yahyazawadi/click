@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -49,6 +49,11 @@ export function ScissorPlanet({ color, size }) {
 
     return new THREE.ExtrudeGeometry(shape, extrudeSettings);
   }, [bladeLen, size]);
+
+  // Clean up geometry from GPU memory on unmount
+  useEffect(() => {
+    return () => sharpBladeGeometry.dispose();
+  }, [sharpBladeGeometry]);
 
   return (
     <group ref={meshRef} rotation={[Math.PI / 4, Math.PI / 6, 0]}>

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -71,6 +71,11 @@ export function MobiusPlanet({ color, size }) {
     geom.computeVertexNormals();
     return geom;
   }, [size]);
+
+  // Clean up geometry from GPU memory on unmount
+  useEffect(() => {
+    return () => mobiusGeometry.dispose();
+  }, [mobiusGeometry]);
 
   return (
     <group>
