@@ -123,6 +123,10 @@ export function SceneRotator({ children, disabled = false }) {
       return;
     }
 
+    // Align rotation axes with the screen (camera's local Right and Up) to prevent axis misalignment
+    axisX.current.set(1, 0, 0).applyQuaternion(_state.camera.quaternion);
+    axisY.current.set(0, 1, 0).applyQuaternion(_state.camera.quaternion);
+
     if (dragging.current) {
       // 1. Process accumulated mouse movements for this frame
       const sensitivity = 2.2;
