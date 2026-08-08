@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Dark Core Radial Flare for Light Mode (Pops on White Tabs) -->
+    <radialGradient id="coreEnergyLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#001430" />
+      <stop offset="35%" stop-color="#002b5c" />
+      <stop offset="70%" stop-color="#004b87" />
+      <stop offset="100%" stop-color="#006bb3" />
+    </radialGradient>
+
+    <!-- Dark Atmosphere Gradient for Light Mode -->
+    <radialGradient id="coreAtmosphereLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#003268" stop-opacity="0.3" />
+      <stop offset="60%" stop-color="#004b87" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#004b87" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Node Glow Gradients for Light Mode -->
+    <radialGradient id="nodeDarkBlueGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#001430" stop-opacity="1" />
+      <stop offset="40%" stop-color="#003268" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#003268" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <g transform="translate(256, 256)">
+    <!-- Ambient Core Atmosphere -->
+    <circle cx="0" cy="0" r="256" fill="url(#coreAtmosphereLight)" />
+
+    <!-- ========================================== -->
+    <!-- 1. BACK ARCS (PASSING BEHIND CENTRAL CORE) -->
+    <!-- ========================================== -->
+
+    <!-- Ring 2 (Outer Tilted Orbital Path - Back Arc) -->
+    <g transform="rotate(35)">
+      <path d="M -270 0 A 270 100 0 0 1 270 0" fill="none" stroke="#003268" stroke-width="14" stroke-linecap="butt" opacity="0.9" />
+    </g>
+
+    <!-- Ring 1 (Inner Bright Orbital Path - Back Arc) -->
+    <g transform="rotate(-15)">
+      <path d="M -220 0 A 220 78 0 0 1 220 0" fill="none" stroke="#001f4d" stroke-width="16" stroke-linecap="butt" opacity="0.95" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- 2. CENTRAL CORE PLANET SPHERE              -->
+    <!-- ========================================== -->
+    <circle cx="0" cy="0" r="135" fill="url(#coreEnergyLight)" />
+
+    <!-- ========================================== -->
+    <!-- 3. FRONT ARCS (PASSING IN FRONT OF CORE)   -->
+    <!-- ========================================== -->
+
+    <!-- Ring 1 (Inner Bright Orbital Path - Front Arc) -->
+    <g transform="rotate(-15)">
+      <path d="M 220 0 A 220 78 0 0 1 -220 0" fill="none" stroke="#001f4d" stroke-width="16" stroke-linecap="butt" opacity="0.95" />
+      <!-- Node on Ring 1 (Front Right) -->
+      <circle cx="216" cy="0" r="40" fill="url(#nodeDarkBlueGlow)" />
+      <circle cx="216" cy="0" r="16" fill="#001430" />
+      <circle cx="216" cy="0" r="7" fill="#00e5ff" />
+    </g>
+
+    <!-- Ring 2 (Outer Tilted Orbital Path - Front Arc) -->
+    <g transform="rotate(35)">
+      <path d="M 270 0 A 270 100 0 0 1 -270 0" fill="none" stroke="#003268" stroke-width="14" stroke-linecap="butt" opacity="0.9" />
+      
+      <!-- Node 1: Top-Left Node on Ring 2 -->
+      <circle cx="-270" cy="0" r="35" fill="url(#nodeDarkBlueGlow)" />
+      <circle cx="-270" cy="0" r="14" fill="#002244" />
+      <circle cx="-270" cy="0" r="6" fill="#00e5ff" />
+
+      <!-- Node 2: Bottom-Right Node on Ring 2 -->
+      <circle cx="270" cy="0" r="35" fill="url(#nodeDarkBlueGlow)" />
+      <circle cx="270" cy="0" r="14" fill="#002244" />
+      <circle cx="270" cy="0" r="6" fill="#00e5ff" />
+    </g>
+
+    <!-- Center Core Emblem Crosshair Rings -->
+    <circle cx="0" cy="0" r="46" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.85" />
+    <circle cx="0" cy="0" r="26" fill="url(#nodeDarkBlueGlow)" />
+    <circle cx="0" cy="0" r="10" fill="#00e5ff" />
+  </g>
+</svg>
