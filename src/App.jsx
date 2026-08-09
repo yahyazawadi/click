@@ -10,6 +10,7 @@ import { CameraController } from './components/CameraController';
 import { SceneRotator } from './components/SceneRotator';
 import { UIOverlay } from './components/UIOverlay';
 import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScrollProvider';
+import { FaviconAnimator } from './components/FaviconAnimator';
 
 export default function App() {
   const [selectedTarget, setSelectedTarget] = useState(null);
@@ -256,6 +257,9 @@ export default function App() {
           selectedProject={selectedProject}
           onReturn={handleReturn}
         />
+
+        {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
+        <FaviconAnimator />
       </div>
     </LenisScrollProvider>
   );

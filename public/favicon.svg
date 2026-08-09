@@ -16,7 +16,7 @@
       <stop offset="100%" stop-color="#00bae3" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Node Glow Gradients (Vector Radial - 100% Circular, Zero Box Artifacts) -->
+    <!-- Node Glow Gradients -->
     <radialGradient id="nodeCyanGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
       <stop offset="30%" stop-color="#00f0ff" stop-opacity="0.9" />
@@ -40,8 +40,10 @@
   </defs>
 
   <g transform="translate(256, 256)">
-    <!-- Ambient Planet Core Atmosphere Glow (Extends to exact top & bottom bounds: 256px radius) -->
-    <circle cx="0" cy="0" r="256" fill="url(#coreAtmosphere)" />
+    <!-- Ambient Planet Core Atmosphere Glow -->
+    <circle cx="0" cy="0" r="256" fill="url(#coreAtmosphere)">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite" />
+    </circle>
 
     <!-- ========================================== -->
     <!-- 1. BACK ARCS (PASSING BEHIND CENTRAL CORE) -->
@@ -58,41 +60,68 @@
     </g>
 
     <!-- ========================================== -->
-    <!-- 2. CENTRAL CORE PLANET SPHERE (MAXIMIZED)  -->
+    <!-- 2. CENTRAL CORE PLANET SPHERE (VISIBLY ROTATING) -->
     <!-- ========================================== -->
-    <circle cx="0" cy="0" r="135" fill="url(#coreEnergy)" />
+    <g>
+      <!-- Core Energy Sphere Base -->
+      <circle cx="0" cy="0" r="135" fill="url(#coreEnergy)" />
 
-    <!-- ========================================== -->
-    <!-- 3. FRONT ARCS (PASSING IN FRONT OF CORE)   -->
-    <!-- ========================================== -->
+      <!-- Surface Details & Energy Filaments (Stationary Core) -->
+      <g>
+        
+        <!-- Curved Energy Swirl Filaments -->
+        <path d="M -100 -35 Q -35 -90 35 -100 Q 90 -35 100 35 Q 35 90 -35 100 Q -90 35 -100 -35 Z" fill="none" stroke="#00f0ff" stroke-width="7" opacity="0.65" stroke-dasharray="25 15 35 10" />
+        <path d="M -80 25 Q 0 -80 80 -25 Q 0 80 -80 25 Z" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.8" stroke-dasharray="15 15" />
+        
+        <!-- 4 Core Energy Surface Orbs -->
+        <circle cx="0" cy="-80" r="13" fill="#ffffff" />
+        <circle cx="80" cy="0" r="11" fill="#00f0ff" />
+        <circle cx="0" cy="80" r="13" fill="#ffffff" />
+        <circle cx="-80" cy="0" r="11" fill="#00f0ff" />
 
-    <!-- Ring 1 (Inner Bright Orbital Path - Front Arc) -->
-    <g transform="rotate(-15)">
-      <path d="M 220 0 A 220 78 0 0 1 -220 0" fill="none" stroke="#00f0ff" stroke-width="16" stroke-linecap="butt" opacity="0.95" />
-      <!-- Node on Ring 1 (Front Right) -->
-      <circle cx="216" cy="0" r="40" fill="url(#nodeCyanGlow)" />
-      <circle cx="216" cy="0" r="16" fill="#00f0ff" />
-      <circle cx="216" cy="0" r="7" fill="#ffffff" />
+        <!-- Rotating Core Emblem Crosshair Star -->
+        <circle cx="0" cy="0" r="46" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.9" />
+        <polygon points="0,-32 9,-9 32,0 9,9 0,32 -9,9 -32,0 -9,-9" fill="#00f0ff" opacity="0.9" />
+        <circle cx="0" cy="0" r="11" fill="#ffffff" />
+      </g>
     </g>
 
-    <!-- Ring 2 (Outer Tilted Orbital Path - Front Arc) -->
+    <!-- ========================================== -->
+    <!-- 3. FRONT ARCS & ANIMATED MOVING PLANETS    -->
+    <!-- ========================================== -->
+
+    <!-- Ring 1 (Inner Bright Orbital Path - Front Arc & Moving Planet) -->
+    <g transform="rotate(-15)">
+      <path d="M 220 0 A 220 78 0 0 1 -220 0" fill="none" stroke="#00f0ff" stroke-width="16" stroke-linecap="butt" opacity="0.95" />
+      
+      <!-- Planet Node 1 moving slowly along Ring 1 -->
+      <g>
+        <animateMotion dur="14s" repeatCount="indefinite" path="M 220 0 A 220 78 0 1 1 -220 0 A 220 78 0 1 1 220 0" />
+        <circle cx="0" cy="0" r="40" fill="url(#nodeCyanGlow)" />
+        <circle cx="0" cy="0" r="16" fill="#00f0ff" />
+        <circle cx="0" cy="0" r="7" fill="#ffffff" />
+      </g>
+    </g>
+
+    <!-- Ring 2 (Outer Tilted Orbital Path - Front Arc & Moving Planets) -->
     <g transform="rotate(35)">
       <path d="M 270 0 A 270 100 0 0 1 -270 0" fill="none" stroke="#5dbae1" stroke-width="14" stroke-linecap="butt" opacity="0.9" />
       
-      <!-- Node 1: Top-Left Node on Ring 2 (Extends to exact left edge: -270 + 35 = -235 -> -256px relative to center) -->
-      <circle cx="-270" cy="0" r="35" fill="url(#nodeBlueGlow)" />
-      <circle cx="-270" cy="0" r="14" fill="#5dbae1" />
-      <circle cx="-270" cy="0" r="6" fill="#ffffff" />
+      <!-- Planet Node 1 moving slowly on Ring 2 -->
+      <g>
+        <animateMotion dur="20s" repeatCount="indefinite" path="M -270 0 A 270 100 0 1 1 270 0 A 270 100 0 1 1 -270 0" />
+        <circle cx="0" cy="0" r="35" fill="url(#nodeBlueGlow)" />
+        <circle cx="0" cy="0" r="14" fill="#5dbae1" />
+        <circle cx="0" cy="0" r="6" fill="#ffffff" />
+      </g>
 
-      <!-- Node 2: Bottom-Right Node on Ring 2 (Extends to exact right edge: +270 - 35 = +235 -> +256px relative to center) -->
-      <circle cx="270" cy="0" r="35" fill="url(#nodeDeepCyanGlow)" />
-      <circle cx="270" cy="0" r="14" fill="#00bae3" />
-      <circle cx="270" cy="0" r="6" fill="#ffffff" />
+      <!-- Planet Node 2 moving slowly on Ring 2 -->
+      <g>
+        <animateMotion dur="20s" repeatCount="indefinite" path="M 270 0 A 270 100 0 1 1 -270 0 A 270 100 0 1 1 270 0" />
+        <circle cx="0" cy="0" r="35" fill="url(#nodeDeepCyanGlow)" />
+        <circle cx="0" cy="0" r="14" fill="#00bae3" />
+        <circle cx="0" cy="0" r="6" fill="#ffffff" />
+      </g>
     </g>
-
-    <!-- Center Core Emblem Crosshair Rings -->
-    <circle cx="0" cy="0" r="46" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.75" />
-    <circle cx="0" cy="0" r="26" fill="url(#nodeCyanGlow)" />
-    <circle cx="0" cy="0" r="10" fill="#ffffff" />
   </g>
 </svg>
