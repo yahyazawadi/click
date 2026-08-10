@@ -9,7 +9,7 @@ export const NebulaMaterial = shaderMaterial(
     uColorSII:  new THREE.Color('#ff4500'), // Sulfur-II  — warm orange-red (SII emission 673nm)
     uColorHa:   new THREE.Color('#c0001a'), // H-alpha    — deep crimson  (Ha  emission 656nm)
     uColorOIII: new THREE.Color('#00b4c8'), // OIII       — ionized teal  (OIII emission 501nm)
-    uColorCore: new THREE.Color('#ffe8c0'), // Hot core   — near-white yellow (ionization front)
+    uColorCore: new THREE.Color('#00e5ff'), // Hot core   — electric cyan (portfolio orbit color)
     uScale: 3.5,
     uWarp: 2.5,
     uMaskRadius: 0.38,
@@ -188,9 +188,9 @@ export const NebulaMaterial = shaderMaterial(
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
       float qLen     = length(q);
 
-      // Deep indigo floor: dust-absorbed lanes glow indigo, never grey
-      // This is the KEY fix — vec3(0.04, 0.0, 0.12) = near-black rich indigo
-      vec3 dustLaneColor = vec3(0.04, 0.0, 0.14) + uColorOIII * 0.08;
+      // Saturated violet floor: dust lanes glow deep violet, never grey
+      // uColorOIII tinted heavily so even darkest absorbed regions stay vivid
+      vec3 dustLaneColor = uColorOIII * 0.25 + uColorHa * 0.12;
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
@@ -210,11 +210,13 @@ export const NebulaMaterial = shaderMaterial(
       // 8. Embedded young star field
       //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
       float stars = starField(vUv, uStarCount, uTime);
-      // Stars only show where there IS gas (inside nebula) and are brightest on dust pillars
+      // Stars: electric cyan <-> hot violet — zero grey, fully on-palette
       float starMask = organicMask * planeEdgeFade;
-      vec3 starColor = mix(vec3(0.9, 0.95, 1.0), vec3(1.0, 0.9, 0.7),
-                           hash1(floor(vUv * uStarCount))); // warm/cool mix per star
-      col = mix(col, col + starColor * 1.8, stars * starMask);
+      float starHue = hash1(floor(vUv * uStarCount));
+      vec3 starColor = mix(vec3(0.0, 0.88, 1.0),   // electric cyan  #00e0ff
+                           vec3(0.72, 0.0,  1.0),   // hot violet     #b800ff
+                           starHue);
+      col = mix(col, col + starColor * 2.0, stars * starMask);
 
       // 9. Final alpha
       float alpha = clamp(finalDensity * organicMask * planeEdgeFade * uAlpha, 0.0, 1.0);

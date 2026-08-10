@@ -30,7 +30,7 @@ export function DualNebulaBackground() {
           uColorSII={new THREE.Color('#9900cc')}   // Dense magenta knots (replaces SII orange)
           uColorHa={new THREE.Color('#c40045')}    // Vivid crimson body  (portfolio hero color)
           uColorOIII={new THREE.Color('#5500bb')}  // Electric violet outer shell
-          uColorCore={new THREE.Color('#c0f0ff')}  // Pale cyan-white ionization core
+          uColorCore={new THREE.Color('#00e5ff')}  // Electric cyan core (portfolio orbit color)
           uScale={3.2}
           uWarp={2.6}
           uMaskRadius={0.38}
@@ -60,7 +60,7 @@ export function DualNebulaBackground() {
           uColorSII={new THREE.Color('#00c8e8')}   // Electric cyan dense regions
           uColorHa={new THREE.Color('#8800dd')}    // Deep violet body
           uColorOIII={new THREE.Color('#cc007a')}  // Magenta outer shell
-          uColorCore={new THREE.Color('#e8f8ff')}  // Near-white hot core
+          uColorCore={new THREE.Color('#00e5ff')}  // Electric cyan core (portfolio orbit color)
           uScale={4.5}
           uWarp={3.8}
           uMaskRadius={0.35}
