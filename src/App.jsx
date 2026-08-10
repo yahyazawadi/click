@@ -13,16 +13,49 @@ import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScro
 import { FaviconAnimator } from './components/FaviconAnimator';
 import { BatteryWarning } from './components/BatteryWarning';
 import { PerformanceWarning } from './components/PerformanceWarning';
+import { FpsProfilerOverlay } from './components/FpsProfilerOverlay';
+import { fpsLogger } from './utils/fpsLogger';
 
 import { useFrame } from '@react-three/fiber';
 
-// FPS-Stabilized Progressive Planet Unloader / Loader Controller
-function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate }) {
+// FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount }) {
   const stableTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
+  const frameDeltas = useRef([]);
+  const lastSnapshotTime = useRef(Date.now());
+  const batteryRef = useRef({ charging: 'unknown', level: 'unknown' });
+
+  // Battery status tracking for telemetry snapshots
+  useEffect(() => {
+    if ('getBattery' in navigator) {
+      navigator.getBattery().then((b) => {
+        batteryRef.current = { charging: b.charging, level: b.level };
+        b.addEventListener('chargingchange', () => { batteryRef.current.charging = b.charging; });
+        b.addEventListener('levelchange', () => { batteryRef.current.level = b.level; });
+      }).catch(() => {});
+    }
+  }, []);
 
   useFrame((_state, delta) => {
+    const frameMs = delta * 1000;
+    frameDeltas.current.push(frameMs);
+    if (frameDeltas.current.length > 300) {
+      frameDeltas.current.shift();
+    }
+
+    // Capture STUTTER_EVENT if single frame exceeds 33.3ms (below 30 FPS)
+    if (delta > 0.0333) {
+      fpsLogger.logStutterEvent({
+        frameDurationMs: frameMs,
+        selectedTarget,
+        unlockedCount,
+        batteryStatus: batteryRef.current,
+        isMobile
+      });
+    }
+
     // Rule: On phone, FPS must stay above 30 FPS (delta <= 0.034s) continuously for 2.0 seconds
     // On desktop, FPS must stay above 45 FPS (delta <= 0.022s) continuously for 0.25 seconds
     const thresholdDelta = isMobile ? 0.034 : 0.022;
@@ -31,19 +64,51 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate }) {
     if (delta <= thresholdDelta) {
       stableTimer.current += delta;
     } else {
-      // Reset timer to 0 if FPS dips below threshold
       stableTimer.current = 0;
     }
 
     fpsAcc.current += delta;
     frameCount.current += 1;
 
-    // Report live FPS every 0.3s to UI Overlay
+    // Every 0.3s: calculate live FPS & 1% lows
     if (fpsAcc.current >= 0.3) {
-      const fps = Math.round(frameCount.current / fpsAcc.current);
-      onFpsUpdate(fps);
+      const liveFps = Math.round(frameCount.current / fpsAcc.current);
+      
+      // Calculate 1% Low FPS
+      const sortedDeltas = [...frameDeltas.current].sort((a, b) => b - a);
+      const onePercentIndex = Math.max(1, Math.floor(sortedDeltas.length * 0.01));
+      const worstFrameMs = sortedDeltas[onePercentIndex - 1] || 16.6;
+      const onePercentLow = Math.round(1000 / worstFrameMs);
+
+      onFpsUpdate(liveFps);
+      onMetricsUpdate({
+        onePercentLow,
+        stutterCount: fpsLogger.stutterEvents.length
+      });
+
       fpsAcc.current = 0;
       frameCount.current = 0;
+    }
+
+    // Every 1.0s: log snapshot to telemetry buffer
+    const now = Date.now();
+    if (now - lastSnapshotTime.current >= 1000) {
+      const avgMs = frameDeltas.current.reduce((a, b) => a + b, 0) / (frameDeltas.current.length || 1);
+      const maxMs = Math.max(...frameDeltas.current, 16.6);
+      const liveFps = Math.round(1000 / avgMs);
+
+      fpsLogger.logSnapshot({
+        fps: liveFps,
+        onePercentLow: Math.round(1000 / maxMs),
+        avgFrameTimeMs: avgMs,
+        maxFrameTimeMs: maxMs,
+        selectedTarget,
+        unlockedCount,
+        batteryStatus: batteryRef.current,
+        isMobile
+      });
+
+      lastSnapshotTime.current = now;
     }
 
     // Unlock next planet once FPS has stayed continuously stable for requiredDuration
@@ -65,6 +130,9 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [unlockedCount, setUnlockedCount] = useState(2); // Priority 1: Core & Scissor planets start unlocked immediately
   const [currentFps, setCurrentFps] = useState(60);
+  const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
+  const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
+  const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
   
   // Track if any warning was dismissed this session to prevent spamming
   const [warningDismissed, setWarningDismissed] = useState(() => 
@@ -285,17 +353,20 @@ export default function App() {
             <pointLight position={[-12, -12, -12]} intensity={0.6} color={SYSTEM_CONFIG.colors.deepShadow} />
 
             <Suspense fallback={null}>
-              {/* Dynamic FPS-Stabilized Progressive Planet Unlocker */}
+              {/* Dynamic FPS-Stabilized Progressive Planet Unlocker & Telemetry Observer */}
               <ProgressivePlanetController
                 onUnlockNext={handleUnlockNext}
                 isMobile={isMobile}
                 onFpsUpdate={setCurrentFps}
+                onMetricsUpdate={setMetrics}
+                selectedTarget={selectedTarget}
+                unlockedCount={unlockedCount}
               />
 
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} />
+                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} />
 
                 {/* Central Sphere Core */}
                 <SystemCore isMobile={isMobile} onSelect={handleSelect} />
@@ -345,7 +416,21 @@ export default function App() {
         />
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
-        <FaviconAnimator isMobile={isMobile} />
+        <FaviconAnimator isMobile={isMobile} enabled={isFaviconEnabled} />
+
+        {/* Real-Time FPS Profiler & 1-Click JSON/CSV Exporter HUD */}
+        <FpsProfilerOverlay
+          currentFps={currentFps}
+          onePercentLow={metrics.onePercentLow}
+          stutterCount={metrics.stutterCount}
+          isMobile={isMobile}
+          selectedTarget={selectedTarget}
+          unlockedCount={unlockedCount}
+          isFaviconEnabled={isFaviconEnabled}
+          isNebulaEnabled={isNebulaEnabled}
+          onToggleFavicon={() => setIsFaviconEnabled((prev) => !prev)}
+          onToggleNebula={() => setIsNebulaEnabled((prev) => !prev)}
+        />
 
         {/* Battery / Low Power Warning UI */}
         <BatteryWarning isDismissed={warningDismissed} onDismiss={handleDismissWarning} />

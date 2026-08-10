@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
-export function FaviconAnimator({ isMobile }) {
+export function FaviconAnimator({ isMobile = false, enabled = true }) {
   useEffect(() => {
     // Mobile browsers ignore animated tab favicons; skip timer to save battery
-    if (isMobile) return;
+    if (isMobile || !enabled) return;
 
     // Hidden Canvas for rendering favicon frames
     const canvas = document.createElement('canvas');
@@ -285,7 +285,7 @@ export function FaviconAnimator({ isMobile }) {
         mediaQuery.removeEventListener('change', handleThemeChange);
       }
     };
-  }, []);
+  }, [isMobile, enabled]);
 
   return null;
 }
