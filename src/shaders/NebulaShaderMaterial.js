@@ -168,40 +168,24 @@ export const NebulaMaterial = shaderMaterial(
       float density = fbm(uv + uWarp * r);
       float gasDensity = smoothstep(0.0, 0.5, density);
 
-      // 4. Dust absorption lanes — absorbed regions emit deep indigo, NOT grey
-      vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
-      float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
-      float absorption = pow(dustField, 2.5) * uDustStrength;
-      // Reduce absorption strength — lanes are thinner and more atmospheric
-      float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity * 0.75);
-      // dustAbsorption amount (0=clear gas, 1=fully absorbed lane)
-      float dustLaneMask = clamp(absorption * gasDensity * 1.6, 0.0, 1.0);
-
-      // 5. Pillar structures
+      // 4. Gas Density & Pillar Structures
       vec2 pillarUv = centeredUv * 3.0;
       float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.14, 1.0);
       float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.11, 0.85);
       float pillars = (p1 + p2 * 0.75) * uPillarStrength;
-      float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
+      float finalDensity = clamp(gasDensity + pillars * organicMask, 0.0, 1.0);
 
-      // 6. Color science — portfolio palette
+      // 5. Pure Saturated Color Science (No dust absorption desaturation / grey channels)
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
       float qLen     = length(q);
 
-      // Saturated violet floor: dust lanes glow deep violet, never grey
-      // uColorOIII tinted heavily so even darkest absorbed regions stay vivid
-      vec3 dustLaneColor = uColorOIII * 0.25 + uColorHa * 0.12;
-
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
+      col = mix(col, uColorHa,   smoothstep(0.15, 0.65, finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.55, 0.90, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.80, 1.0,  finalDensity) + coreGlow * 0.4);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
 
-      // Blend in indigo dust lane color so absorbed areas are rich, not grey
-      col = mix(col, dustLaneColor, dustLaneMask * 0.7);
-
-      // 7. Volumetric scatter halo (soft inner glow)
+      // 6. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
       col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
