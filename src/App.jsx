@@ -26,7 +26,9 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
   const lowFpsTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
-  const frameDeltas = useRef([]);
+  const frameDeltas = useRef(new Float32Array(300));
+  const ringIdx = useRef(0);
+  const sampleCount = useRef(0);
   const lastSnapshotTime = useRef(Date.now());
   const batteryRef = useRef({ charging: 'unknown', level: 'unknown' });
 
@@ -43,10 +45,11 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
 
   useFrame((_state, delta) => {
     const frameMs = delta * 1000;
-    frameDeltas.current.push(frameMs);
-    if (frameDeltas.current.length > 300) {
-      frameDeltas.current.shift();
-    }
+    
+    // Ring buffer write — zero allocation, zero array shifting
+    frameDeltas.current[ringIdx.current] = frameMs;
+    ringIdx.current = (ringIdx.current + 1) % 300;
+    if (sampleCount.current < 300) sampleCount.current += 1;
 
     const renderInfo = _state.gl?.info?.render ? {
       calls: _state.gl.info.render.calls,
@@ -98,10 +101,11 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     if (fpsAcc.current >= 0.3) {
       const liveFps = Math.round(frameCount.current / fpsAcc.current);
       
-      // Calculate 1% Low FPS — simple O(n) max scan, zero allocation, no mutation
+      // Calculate 1% Low FPS — zero allocation ring buffer scan
       let worstFrameMs = 16.6;
+      const count = sampleCount.current;
       const deltas = frameDeltas.current;
-      for (let k = 0; k < deltas.length; k++) {
+      for (let k = 0; k < count; k++) {
         if (deltas[k] > worstFrameMs) worstFrameMs = deltas[k];
       }
       const onePercentLow = Math.round(1000 / worstFrameMs);
@@ -123,13 +127,16 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     // Every 1.0s: log snapshot to telemetry buffer
     const now = Date.now();
     if (now - lastSnapshotTime.current >= 1000) {
-      const avgMs = frameDeltas.current.length
-        ? frameDeltas.current.reduce((a, b) => a + b, 0) / frameDeltas.current.length
-        : 16.6;
+      const count = sampleCount.current;
+      let sumMs = 0;
       let maxMs = 16.6;
-      for (let i = 0; i < frameDeltas.current.length; i++) {
-        if (frameDeltas.current[i] > maxMs) maxMs = frameDeltas.current[i];
+      const deltas = frameDeltas.current;
+      for (let i = 0; i < count; i++) {
+        const val = deltas[i];
+        sumMs += val;
+        if (val > maxMs) maxMs = val;
       }
+      const avgMs = count > 0 ? sumMs / count : 16.6;
       const liveFps = Math.round(1000 / avgMs);
 
       fpsLogger.logSnapshot({
