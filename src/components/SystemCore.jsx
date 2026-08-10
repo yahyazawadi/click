@@ -7,6 +7,7 @@ import '../shaders/PlanetCoreMaterial';
 export function SystemCore({ onSelect }) {
   const innerCoreRef = useRef();
   const shaderMatRef = useRef();
+  const outerLatticeRef = useRef();
   const ringRef1 = useRef();
   const ringRef2 = useRef();
   const [hovered, setHovered] = useState(false);
@@ -20,6 +21,10 @@ export function SystemCore({ onSelect }) {
 
     if (innerCoreRef.current) {
       innerCoreRef.current.rotation.y += delta * 0.15;
+    }
+    if (outerLatticeRef.current) {
+      outerLatticeRef.current.rotation.y -= delta * 0.15;
+      outerLatticeRef.current.rotation.x += delta * 0.05;
     }
     if (ringRef1.current) {
       ringRef1.current.rotation.z += delta * 0.4;
@@ -54,6 +59,17 @@ export function SystemCore({ onSelect }) {
           uAtmosphere={new THREE.Color('#00BAE3')}       // Limb atmosphere halo
           uContinentColor={new THREE.Color('#2d5a6e')}   // Clearly visible teal landmass
           uCoastColor={new THREE.Color('#1a8090')}       // Bright coastal shelf
+        />
+      </mesh>
+
+      {/* 2. Outer Rotating Geodesic Wireframe Shield */}
+      <mesh ref={outerLatticeRef}>
+        <icosahedronGeometry args={[coreRadius * 1.25, 1]} />
+        <meshStandardMaterial
+          color={hovered ? '#00e5ff' : SYSTEM_CONFIG.colors.primaryCyan}
+          wireframe
+          transparent
+          opacity={hovered ? 0.8 : 0.5}
         />
       </mesh>
 
