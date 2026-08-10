@@ -70,7 +70,7 @@ export const PlanetCoreMaterial = shaderMaterial(
                             dot( hash3(i + vec3(1.0,1.0,1.0)), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
     }
 
-    // Adaptive 3D FBM (2 octaves on mobile vs 3 on desktop)
+    // Adaptive 3D FBM (2 octaves on mobile vs 6 on desktop)
     float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
@@ -79,8 +79,8 @@ export const PlanetCoreMaterial = shaderMaterial(
          -0.80,  0.60,  0.00,
           0.48,  0.64,  0.60
       );
-      int count = uIsMobile > 0.5 ? 2 : 3;
-      for (int i = 0; i < 3; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 6;
+      for (int i = 0; i < 6; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
@@ -126,14 +126,21 @@ export const PlanetCoreMaterial = shaderMaterial(
       float stormMask = smoothstep(0.3, 0.7, stormIntensity) * smoothstep(0.6, 0.85, bands);
       col = mix(col, uStormHighlight, stormMask * 0.7);
 
-      // ---- 3b. Continent landmasses (smooth single-pass FBM) ----
+      // ---- 3b. Continent landmasses ----
       float continentDrift = uTime * 0.004;
       float cC = cos(continentDrift);
       float cS = sin(continentDrift);
       mat3 rotCY = mat3(cC, 0.0, cS, 0.0, 1.0, 0.0, -cS, 0.0, cC);
       vec3 cP = rotCY * p;
 
-      float continentField = fbm(cP * 1.1 + vec3(8.2, 61.3, 3.4));
+      float continentField;
+      if (uIsMobile > 0.5) {
+        continentField = fbm(cP * 1.1 + vec3(8.2, 61.3, 3.4));
+      } else {
+        vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
+                       fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));
+        continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
+      }
 
       float seaLevel   = -0.10;
       float landHeight = smoothstep(seaLevel, seaLevel + 0.30, continentField);

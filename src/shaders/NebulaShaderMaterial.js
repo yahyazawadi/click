@@ -77,13 +77,13 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // Adaptive Gas FBM (2 octaves on mobile vs 4 on desktop)
+    // Adaptive Gas FBM (2 octaves on mobile vs 8 on desktop)
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
-      int count = uIsMobile > 0.5 ? 2 : 4;
-      for (int i = 0; i < 4; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 8;
+      for (int i = 0; i < 8; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 2.07 + vec2(13.4, 27.9);
@@ -92,13 +92,13 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // Adaptive Dust FBM (2 octaves on mobile vs 3 on desktop)
+    // Adaptive Dust FBM (2 octaves on mobile vs 6 on desktop)
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.62, 0.78, -0.78, 0.62);
-      int count = uIsMobile > 0.5 ? 2 : 3;
-      for (int i = 0; i < 3; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 6;
+      for (int i = 0; i < 6; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 1.97 + vec2(4.1, 51.3);
