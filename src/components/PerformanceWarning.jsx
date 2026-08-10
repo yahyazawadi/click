@@ -3,9 +3,8 @@ import React, { useEffect, useState } from 'react';
 // Returns true if we're on the /warning-performance preview route
 const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning-performance';
 
-export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
+export function PerformanceWarning({ currentFps = 60, isMobile = false, isDismissed = false, onDismiss = () => {} }) {
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
-  const [hasDismissed, setHasDismissed] = useState(false);
   const [isBatteryKnown, setIsBatteryKnown] = useState(false);
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
 
   useEffect(() => {
     // If preview route or already dismissed, do nothing
-    if (isPreviewRoute() || hasDismissed) return;
+    if (isPreviewRoute() || isDismissed) return;
     
     // Only target Desktops/Laptops. 
     if (isMobile) return;
@@ -41,9 +40,9 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
     }, 5000);
 
     return () => clearInterval(checkFps);
-  }, [currentFps, hasDismissed, isMobile, isBatteryKnown]);
+  }, [currentFps, isDismissed, isMobile, isBatteryKnown]);
 
-  if (!showWarning || hasDismissed) return null;
+  if (!showWarning || isDismissed) return null;
 
   return (
     <div style={{
@@ -93,7 +92,7 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
         </p>
         
         <button 
-          onClick={() => setHasDismissed(true)}
+          onClick={onDismiss}
           style={{
             marginTop: '0.25rem',
             background: 'transparent',

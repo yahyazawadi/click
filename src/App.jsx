@@ -65,6 +65,16 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [unlockedCount, setUnlockedCount] = useState(2); // Priority 1: Core & Scissor planets start unlocked immediately
   const [currentFps, setCurrentFps] = useState(60);
+  
+  // Track if any warning was dismissed this session to prevent spamming
+  const [warningDismissed, setWarningDismissed] = useState(() => 
+    sessionStorage.getItem('yahya_warning_dismissed') === 'true'
+  );
+
+  const handleDismissWarning = () => {
+    sessionStorage.setItem('yahya_warning_dismissed', 'true');
+    setWarningDismissed(true);
+  };
 
   const handleUnlockNext = () => {
     setUnlockedCount((prev) => Math.min(SYSTEM_CONFIG.projects.length, prev + 1));
@@ -338,8 +348,8 @@ export default function App() {
         <FaviconAnimator isMobile={isMobile} />
 
         {/* Battery / Low Power Warning UI */}
-        <BatteryWarning />
-        <PerformanceWarning currentFps={currentFps} isMobile={isMobile} />
+        <BatteryWarning isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
+        <PerformanceWarning currentFps={currentFps} isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
       </div>
     </LenisScrollProvider>
   );

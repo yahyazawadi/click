@@ -3,14 +3,13 @@ import React, { useEffect, useState } from 'react';
 // Returns true if we're on the /warning preview route
 const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning';
 
-export function BatteryWarning() {
+export function BatteryWarning({ isDismissed = false, onDismiss = () => {} }) {
   // Initialize directly from pathname — no async race, always correct on frame 1
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
-  const [hasDismissed, setHasDismissed] = useState(false);
 
   useEffect(() => {
     // If we're on the /warning preview route, always show — skip battery API
-    if (isPreviewRoute() || hasDismissed) return;
+    if (isPreviewRoute() || isDismissed) return;
 
     // Check actual battery status on real devices
     if ('getBattery' in navigator) {
@@ -26,9 +25,9 @@ export function BatteryWarning() {
         return () => battery.removeEventListener('chargingchange', checkBattery);
       });
     }
-  }, [hasDismissed]);
+  }, [isDismissed]);
 
-  if (!showWarning || hasDismissed) return null;
+  if (!showWarning || isDismissed) return null;
 
   return (
     <div style={{
@@ -77,7 +76,7 @@ export function BatteryWarning() {
         </p>
         
         <button 
-          onClick={() => setHasDismissed(true)}
+          onClick={onDismiss}
           style={{
             marginTop: '0.25rem',
             background: 'transparent',
