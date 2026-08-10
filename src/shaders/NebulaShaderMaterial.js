@@ -5,12 +5,12 @@ import { extend } from '@react-three/fiber';
 export const NebulaMaterial = shaderMaterial(
   {
     uTime: 0,
-    uColor1: new THREE.Color('#08001a'), // Dark Midnight Indigo
+    uColor1: new THREE.Color('#000000'), // Transparent Space Base
     uColor2: new THREE.Color('#c40045'), // Vibrant Crimson Gas Cloud Mass
-    uColor3: new THREE.Color('#a100ff'), // Violet Emission Glow
+    uColor3: new THREE.Color('#9900ff'), // Violet / Magenta Emission Glow
     uScale: 3.5,
     uWarp: 2.5,
-    uMaskRadius: 0.45,
+    uMaskRadius: 0.38,
     uEdgeWarp: 0.25,
     uParallaxOffset: new THREE.Vector2(0, 0),
     uAlpha: 1.0,
@@ -25,7 +25,7 @@ export const NebulaMaterial = shaderMaterial(
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-  // Fragment Shader - Organic, Non-Square Nebula Cloud Boundary with Noise Edge Masking
+  // Fragment Shader - Zero Rectangular Edges, Pure Organic Fractal Gas Alpha
   /* glsl */ `
     uniform float uTime;
     uniform vec3 uColor1;
@@ -74,17 +74,18 @@ export const NebulaMaterial = shaderMaterial(
 
     void main() {
       vec2 centeredUv = vUv - vec2(0.5);
-      vec2 uv = centeredUv * uScale + uParallaxOffset;
 
-      // 1. Organic irregular cloud shape mask (eliminates all box/square edges)
+      // 1. Mandatory Plane Edge Fade (Forces alpha to 0.0 at UV 0.44, well before physical mesh boundary at 0.50)
+      float edgeDist = length(centeredUv);
+      float planeEdgeFade = smoothstep(0.45, 0.15, edgeDist);
+
+      // 2. Organic noise edge displacement mask
       float angle = atan(centeredUv.y, centeredUv.x);
-      float edgeDistortion = fbm(vec2(angle * 2.5, uTime * 0.015) + centeredUv * 2.0) * uEdgeWarp;
-      float dist = length(centeredUv) + edgeDistortion;
+      float edgeNoise = fbm(vec2(angle * 2.5, uTime * 0.015) + centeredUv * 2.0) * uEdgeWarp;
+      float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.15, edgeDist + edgeNoise);
 
-      // Smooth organic falloff curve
-      float organicShapeMask = smoothstep(uMaskRadius, uMaskRadius * 0.15, dist);
-
-      // 2. Domain Warping for fluid cosmic gas swirls
+      // 3. Domain Warped Gas Turbulence
+      vec2 uv = centeredUv * uScale + uParallaxOffset;
       vec2 q = vec2(0.0);
       q.x = fbm(uv + vec2(0.0, uTime * 0.02));
       q.y = fbm(uv + vec2(5.2, uTime * 0.015));
@@ -95,21 +96,16 @@ export const NebulaMaterial = shaderMaterial(
 
       float density = fbm(uv + uWarp * r);
 
-      // Sharpen cloud contrast for defined gas structures & wisps
-      float cloudVal = smoothstep(-0.2, 0.4, density);
+      // 4. Gas Density Threshold: Gas exists ONLY where turbulence is positive. Gaps are 100% clear space!
+      float gasDensity = smoothstep(0.0, 0.5, density);
 
-      // Color composition
-      vec3 col = mix(uColor1, uColor2, smoothstep(-0.3, 0.4, length(q)));
-      col = mix(col, uColor3, smoothstep(0.0, 0.5, r.x * r.x * 2.5));
-
-      // Luminous gas core emission
-      float glow = pow(cloudVal, 1.8);
-      col += uColor3 * glow * 1.2;
-
+      // 5. Gas Emission Color
+      vec3 col = mix(uColor2, uColor3, smoothstep(0.0, 0.7, length(q)));
+      col += uColor3 * pow(gasDensity, 2.0) * 1.2;
       col *= uBrightness;
 
-      // 3. Combined organic gas alpha transparency (completely seamless dissipation into deep space)
-      float alpha = clamp(cloudVal * organicShapeMask * uAlpha, 0.0, 1.0);
+      // 6. Total Organic Alpha (Zero square edges can ever render!)
+      float alpha = clamp(gasDensity * organicMask * planeEdgeFade * uAlpha, 0.0, 1.0);
 
       gl_FragColor = vec4(col, alpha);
     }
