@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
+import { DualNebulaBackground } from './DualNebulaBackground';
 import { SYSTEM_CONFIG } from '../config';
 
 export function CosmicBackground() {
@@ -15,16 +16,20 @@ export function CosmicBackground() {
   });
 
   return (
-    <group ref={starsRef}>
-      <Stars
-        radius={100}
-        depth={50}
-        count={2500}
-        factor={4}
-        saturation={0}
-        fade
-        speed={1}
-      />
-    </group>
+    <>
+      <DualNebulaBackground />
+      <group ref={starsRef}>
+        <Stars
+          radius={100}
+          depth={50}
+          count={2500}
+          factor={4}
+          saturation={0}
+          fade
+          speed={1}
+        />
+      </group>
+    </>
   );
 }
+

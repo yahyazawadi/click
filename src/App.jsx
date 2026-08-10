@@ -214,11 +214,11 @@ export default function App() {
             <pointLight position={[-12, -12, -12]} intensity={0.6} color={SYSTEM_CONFIG.colors.deepShadow} />
 
             <Suspense fallback={null}>
-              {/* Background Stars */}
-              <CosmicBackground />
-
-              {/* Manual Drag & Spin */}
+              {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
+                {/* Background Nebulae & Stars */}
+                <CosmicBackground />
+
                 {/* Central Sphere Core */}
                 <SystemCore onSelect={handleSelect} />
 
