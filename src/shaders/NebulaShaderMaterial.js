@@ -77,13 +77,13 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // Optimized Adaptive Gas FBM (2 octaves for desktop, 1 for mobile)
+    // Full Realistic Gas FBM (3 octaves for desktop ultra-detail, 2 for mobile)
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
-      int count = uIsMobile > 0.5 ? 1 : 2;
-      for (int i = 0; i < 2; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 3;
+      for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 2.07 + vec2(13.4, 27.9);
