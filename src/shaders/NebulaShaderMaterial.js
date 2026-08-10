@@ -18,8 +18,10 @@ export const NebulaMaterial = shaderMaterial(
     uAlpha: 1.0,
     uBrightness: 2.2,
     uDustStrength: 0.55,
-    uPillarStrength: 0.6,  // elongated density pillar influence
-    uCoreRadius: 0.18,     // ionization hot-core region radius
+    uPillarStrength: 0.6,
+    uCoreRadius: 0.18,
+    uStarCount: 12.0,    // number of embedded young stars per nebula
+    uGlowRadius: 0.32,   // volumetric halo radius (0..0.5)
   },
   // Vertex Shader
   /* glsl */ `
@@ -29,7 +31,7 @@ export const NebulaMaterial = shaderMaterial(
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-  // Fragment Shader — Hubble Emission Palette + Ionization Core + Pillar Columns
+  // Fragment Shader — Full Realistic Nebula with Stars + Volumetric Glow
   /* glsl */ `
     uniform float uTime;
     uniform vec3 uColorSII;
@@ -46,6 +48,8 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uDustStrength;
     uniform float uPillarStrength;
     uniform float uCoreRadius;
+    uniform float uStarCount;
+    uniform float uGlowRadius;
 
     varying vec2 vUv;
 
@@ -53,6 +57,9 @@ export const NebulaMaterial = shaderMaterial(
     vec2 hash2(vec2 p) {
       p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
       return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+    }
+    float hash1(vec2 p) {
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
     }
 
     float noise(vec2 p) {
@@ -81,7 +88,7 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // 6-octave dust FBM (different rotation + seed)
+    // 6-octave dust FBM
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
@@ -94,22 +101,54 @@ export const NebulaMaterial = shaderMaterial(
       return v * 0.5 + 0.5;
     }
 
-    // Pillar column: creates elongated density ridge along a direction
-    // baseUv: UV in nebula space; dir: pillar axis direction; thickness controls width
+    // Pillar column density ridge
     float pillar(vec2 baseUv, vec2 dir, float thickness, float len) {
-      vec2 n = vec2(-dir.y, dir.x); // normal to pillar axis
+      vec2 n = vec2(-dir.y, dir.x);
       float along = dot(baseUv, dir);
       float perp  = dot(baseUv, n);
-      float pillShape = smoothstep(thickness, 0.0, abs(perp))
-                      * smoothstep(0.0, 0.3, along)
-                      * smoothstep(len, len * 0.4, along);
-      return pillShape;
+      return smoothstep(thickness, 0.0, abs(perp))
+           * smoothstep(0.0, 0.3, along)
+           * smoothstep(len, len * 0.4, along);
+    }
+
+    // Embedded young star field — scattered bright pinpoints inside nebula
+    // Uses a grid-based approach: each cell can contain 0-1 stars
+    float starField(vec2 uv, float count, float time) {
+      float result = 0.0;
+      vec2 cell = floor(uv * count);
+      // Check this cell and neighbors for star
+      for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+          vec2 neighborCell = cell + vec2(float(dx), float(dy));
+          // Pseudo-random star position within cell
+          vec2 starPos = (neighborCell + 0.5 + 0.45 * hash2(neighborCell + vec2(13.7, 29.3))) / count;
+          float starDist = length(uv / count - starPos);
+          // Only ~30% of cells contain a star (hash threshold)
+          float presence = step(0.7, hash1(neighborCell + vec2(7.3, 41.9)));
+          // Twinkle animation
+          float twinkle = 0.8 + 0.2 * sin(time * 3.0 + hash1(neighborCell) * 6.28318);
+          // Star brightness — tiny sharp disk + soft diffraction spike halo
+          float disk = smoothstep(0.0008, 0.0, starDist);
+          float halo = exp(-starDist * 280.0) * 0.4;
+          result += presence * twinkle * (disk + halo);
+        }
+      }
+      return clamp(result, 0.0, 1.0);
+    }
+
+    // Volumetric scatter glow — soft halo around the densest gas regions
+    // Approximated as a blurred version of density (implemented as distance-based radial falloff
+    // centered at nebula "bright spots" found via coarse fbm)
+    float volumetricGlow(vec2 centeredUv, float density, float glowRadius) {
+      float radial = 1.0 - smoothstep(0.0, glowRadius, length(centeredUv));
+      // Glow is strong where density is high, falls off radially from center
+      return pow(radial, 1.5) * pow(density, 0.6) * 0.5;
     }
 
     void main() {
       vec2 centeredUv = vUv - vec2(0.5);
 
-      // 1. Radial plane edge fade
+      // 1. Radial plane edge kill
       float edgeDist = length(centeredUv);
       float planeEdgeFade = smoothstep(0.45, 0.15, edgeDist);
 
@@ -118,7 +157,7 @@ export const NebulaMaterial = shaderMaterial(
       float edgeN   = fbm(vec2(angle * 2.5, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
-      // 3. Domain-warped gas density (two warp levels for turbulence)
+      // 3. Domain-warped gas density
       vec2 uv = centeredUv * uScale + uParallaxOffset;
       vec2 q;
       q.x = fbm(uv + vec2(0.0,  uTime * 0.018));
@@ -135,40 +174,42 @@ export const NebulaMaterial = shaderMaterial(
       float absorption = pow(dustField, 2.5) * uDustStrength;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
-      // 5. Pillar structures — dense elongated columns at 2 different angles
-      //    Pillars exist in nebula UV space and add density on top of gas
+      // 5. Pillar structures
       vec2 pillarUv = centeredUv * 3.0;
       float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.14, 1.0);
       float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.11, 0.85);
       float pillars = (p1 + p2 * 0.75) * uPillarStrength;
-      // Pillars add to gas density but cap at 1.0
       float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
 
       // 6. Hubble SHO color science
-      //    - OIII (teal/cyan) outer shell — ionization front at cloud boundary
-      //    - H-alpha (deep red) main body
-      //    - SII (warm orange) mid-density knots
-      //    - Hot core (near-white) at highest density / pillar tip / center
-      float coreGlow   = smoothstep(uCoreRadius, 0.0, edgeDist);            // spatial hot core
-      float densityT   = finalDensity;
-      float qLen       = length(q);
+      float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
+      float qLen     = length(q);
 
-      // Outer ionized shell = OIII (outer boundary of nebula picks this up)
       vec3 col = uColorOIII;
-      // Mid-density H-alpha gas body
-      col = mix(col, uColorHa,  smoothstep(0.1, 0.6, densityT));
-      // High-density Sulfur-II knots
-      col = mix(col, uColorSII, smoothstep(0.5, 0.85, densityT));
-      // Hot ionization front / pillar tips
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, densityT) + coreGlow * 0.5);
-
-      // Add emission brightness gradient based on turbulence intensity
+      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
+
+      // 7. Volumetric scatter halo (soft inner glow)
+      float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
+      col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
       col *= uBrightness;
 
-      // 7. Final alpha
+      // 8. Embedded young star field
+      //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
+      float stars = starField(vUv, uStarCount, uTime);
+      // Stars only show where there IS gas (inside nebula) and are brightest on dust pillars
+      float starMask = organicMask * planeEdgeFade;
+      vec3 starColor = mix(vec3(0.9, 0.95, 1.0), vec3(1.0, 0.9, 0.7),
+                           hash1(floor(vUv * uStarCount))); // warm/cool mix per star
+      col = mix(col, col + starColor * 1.8, stars * starMask);
+
+      // 9. Final alpha
       float alpha = clamp(finalDensity * organicMask * planeEdgeFade * uAlpha, 0.0, 1.0);
+      // Stars need their own alpha boost so they punch through
+      alpha = clamp(alpha + stars * starMask * 0.95, 0.0, 1.0);
 
       gl_FragColor = vec4(col, alpha);
     }
