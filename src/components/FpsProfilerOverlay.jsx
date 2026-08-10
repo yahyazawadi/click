@@ -141,7 +141,7 @@ export function FpsProfilerOverlay({
           onClick={() => setVisible(false)}
           style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem' }}
         >
-          ✕
+          X
         </button>
       </div>
 
