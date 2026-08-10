@@ -4,7 +4,7 @@ import { Stars } from '@react-three/drei';
 import { DualNebulaBackground } from './DualNebulaBackground';
 import { SYSTEM_CONFIG } from '../config';
 
-export function CosmicBackground() {
+export function CosmicBackground({ isMobile }) {
   const starsRef = useRef();
 
   // Very slow background rotation for deep space ambiance
@@ -17,12 +17,12 @@ export function CosmicBackground() {
 
   return (
     <>
-      <DualNebulaBackground />
+      <DualNebulaBackground isMobile={isMobile} />
       <group ref={starsRef}>
         <Stars
           radius={100}
           depth={50}
-          count={2500}
+          count={isMobile ? 1000 : 2500}
           factor={4}
           saturation={0}
           fade

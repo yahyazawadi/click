@@ -18,6 +18,17 @@ export default function App() {
   const [activeTitles, setActiveTitles] = useState([]);
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection for targeted performance scaling
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || ('ontouchstart' in window && window.innerWidth < 1024));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Total indices = 1 (Overview) + 1 (Core) + 8 Projects = 10 total positions
   const totalIndices = 2 + SYSTEM_CONFIG.projects.length;
@@ -200,9 +211,9 @@ export default function App() {
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
-            dpr={[1, 1.5]}
+            dpr={isMobile ? [1, 1] : [1, 1.5]}
             camera={{ position: [0, 25, 55], fov: 45 }}
-            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+            gl={{ antialias: !isMobile, alpha: false, powerPreference: 'high-performance' }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >
@@ -217,10 +228,10 @@ export default function App() {
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground />
+                <CosmicBackground isMobile={isMobile} />
 
                 {/* Central Sphere Core */}
-                <SystemCore onSelect={handleSelect} />
+                <SystemCore isMobile={isMobile} onSelect={handleSelect} />
 
                 {/* Tilted Macro Orbital Rings */}
                 {SYSTEM_CONFIG.rings.map((ring) => (
@@ -259,7 +270,7 @@ export default function App() {
         />
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
-        <FaviconAnimator />
+        <FaviconAnimator isMobile={isMobile} />
       </div>
     </LenisScrollProvider>
   );

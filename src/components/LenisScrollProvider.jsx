@@ -36,8 +36,53 @@ export function LenisScrollProvider({ children, onIndexChange, totalIndices = 9 
       }
     };
 
+    let touchStartY = 0;
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 1) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchEnd = (e) => {
+      if (isCooldownRef.current || !e.changedTouches || e.changedTouches.length !== 1) return;
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffY = touchStartY - touchEndY;
+
+      if (Math.abs(diffY) > 45) {
+        let nextIndex = currentIndexRef.current;
+        if (diffY > 0) {
+          // Swipe UP -> Next index
+          nextIndex = Math.min(totalIndices - 1, currentIndexRef.current + 1);
+        } else {
+          // Swipe DOWN -> Prev index
+          nextIndex = Math.max(0, currentIndexRef.current - 1);
+        }
+
+        if (nextIndex !== currentIndexRef.current) {
+          currentIndexRef.current = nextIndex;
+          isCooldownRef.current = true;
+
+          if (onIndexChange) {
+            onIndexChange(nextIndex);
+          }
+
+          setTimeout(() => {
+            isCooldownRef.current = false;
+          }, 450);
+        }
+      }
+    };
+
     window.addEventListener('wheel', handleWheel, { passive: true });
-    return () => window.removeEventListener('wheel', handleWheel);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
   }, [onIndexChange, totalIndices]);
 
   // Listen to programmatically updated indices (e.g. when clicking a planet)

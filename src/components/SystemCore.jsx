@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
 import '../shaders/PlanetCoreMaterial';
 
-export function SystemCore({ onSelect }) {
+export function SystemCore({ onSelect, isMobile }) {
   const innerCoreRef = useRef();
   const shaderMatRef = useRef();
   const ringRef1 = useRef();
@@ -31,6 +31,7 @@ export function SystemCore({ onSelect }) {
   });
 
   const coreRadius = SYSTEM_CONFIG.core.radius || 1.8;
+  const segments = isMobile ? 32 : 64;
 
   return (
     <group
@@ -44,7 +45,7 @@ export function SystemCore({ onSelect }) {
     >
       {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <sphereGeometry args={[coreRadius, 64, 64]} />
+        <sphereGeometry args={[coreRadius, segments, segments]} />
         <planetCoreMaterial
           ref={shaderMatRef}
           uDeepOcean={new THREE.Color('#041830')}        // Deep space blue
