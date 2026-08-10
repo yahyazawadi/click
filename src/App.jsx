@@ -178,6 +178,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
+  // DEV: switch nebula HIGH-tier warp path live (0=Silky Wisps 1=Deep Ocean 2=Orion Ribbon 3=Veins)
+  const [nebulaPath, setNebulaPath] = useState(0);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
@@ -457,7 +459,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} />
+                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} nebulaPath={nebulaPath} />
 
                 {/* Central Sphere Core */}
                 <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} isSelected={selectedTarget === 'core'} />
@@ -532,6 +534,41 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         {/* Battery / Low Power Warning UI */}
         <BatteryWarning isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
         <PerformanceWarning currentFps={currentFps} isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
+
+        {/* DEV — Nebula Path Switcher (floating, bottom-left) */}
+        {import.meta.env.DEV && (
+          <div style={{
+            position: 'fixed', bottom: 18, left: 18, zIndex: 9999,
+            display: 'flex', flexDirection: 'column', gap: 6,
+            fontFamily: 'monospace', fontSize: 11,
+          }}>
+            <span style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: 1, marginBottom: 2 }}>NEBULA PATH</span>
+            {[
+              [0, '0 · Silky Wisps'],
+              [1, '1 · Deep Ocean'],
+              [2, '2 · Orion Ribbon'],
+              [3, '3 · Bio Veins'],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setNebulaPath(id)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 5,
+                  border: nebulaPath === id ? '1px solid rgba(150,120,255,0.9)' : '1px solid rgba(255,255,255,0.15)',
+                  background: nebulaPath === id ? 'rgba(100,60,200,0.55)' : 'rgba(0,0,0,0.45)',
+                  color: nebulaPath === id ? '#d4b8ff' : 'rgba(255,255,255,0.5)',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                  transition: 'all 0.15s',
+                  textAlign: 'left',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </LenisScrollProvider>
   );

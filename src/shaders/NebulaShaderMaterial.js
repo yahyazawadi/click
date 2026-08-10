@@ -1,3 +1,92 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  HIGH-TIER NEBULA ITERATION PATHS
+//  Change NEBULA_PATH (0–3) to switch between visual experiments.
+//  Save the file — Vite hot-reloads instantly. No deploy needed.
+//
+//  0  SILKY WISPS       — current natural look: single warp + micro-filaments
+//  1  DEEP OCEAN PILLARS — second-pass warp blended softly, like cumulonimbus
+//  2  ORION RIBBON       — asymmetric curl + radial stretch, like emission bow
+//  3  BIOLUMINESCENT VEINS — tight sinusoidal filament lattice inside the gas
+// ─────────────────────────────────────────────────────────────────────────────
+const NEBULA_PATH = 0;
+
+// ─── HIGH-TIER GLSL SNIPPETS — one is injected at runtime based on NEBULA_PATH ───
+// All paths take: uv, uWarp, uTime, fbm()  →  write float density, float qLen
+
+const HIGH_PATH_SNIPPETS = [
+
+  /* ── PATH 0 : SILKY WISPS ──────────────────────────────────────────────────
+     Natural baseline: smooth single domain-warp + delicate micro-filaments
+     blended only where gas is dense. Very clean organic look.               */
+  `
+    // PATH 0 — Silky Wisps
+    vec2 q0;
+    q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
+    q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
+    qLen = length(q0);
+    float base0     = fbm(uv + uWarp * q0);
+    float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
+    density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
+  `,
+
+  /* ── PATH 1 : DEEP OCEAN PILLARS ───────────────────────────────────────────
+     Two soft domain-warp passes at very different speeds. Second pass is
+     blended gently (not full strength) so you get depth without chaos.
+     Feels like cumulonimbus or undersea thermal vents.                       */
+  `
+    // PATH 1 — Deep Ocean Pillars
+    vec2 q1;
+    q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
+    q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
+    qLen = length(q1);
+    vec2 r1;
+    r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
+    r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
+    float base1 = fbm(uv + uWarp * q1);
+    float deep1 = fbm(uv + uWarp * r1 * 0.5);
+    density = mix(base1, deep1, 0.32);  // soft blend — no muddy double-warp
+  `,
+
+  /* ── PATH 2 : ORION RIBBON ─────────────────────────────────────────────────
+     Asymmetric angular curl + a radial bow-stretch modulator. The warp
+     vector is rotated by a slow angle offset, creating an elongated ribbon
+     arc like an emission bow-shock or an Orion Nebula shard.                 */
+  `
+    // PATH 2 — Orion Ribbon
+    float bowAngle = uTime * 0.006;
+    mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
+    vec2 q2;
+    q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
+    q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
+    qLen = length(q2);
+    // Radial bow stretch: density falls off perpendicular to ribbon axis
+    float ribbonMask = 1.0 - smoothstep(0.0, 0.55, abs(uv.y * 0.7 - uv.x * 0.3));
+    float base2 = fbm(uv + uWarp * q2);
+    density = base2 * (0.7 + 0.3 * ribbonMask);
+  `,
+
+  /* ── PATH 3 : BIOLUMINESCENT VEINS ─────────────────────────────────────────
+     Sinusoidal lattice carved through the warp density field. Creates a
+     glowing vein network inside the gas cloud — like deep ocean creatures
+     or branching plasma threads. Stays natural because veins only glow
+     where gas already exists (masked by baseDensity).                        */
+  `
+    // PATH 3 — Bioluminescent Veins
+    vec2 q3;
+    q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
+    q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
+    qLen = length(q3);
+    float base3 = fbm(uv + uWarp * q3);
+    // Vein lattice: sinusoidal crosshatch in warped space
+    vec2 veinUv = uv * 4.5 + q3 * 1.2;
+    float veinX  = abs(sin(veinUv.x * 3.14159));
+    float veinY  = abs(sin(veinUv.y * 3.14159 + 1.1));
+    float veins  = pow(max(veinX, veinY), 6.0) * 0.22;
+    // Only glow where gas is present (mask veins to dense regions)
+    density = base3 + veins * smoothstep(0.2, 0.75, base3);
+  `,
+];
+
 import * as THREE from 'three';
 import { shaderMaterial } from '@react-three/drei';
 import { extend } from '@react-three/fiber';
@@ -23,6 +112,7 @@ export const NebulaMaterial = shaderMaterial(
     uCoreRadius: 0.18,
     uStarCount: 12.0,    // number of embedded young stars per nebula
     uGlowRadius: 0.32,   // volumetric halo radius (0..0.5)
+    uNebulaPath: 0,      // DEV: 0=Silky Wisps  1=Deep Ocean  2=Orion Ribbon  3=Bioluminescent Veins
   },
   // Vertex Shader
   /* glsl */ `
@@ -33,9 +123,11 @@ export const NebulaMaterial = shaderMaterial(
     }
   `,
   // Fragment Shader — Full Realistic Nebula with Stars + Volumetric Glow
+  // Uses template literal so NEBULA_PATH can be interpolated at module load time
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
+    uniform int   uNebulaPath; // 0–3, selects HIGH-tier formula at runtime
     uniform vec3 uColorSII;
     uniform vec3 uColorHa;
     uniform vec3 uColorOIII;
@@ -167,14 +259,67 @@ export const NebulaMaterial = shaderMaterial(
       //   LOW:  1-pass direct fbm (no warp)
       vec2 uv = centeredUv * uScale + uParallaxOffset;
       float density;
-      if (uPerfTier < 0.8) {
-        // HIGH & MED — sleek single domain warp (silky organic gas flow without chaotic noise)
+      float qLen = 0.0;
+
+      if (uPerfTier < 0.3) {
+        // ── HIGH tier: runtime path selected by uNebulaPath uniform (0–3) ──
+        if (uNebulaPath == 0) {
+          // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
+          vec2 q0;
+          q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
+          q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
+          qLen = length(q0);
+          float base0 = fbm(uv + uWarp * q0);
+          float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
+          density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
+
+        } else if (uNebulaPath == 1) {
+          // PATH 1 — Deep Ocean Pillars: two soft warp passes blended gently
+          vec2 q1;
+          q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
+          q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
+          qLen = length(q1);
+          vec2 r1;
+          r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
+          r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
+          float base1 = fbm(uv + uWarp * q1);
+          float deep1 = fbm(uv + uWarp * r1 * 0.5);
+          density = mix(base1, deep1, 0.32);
+
+        } else if (uNebulaPath == 2) {
+          // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
+          float bowAngle = uTime * 0.006;
+          mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
+          vec2 q2;
+          q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
+          q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
+          qLen = length(q2);
+          float ribbonMask = 1.0 - smoothstep(0.0, 0.55, abs(uv.y * 0.7 - uv.x * 0.3));
+          float base2 = fbm(uv + uWarp * q2);
+          density = base2 * (0.7 + 0.3 * ribbonMask);
+
+        } else {
+          // PATH 3 — Bioluminescent Veins: sinusoidal lattice inside gas
+          vec2 q3;
+          q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
+          q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
+          qLen = length(q3);
+          float base3 = fbm(uv + uWarp * q3);
+          vec2 veinUv = uv * 4.5 + q3 * 1.2;
+          float veinX = abs(sin(veinUv.x * 3.14159));
+          float veinY = abs(sin(veinUv.y * 3.14159 + 1.1));
+          float veins = pow(max(veinX, veinY), 6.0) * 0.22;
+          density = base3 + veins * smoothstep(0.2, 0.75, base3);
+        }
+
+      } else if (uPerfTier < 0.8) {
+        // MED — Single domain warp (smooth organic gas flow)
         vec2 q;
         q.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q.y = fbm(uv + vec2(5.2, uTime * 0.013));
         density = fbm(uv + uWarp * q);
       } else {
-        // LOW — direct fbm, no warp
+        // LOW — Direct fbm (flat performance mode)
         density = fbm(uv + vec2(uTime * 0.015));
       }
       float gasDensity = smoothstep(0.0, 0.5, density);
@@ -182,7 +327,9 @@ export const NebulaMaterial = shaderMaterial(
       // 4. Dark dust absorption lanes
       vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
       float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
-      float absorption = pow(dustField, 2.5) * uDustStrength;
+      // HIGH tier gets slightly crispier dust lanes for extra 3D depth
+      float dustExponent = uPerfTier < 0.3 ? 2.8 : 2.5;
+      float absorption = pow(dustField, dustExponent) * uDustStrength;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
       // 5. Pillar structures
@@ -194,15 +341,15 @@ export const NebulaMaterial = shaderMaterial(
 
       // 6. Hubble SHO color science
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
-      // qLen: only relevant on HIGH tier where q is computed in the warp branch.
-      // Set to 0.0 safely for all tiers (no scoping issue).
-      float qLen = 0.0;
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
       col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
       col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
-      col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
+      // Volumetric light scatter active on HIGH tier when qLen is calculated
+      if (uPerfTier < 0.3) {
+        col += uColorOIII * pow(max(0.0, qLen - 0.28), 2.0) * 0.4;
+      }
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);

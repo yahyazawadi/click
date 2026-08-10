@@ -3,14 +3,20 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import '../shaders/NebulaShaderMaterial';
 
-export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0 }) {
+export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath = 0 }) {
   const matRefLayer1 = useRef();
   const matRefLayer2 = useRef();
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    if (matRefLayer1.current) matRefLayer1.current.uTime = time * 0.35;
-    if (matRefLayer2.current) matRefLayer2.current.uTime = time * 0.55;
+    if (matRefLayer1.current) {
+      matRefLayer1.current.uTime = time * 0.35;
+      matRefLayer1.current.uNebulaPath = nebulaPath;
+    }
+    if (matRefLayer2.current) {
+      matRefLayer2.current.uTime = time * 0.55;
+      matRefLayer2.current.uNebulaPath = nebulaPath;
+    }
   });
 
   // Memoize colors ONCE to prevent allocation on React re-renders
