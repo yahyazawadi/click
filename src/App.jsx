@@ -11,6 +11,7 @@ import { SceneRotator } from './components/SceneRotator';
 import { UIOverlay } from './components/UIOverlay';
 import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScrollProvider';
 import { FaviconAnimator } from './components/FaviconAnimator';
+import { BatteryWarning } from './components/BatteryWarning';
 
 import { useFrame } from '@react-three/fiber';
 
@@ -334,6 +335,9 @@ export default function App() {
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
         <FaviconAnimator isMobile={isMobile} />
+
+        {/* Battery / Low Power Warning UI */}
+        <BatteryWarning />
       </div>
     </LenisScrollProvider>
   );
