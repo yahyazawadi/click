@@ -39,59 +39,56 @@ export function BatteryWarning() {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      color: 'var(--text-pure)',
       fontFamily: 'var(--font-mono)',
       textAlign: 'center',
       backdropFilter: 'blur(15px)',
       padding: '2rem'
     }}>
       <div style={{
-        border: '1px solid #FF4500',
-        padding: '3rem',
+        border: '1px solid rgba(0, 186, 227, 0.5)',
+        padding: '2rem 2.5rem',
         borderRadius: '12px',
-        background: 'rgba(255, 69, 0, 0.03)',
-        boxShadow: '0 0 40px rgba(255, 69, 0, 0.15)',
-        maxWidth: '550px',
+        background: 'rgba(0, 50, 104, 0.25)',
+        boxShadow: '0 0 40px rgba(0, 186, 227, 0.12)',
+        maxWidth: '480px',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        gap: '1rem'
       }}>
-        <div style={{ color: '#FF4500', fontSize: '3rem', marginBottom: '1.5rem', lineHeight: 1 }}>
-          ⚠️
-        </div>
-        
+        <span style={{ fontSize: '0.65rem', color: 'var(--primary-cyan)', letterSpacing: '0.2em' }}>
+          [ SYSTEM WARNING ]
+        </span>
+
         <h2 style={{ 
           fontFamily: 'var(--font-sans)', 
-          fontSize: '1.6rem', 
-          marginBottom: '1rem',
+          fontSize: '1.3rem', 
           letterSpacing: '0.1em',
-          color: '#FF4500',
-          textShadow: '0 0 10px rgba(255, 69, 0, 0.5)'
+          color: 'var(--text-pure)',
         }}>
           SYSTEM POWER LIMITED
         </h2>
         
         <p style={{ 
-          fontSize: '0.85rem', 
-          lineHeight: '1.8',
-          color: 'rgba(252, 252, 252, 0.85)',
-          marginBottom: '2.5rem',
-          letterSpacing: '0.05em'
+          fontSize: '0.8rem', 
+          lineHeight: '1.7',
+          color: 'rgba(252, 252, 252, 0.75)',
+          letterSpacing: '0.03em'
         }}>
-          Your device is currently running on battery power. <br/><br/>
-          Browsers and GPUs artificially restrict 3D performance to save battery.
-          To experience this simulation at a smooth 60+ FPS, please plug in your charger.
+          Your device is running on battery power. Browsers restrict GPU performance to save power — 
+          plug in your charger to experience this simulation at 60+ FPS.
         </p>
         
         <button 
           onClick={() => setShowWarning(false)}
           style={{
+            marginTop: '0.25rem',
             background: 'transparent',
-            border: '1px solid #FF4500',
-            color: '#FF4500',
-            padding: '0.75rem 2rem',
+            border: '1px solid var(--primary-cyan)',
+            color: 'var(--primary-cyan)',
+            padding: '0.55rem 1.75rem',
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.75rem',
+            fontSize: '0.7rem',
             letterSpacing: '0.15em',
             borderRadius: '999px',
             cursor: 'pointer',
@@ -99,13 +96,13 @@ export function BatteryWarning() {
             outline: 'none'
           }}
           onMouseOver={(e) => {
-            e.target.style.background = '#FF4500';
+            e.target.style.background = 'var(--primary-cyan)';
             e.target.style.color = '#000';
-            e.target.style.boxShadow = '0 0 20px #FF4500';
+            e.target.style.boxShadow = '0 0 20px var(--primary-cyan)';
           }}
           onMouseOut={(e) => {
             e.target.style.background = 'transparent';
-            e.target.style.color = '#FF4500';
+            e.target.style.color = 'var(--primary-cyan)';
             e.target.style.boxShadow = 'none';
           }}
         >
