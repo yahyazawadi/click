@@ -41,21 +41,31 @@ export function ScissorMoonPlanet({ color, size }) {
     });
   }, [planetRadius]);
 
-  // Shared blade extrude geometry (reused by all 7 scissors)
+  // Shared continuous blade & shank extrude geometry (reused by all scissors)
   const bladeGeo = useMemo(() => {
     const shape = new THREE.Shape();
-    shape.moveTo(0,             -size * 0.055);
-    shape.lineTo(bladeLen * 0.8, -size * 0.038);
-    shape.lineTo(bladeLen,        0           );
-    shape.lineTo(bladeLen * 0.7,  size * 0.09 );
-    shape.lineTo(0,               size * 0.11 );
+    // Razor sharp pointed tip
+    shape.moveTo(bladeLen, 0);
+    // Upper blade back spine
+    shape.lineTo(bladeLen * 0.75, size * 0.08);
+    shape.lineTo(0, size * 0.09);
+    // Smooth handle shank contour flowing back to finger loop
+    shape.lineTo(-bladeLen * 0.22, size * 0.14);
+    shape.lineTo(-bladeLen * 0.42, size * 0.22);
+    shape.lineTo(-bladeLen * 0.45, size * 0.12);
+    shape.lineTo(-bladeLen * 0.20, size * 0.01);
+    shape.lineTo(0, -size * 0.04);
+    // Razor cutting edge
+    shape.lineTo(bladeLen * 0.8, -size * 0.035);
     shape.closePath();
+
     return new THREE.ExtrudeGeometry(shape, {
-      steps: 1, depth: size * 0.045,
+      steps: 1,
+      depth: size * 0.04,
       bevelEnabled: true,
-      bevelThickness: size * 0.012,
-      bevelSize:      size * 0.008,
-      bevelSegments:  3,
+      bevelThickness: size * 0.01,
+      bevelSize: size * 0.008,
+      bevelSegments: 4,
     });
   }, [bladeLen, size]);
 
@@ -138,20 +148,6 @@ export function ScissorMoonPlanet({ color, size }) {
                 <boxGeometry args={[bladeLen * 0.82, size * 0.016, size * 0.04]} />
                 <meshStandardMaterial color="#FCFCFC" emissive="#FCFCFC" emissiveIntensity={1.5} />
               </mesh>
-              {/* Handle shank */}
-              <mesh
-                position={[-bladeLen * 0.18, -size * 0.1, size * 0.035]}
-                rotation={[0, 0, -Math.PI / 18]}
-              >
-                <boxGeometry args={[bladeLen * 0.4, size * 0.12, size * 0.07]} />
-                <meshStandardMaterial
-                  color="#00BAE3"
-                  emissive="#00BAE3"
-                  emissiveIntensity={0.65}
-                  metalness={0.7}
-                  roughness={0.2}
-                />
-              </mesh>
               {/* Handle finger loop */}
               <group
                 position={[-bladeLen * 0.42, -size * 0.2, size * 0.04]}
@@ -196,20 +192,6 @@ export function ScissorMoonPlanet({ color, size }) {
               >
                 <boxGeometry args={[bladeLen * 0.82, size * 0.016, size * 0.04]} />
                 <meshStandardMaterial color="#FCFCFC" emissive="#FCFCFC" emissiveIntensity={1.5} />
-              </mesh>
-              {/* Handle shank */}
-              <mesh
-                position={[-bladeLen * 0.18, size * 0.1, -size * 0.035]}
-                rotation={[0, 0, Math.PI / 18]}
-              >
-                <boxGeometry args={[bladeLen * 0.4, size * 0.12, size * 0.07]} />
-                <meshStandardMaterial
-                  color="#00BAE3"
-                  emissive="#00BAE3"
-                  emissiveIntensity={0.65}
-                  metalness={0.7}
-                  roughness={0.2}
-                />
               </mesh>
               {/* Handle finger loop */}
               <group
