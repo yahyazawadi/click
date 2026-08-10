@@ -167,17 +167,8 @@ export const NebulaMaterial = shaderMaterial(
       //   LOW:  1-pass direct fbm (no warp)
       vec2 uv = centeredUv * uScale + uParallaxOffset;
       float density;
-      if (uPerfTier < 0.3) {
-        // HIGH — full double domain warp
-        vec2 q;
-        q.x = fbm(uv + vec2(0.0, uTime * 0.018));
-        q.y = fbm(uv + vec2(5.2, uTime * 0.013));
-        vec2 r;
-        r.x = fbm(uv + uWarp * q + vec2(1.7, uTime * 0.010));
-        r.y = fbm(uv + uWarp * q + vec2(8.3, uTime * 0.016));
-        density = fbm(uv + uWarp * r);
-      } else if (uPerfTier < 0.8) {
-        // MED — single domain warp (skip r level)
+      if (uPerfTier < 0.8) {
+        // HIGH & MED — sleek single domain warp (silky organic gas flow without chaotic noise)
         vec2 q;
         q.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q.y = fbm(uv + vec2(5.2, uTime * 0.013));
