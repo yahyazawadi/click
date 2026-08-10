@@ -7,10 +7,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'three-core': ['three'],
-          'r3f': ['@react-three/fiber', '@react-three/drei'],
-          'vendor': ['react', 'react-dom'],
+        manualChunks(id) {
+          if (id.includes('node_modules/three/')) {
+            return 'three-core';
+          }
+          if (id.includes('node_modules/@react-three/')) {
+            return 'r3f';
+          }
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor';
+          }
         }
       }
     }

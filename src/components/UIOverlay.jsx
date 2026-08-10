@@ -16,7 +16,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
         <header className="top-header">
           <div className="brand-box" onClick={onReturn}>
             <div className="brand-dot"></div>
-            <span className="brand-title">YAHYA.CLICK</span>
+            <h1 className="brand-title">YAHYA.CLICK</h1>
           </div>
 
           <div className="top-right-hud">
