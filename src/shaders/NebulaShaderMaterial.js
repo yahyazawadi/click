@@ -168,11 +168,14 @@ export const NebulaMaterial = shaderMaterial(
       float density = fbm(uv + uWarp * r);
       float gasDensity = smoothstep(0.0, 0.5, density);
 
-      // 4. Dark dust absorption lanes
+      // 4. Dust absorption lanes — absorbed regions emit deep indigo, NOT grey
       vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
       float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
       float absorption = pow(dustField, 2.5) * uDustStrength;
-      float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
+      // Reduce absorption strength — lanes are thinner and more atmospheric
+      float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity * 0.75);
+      // dustAbsorption amount (0=clear gas, 1=fully absorbed lane)
+      float dustLaneMask = clamp(absorption * gasDensity * 1.6, 0.0, 1.0);
 
       // 5. Pillar structures
       vec2 pillarUv = centeredUv * 3.0;
@@ -181,15 +184,22 @@ export const NebulaMaterial = shaderMaterial(
       float pillars = (p1 + p2 * 0.75) * uPillarStrength;
       float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
 
-      // 6. Hubble SHO color science
+      // 6. Color science — portfolio palette
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
       float qLen     = length(q);
+
+      // Deep indigo floor: dust-absorbed lanes glow indigo, never grey
+      // This is the KEY fix — vec3(0.04, 0.0, 0.12) = near-black rich indigo
+      vec3 dustLaneColor = vec3(0.04, 0.0, 0.14) + uColorOIII * 0.08;
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
       col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
       col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
+
+      // Blend in indigo dust lane color so absorbed areas are rich, not grey
+      col = mix(col, dustLaneColor, dustLaneMask * 0.7);
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
