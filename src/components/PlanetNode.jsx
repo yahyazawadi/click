@@ -18,7 +18,7 @@ import {
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex to dedicated component files
-function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile }) {
+function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile, perfTierFloat }) {
   const nodeType = typeof type === 'number' ? Math.abs(type) % 11 : 0;
 
   switch (nodeType) {
@@ -43,13 +43,13 @@ function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile }) {
     case 9:
       return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
     case 10:
-      return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} />;
+      return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
     default:
       return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
   }
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true }) {
+export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true, perfTierFloat = 0.0 }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
   const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
@@ -123,6 +123,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
           size={project.size || 0.5}
           isSelected={isSelected}
           isMobile={isMobile}
+          perfTierFloat={perfTierFloat}
         />
       )}
       {/* Floating HTML Title Label — only mounted when actually visible */}

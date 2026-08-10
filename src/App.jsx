@@ -15,6 +15,7 @@ import { BatteryWarning } from './components/BatteryWarning';
 import { PerformanceWarning } from './components/PerformanceWarning';
 import { FpsProfilerOverlay } from './components/FpsProfilerOverlay';
 import { fpsLogger } from './utils/fpsLogger';
+import { tierToFloat } from './utils/detectGpuTier.js';
 
 import { useFrame } from '@react-three/fiber';
 
@@ -74,10 +75,12 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     if (fpsAcc.current >= 0.3) {
       const liveFps = Math.round(frameCount.current / fpsAcc.current);
       
-      // Calculate 1% Low FPS
-      const sortedDeltas = [...frameDeltas.current].sort((a, b) => b - a);
-      const onePercentIndex = Math.max(1, Math.floor(sortedDeltas.length * 0.01));
-      const worstFrameMs = sortedDeltas[onePercentIndex - 1] || 16.6;
+      // Calculate 1% Low FPS — simple O(n) max scan, zero allocation, no mutation
+      let worstFrameMs = 16.6;
+      const deltas = frameDeltas.current;
+      for (let k = 0; k < deltas.length; k++) {
+        if (deltas[k] > worstFrameMs) worstFrameMs = deltas[k];
+      }
       const onePercentLow = Math.round(1000 / worstFrameMs);
 
       if (typeof onFpsUpdate === 'function') {
@@ -97,8 +100,13 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     // Every 1.0s: log snapshot to telemetry buffer
     const now = Date.now();
     if (now - lastSnapshotTime.current >= 1000) {
-      const avgMs = frameDeltas.current.reduce((a, b) => a + b, 0) / (frameDeltas.current.length || 1);
-      const maxMs = Math.max(...frameDeltas.current, 16.6);
+      const avgMs = frameDeltas.current.length
+        ? frameDeltas.current.reduce((a, b) => a + b, 0) / frameDeltas.current.length
+        : 16.6;
+      let maxMs = 16.6;
+      for (let i = 0; i < frameDeltas.current.length; i++) {
+        if (frameDeltas.current[i] > maxMs) maxMs = frameDeltas.current[i];
+      }
       const liveFps = Math.round(1000 / avgMs);
 
       fpsLogger.logSnapshot({
@@ -125,18 +133,26 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
   return null;
 }
 
-export default function App() {
+export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: initialPerfTierFloat = 0.0 }) {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const targetPlanetPosRef = useRef(new THREE.Vector3());
   const [activeTitles, setActiveTitles] = useState([]);
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [unlockedCount, setUnlockedCount] = useState(2); // Priority 1: Core & Scissor planets start unlocked immediately
+  const [unlockedCount, setUnlockedCount] = useState(2);
   const [currentFps, setCurrentFps] = useState(60);
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
+  // GPU tier — starts from benchmark result but can be overridden via profiler HUD
+  const [gpuTier, setGpuTier] = useState(initialGpuTier);
+  const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
+
+  const handleSetTier = (tier) => {
+    setGpuTier(tier);
+    setPerfTierFloat(tierToFloat(tier));
+  };
   
   // Track if any warning was dismissed this session to prevent spamming
   const [warningDismissed, setWarningDismissed] = useState(() => 
@@ -370,10 +386,10 @@ export default function App() {
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} />
+                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} />
 
                 {/* Central Sphere Core */}
-                <SystemCore isMobile={isMobile} onSelect={handleSelect} />
+                <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} />
 
                 {/* Tilted Macro Orbital Rings */}
                 {SYSTEM_CONFIG.rings.map((ring) => (
@@ -399,6 +415,7 @@ export default function App() {
                       hasSelection={!!selectedTarget}
                       showTitle={activeTitles.includes(proj.id)}
                       targetPlanetPosRef={targetPlanetPosRef}
+                      perfTierFloat={perfTierFloat}
                     />
                   );
                 })}
@@ -434,6 +451,8 @@ export default function App() {
           isNebulaEnabled={isNebulaEnabled}
           onToggleFavicon={() => setIsFaviconEnabled((prev) => !prev)}
           onToggleNebula={() => setIsNebulaEnabled((prev) => !prev)}
+          gpuTier={gpuTier}
+          onSetTier={handleSetTier}
         />
 
         {/* Battery / Low Power Warning UI */}

@@ -5,7 +5,7 @@ import { extend } from '@react-three/fiber';
 export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
-    uIsMobile: 0.0,
+    uPerfTier: 0.0,  // 0.0=high, 0.5=med, 1.0=low
     uDeepOcean:      new THREE.Color('#041830'),  // Deep space blue
     uMidOcean:       new THREE.Color('#0a4070'),  // Visible ocean mid-tone
     uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt teal-blue
@@ -34,7 +34,7 @@ export const PlanetCoreMaterial = shaderMaterial(
   // Fragment Shader — World-space lighting aligned with Nebula 1 (Top-Left)
   /* glsl */ `
     uniform float uTime;
-    uniform float uIsMobile;
+    uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
     uniform vec3 uDeepOcean;
     uniform vec3 uMidOcean;
     uniform vec3 uCloudBand;
@@ -70,7 +70,10 @@ export const PlanetCoreMaterial = shaderMaterial(
                             dot( hash3(i + vec3(1.0,1.0,1.0)), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
     }
 
-    // Adaptive 3D FBM (2 octaves on mobile vs 3 on desktop)
+    // Adaptive 3D FBM — octave count by tier:
+    //   high (<0.3) → 3 octaves
+    //   med  (<0.8) → 2 octaves
+    //   low  (>=0.8)→ 1 octave
     float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
@@ -79,7 +82,7 @@ export const PlanetCoreMaterial = shaderMaterial(
          -0.80,  0.60,  0.00,
           0.48,  0.64,  0.60
       );
-      int count = uIsMobile > 0.5 ? 2 : 3;
+      int count = uPerfTier < 0.3 ? 3 : (uPerfTier < 0.8 ? 2 : 1);
       for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
@@ -105,10 +108,16 @@ export const PlanetCoreMaterial = shaderMaterial(
       
       vec2 r;
       float cloudField;
-      if (uIsMobile > 0.5) {
+      if (uPerfTier >= 0.8) {
+        // LOW: skip domain warp, direct fbm
+        r = q;
+        cloudField = fbm(driftP * 2.5);
+      } else if (uPerfTier >= 0.3) {
+        // MED: single warp level
         r = q;
         cloudField = fbm(driftP * 2.5 + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
       } else {
+        // HIGH: full double domain warp
         vec3 driftP2 = rotY * (p * 2.5) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
         r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
                  fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
@@ -140,10 +149,15 @@ export const PlanetCoreMaterial = shaderMaterial(
       vec3 cP = rotCY * p;
 
       float continentField;
-      if (uIsMobile > 0.5) {
-        // Fast direct continent texture on mobile (cuts 2 FBM domain warp passes)
+      if (uPerfTier >= 0.8) {
+        // LOW: skip domain warp
         continentField = fbm(cP * 0.95 + vec3(8.2, 61.3, 3.4));
+      } else if (uPerfTier >= 0.3) {
+        // MED: single warp level
+        vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)), 0.0);
+        continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.0, 0.0) + vec3(8.2, 61.3, 3.4));
       } else {
+        // HIGH: full double domain warp
         vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
                        fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));
         continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));

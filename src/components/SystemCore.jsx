@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
 import '../shaders/PlanetCoreMaterial';
 
-export function SystemCore({ onSelect, isMobile }) {
+export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
   const innerCoreRef = useRef();
   const shaderMatRef = useRef();
   const ringRef1 = useRef();
@@ -58,7 +58,7 @@ export function SystemCore({ onSelect, isMobile }) {
         <sphereGeometry args={[coreRadius, 48, 48]} />
         <planetCoreMaterial
           ref={shaderMatRef}
-          uIsMobile={isMobile ? 1.0 : 0.0}
+          uPerfTier={perfTierFloat}
           uDeepOcean={colors.deepOcean}
           uMidOcean={colors.midOcean}
           uCloudBand={colors.cloudBand}

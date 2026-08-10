@@ -5,7 +5,7 @@ import { extend } from '@react-three/fiber';
 export const ScissorMoonShaderMaterial = shaderMaterial(
   {
     uTime:       0,
-    uIsMobile:   0.0,
+    uPerfTier:   0.0,  // 0.0=high, 0.5=med, 1.0=low
     uDeepSea:    new THREE.Color('#031224'),
     uMidSea:     new THREE.Color('#07304d'),
     uShallowSea: new THREE.Color('#0f5d75'),
@@ -38,7 +38,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   // ── Fragment Shader ─────────────────────────────────────────────────────────
   /* glsl */ `
     uniform float uTime;
-    uniform float uIsMobile;
+    uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
     uniform vec3  uDeepSea;
     uniform vec3  uMidSea;
     uniform vec3  uShallowSea;
@@ -83,7 +83,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       mat3 rot = mat3( 0.36, 0.48,-0.80,
                       -0.80, 0.60, 0.00,
                        0.48, 0.64, 0.60);
-      int count = uIsMobile > 0.5 ? 2 : 3;
+      int count = uPerfTier < 0.3 ? 3 : (uPerfTier < 0.8 ? 2 : 1);
       for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
@@ -109,10 +109,20 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       // ── 1. Ocean base ────────────────────────────────────────────────────
       vec3  dP  = rotY(uTime * 0.016) * p;
       vec2  q   = vec2(fbm(dP * 1.9), fbm(dP * 1.9 + vec3(5.2, 1.3, 2.9)));
-      vec3  dP2 = rotY(uTime * 0.016) * (p * 2.3) + vec3(1.7*q.x, 1.7*q.y, 0.0);
-      vec2  r   = vec2(fbm(dP2 + vec3(1.7, 9.2, 4.3)),
-                       fbm(dP2 + vec3(8.3, 2.8, 1.1)));
-      float oceanField = fbm(dP * 2.6 + vec3(1.8*r.x, 1.8*r.y, 0.0));
+      float oceanField;
+      if (uPerfTier >= 0.8) {
+        // LOW: skip warp, direct fbm
+        oceanField = fbm(dP * 2.6);
+      } else if (uPerfTier >= 0.3) {
+        // MED: single warp level
+        oceanField = fbm(dP * 2.6 + vec3(1.8*q.x, 1.8*q.y, 0.0));
+      } else {
+        // HIGH: full double warp
+        vec3  dP2 = rotY(uTime * 0.016) * (p * 2.3) + vec3(1.7*q.x, 1.7*q.y, 0.0);
+        vec2  r   = vec2(fbm(dP2 + vec3(1.7, 9.2, 4.3)),
+                         fbm(dP2 + vec3(8.3, 2.8, 1.1)));
+        oceanField = fbm(dP * 2.6 + vec3(1.8*r.x, 1.8*r.y, 0.0));
+      }
 
       vec3 col = uDeepSea;
       col = mix(col, uMidSea,     smoothstep(-0.25, 0.20, oceanField));
@@ -122,10 +132,17 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       vec3  cP  = rotY(uTime * 0.003) * p;
       float cont;
       float terr;
-      if (uIsMobile > 0.5) {
+      if (uPerfTier >= 0.8) {
+        // LOW: direct fbm, no warp, skip terrain
         cont = fbm(cP * 1.05 + vec3(8.2, 61.3, 3.4));
         terr = 0.0;
+      } else if (uPerfTier >= 0.3) {
+        // MED: single warp
+        vec2  cq  = vec2(fbm(cP * 0.65 + vec3(31.7, 12.5, 4.1)), 0.0);
+        cont  = fbm(cP * 1.05 + vec3(0.5*cq.x, 0.0, 0.0) + vec3(8.2, 61.3, 3.4));
+        terr  = 0.0;
       } else {
+        // HIGH: full domain warp + terrain detail
         vec2  cq  = vec2(fbm(cP * 0.65 + vec3(31.7, 12.5, 4.1)),
                          fbm(cP * 0.65 + vec3(14.3, 47.8, 2.2)));
         cont  = fbm(cP * 1.05 + vec3(0.5*cq.x, 0.5*cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
@@ -154,13 +171,15 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       float ice    = smoothstep(0.0, 0.5, max(northI, southI) + iceN);
       col = mix(col, uPolarIce, ice);
 
-      // ── 4. Cloud Layer ───────────────────────────────────────────────────
-      vec3  clP   = rotY(uTime * 0.030) * p;
-      float cl1   = fbm(clP * 3.6 + vec3(21.0, 5.0, 11.0));
-      float cl2   = fbm(clP * 2.3 + vec3( 3.0,17.0,  8.0));
-      float cloud = smoothstep(0.08, 0.52, cl1 * 0.60 + cl2 * 0.40);
-      cloud      *= (1.0 - ice * 0.55);
-      col = mix(col, uCloud, cloud * 0.80);
+      // ── 4. Cloud Layer (skipped on LOW tier to save 2 FBM calls) ─────────
+      if (uPerfTier < 0.8) {
+        vec3  clP   = rotY(uTime * 0.030) * p;
+        float cl1   = fbm(clP * 3.6 + vec3(21.0, 5.0, 11.0));
+        float cl2   = uPerfTier < 0.3 ? fbm(clP * 2.3 + vec3(3.0, 17.0, 8.0)) : cl1 * 0.8;
+        float cloud = smoothstep(0.08, 0.52, cl1 * 0.60 + cl2 * 0.40);
+        cloud      *= (1.0 - ice * 0.55);
+        col = mix(col, uCloud, cloud * 0.80);
+      }
 
       // ── 5. PBR Lighting (World Space) ────────────────────────────────────
       vec3  lightDir = normalize(vec3(-30.0, 20.0, 15.0) - vWorldPosition);

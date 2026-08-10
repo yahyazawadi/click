@@ -5,7 +5,7 @@ import { extend } from '@react-three/fiber';
 export const NebulaMaterial = shaderMaterial(
   {
     uTime: 0,
-    uIsMobile: 0.0,
+    uPerfTier: 0.0,     // 0.0=high (full quality), 0.5=med (skip r-warp), 1.0=low (1 FBM pass)
     // Hubble SHO palette: Sulfur-II → H-alpha → OIII
     uColorSII:  new THREE.Color('#ff4500'), // Sulfur-II  — warm orange-red (SII emission 673nm)
     uColorHa:   new THREE.Color('#c0001a'), // H-alpha    — deep crimson  (Ha  emission 656nm)
@@ -35,7 +35,7 @@ export const NebulaMaterial = shaderMaterial(
   // Fragment Shader — Full Realistic Nebula with Stars + Volumetric Glow
   /* glsl */ `
     uniform float uTime;
-    uniform float uIsMobile;
+    uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
     uniform vec3 uColorSII;
     uniform vec3 uColorHa;
     uniform vec3 uColorOIII;
@@ -77,12 +77,15 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // Full Realistic Gas FBM (3 octaves for desktop ultra-detail, 2 for mobile)
+    // FBM — octave count driven by uPerfTier:
+    //   high (< 0.3) → 3 octaves
+    //   med  (< 0.8) → 2 octaves
+    //   low  (>= 0.8)→ 1 octave
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
-      int count = uIsMobile > 0.5 ? 2 : 3;
+      int count = uPerfTier < 0.3 ? 3 : (uPerfTier < 0.8 ? 2 : 1);
       for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
@@ -92,12 +95,14 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // Adaptive Dust FBM (2 octaves on mobile vs 2 on desktop)
+    // Dust FBM — 2 octaves on high/med, 1 on low
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.62, 0.78, -0.78, 0.62);
+      int count = uPerfTier < 0.8 ? 2 : 1;
       for (int i = 0; i < 2; i++) {
+        if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 1.97 + vec2(4.1, 51.3);
         a *= 0.52;
@@ -157,14 +162,30 @@ export const NebulaMaterial = shaderMaterial(
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
+      //   HIGH: full 5-pass warp (q → r → density)
+      //   MED:  3-pass warp (q → density, skip r)
+      //   LOW:  1-pass direct fbm (no warp)
       vec2 uv = centeredUv * uScale + uParallaxOffset;
-      vec2 q;
-      q.x = fbm(uv + vec2(0.0,  uTime * 0.018));
-      q.y = fbm(uv + vec2(5.2,  uTime * 0.013));
-      vec2 r;
-      r.x = fbm(uv + uWarp * q + vec2(1.7, uTime * 0.010));
-      r.y = fbm(uv + uWarp * q + vec2(8.3, uTime * 0.016));
-      float density = fbm(uv + uWarp * r);
+      float density;
+      if (uPerfTier < 0.3) {
+        // HIGH — full double domain warp
+        vec2 q;
+        q.x = fbm(uv + vec2(0.0, uTime * 0.018));
+        q.y = fbm(uv + vec2(5.2, uTime * 0.013));
+        vec2 r;
+        r.x = fbm(uv + uWarp * q + vec2(1.7, uTime * 0.010));
+        r.y = fbm(uv + uWarp * q + vec2(8.3, uTime * 0.016));
+        density = fbm(uv + uWarp * r);
+      } else if (uPerfTier < 0.8) {
+        // MED — single domain warp (skip r level)
+        vec2 q;
+        q.x = fbm(uv + vec2(0.0, uTime * 0.018));
+        q.y = fbm(uv + vec2(5.2, uTime * 0.013));
+        density = fbm(uv + uWarp * q);
+      } else {
+        // LOW — direct fbm, no warp
+        density = fbm(uv + vec2(uTime * 0.015));
+      }
       float gasDensity = smoothstep(0.0, 0.5, density);
 
       // 4. Dark dust absorption lanes
@@ -182,7 +203,9 @@ export const NebulaMaterial = shaderMaterial(
 
       // 6. Hubble SHO color science
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
-      float qLen     = length(q);
+      // qLen: only relevant on HIGH tier where q is computed in the warp branch.
+      // Set to 0.0 safely for all tiers (no scoping issue).
+      float qLen = 0.0;
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));

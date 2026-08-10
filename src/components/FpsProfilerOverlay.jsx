@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fpsLogger } from '../utils/fpsLogger';
 
+const TIER_COLORS = {
+  high: '#00ffaa',
+  med:  '#ffbb00',
+  low:  '#ff4444',
+};
+
 export function FpsProfilerOverlay({ 
   currentFps = 60, 
   onePercentLow = 60, 
@@ -11,7 +17,10 @@ export function FpsProfilerOverlay({
   onToggleFavicon,
   onToggleNebula,
   isFaviconEnabled = true,
-  isNebulaEnabled = true
+  isNebulaEnabled = true,
+  // GPU tier props
+  gpuTier = 'high',
+  onSetTier,
 }) {
   // Check if URL has ?debug=fps or ?profiler=true
   const isDebugUrl = typeof window !== 'undefined' && 
@@ -133,7 +142,7 @@ export function FpsProfilerOverlay({
       gap: '0.65rem'
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', pb: '0.4rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem' }}>
         <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)' }}>
           TELEMETRY PROFILER
         </span>
@@ -151,6 +160,9 @@ export function FpsProfilerOverlay({
         <div>1% LOW: <strong style={{ color: onePercentLow >= 30 ? '#00ffaa' : '#ffbb00' }}>{onePercentLow}</strong></div>
         <div>STUTTERS: <strong style={{ color: stutterCount === 0 ? '#00ffaa' : '#ff4444' }}>{stutterCount}</strong></div>
         <div>UNLOCKED: <strong>{unlockedCount}/8</strong></div>
+        <div style={{ gridColumn: '1 / -1' }}>
+          GPU TIER: <strong style={{ color: TIER_COLORS[gpuTier] ?? '#888' }}>{gpuTier.toUpperCase()}</strong>
+        </div>
       </div>
 
       {/* Frame Time Mini Graph */}
@@ -159,6 +171,40 @@ export function FpsProfilerOverlay({
           FRAME TIME GRAPH (ms) — 16.6ms target
         </div>
         <canvas ref={canvasRef} width={288} height={50} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)' }} />
+      </div>
+
+      {/* GPU Tier Switcher */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)' }}>GPU TIER OVERRIDE:</div>
+        <div style={{ display: 'flex', gap: '0.4rem' }}>
+          {['high', 'med', 'low'].map((tier) => {
+            const isActive = gpuTier === tier;
+            const col = TIER_COLORS[tier];
+            return (
+              <button
+                key={tier}
+                onClick={() => onSetTier && onSetTier(tier)}
+                style={{
+                  flex: 1,
+                  padding: '0.35rem',
+                  fontSize: '0.63rem',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: isActive ? 'bold' : 'normal',
+                  border: `1px solid ${isActive ? col : '#444'}`,
+                  background: isActive ? `${col}22` : 'transparent',
+                  color: isActive ? col : '#666',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isActive ? `0 0 8px ${col}44` : 'none',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {tier.toUpperCase()}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Diagnostic Toggles */}

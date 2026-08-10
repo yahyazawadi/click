@@ -18,7 +18,7 @@ const SCISSOR_POSITIONS = [
   { phi: 1.45, theta: 5.70, rotZ: 2.6, speedMult: 1.30, ampMult: 1.05 },
 ];
 
-export function ScissorMoonPlanet({ color, size, isMobile }) {
+export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
   const planetRef    = useRef();
   const shaderMatRef = useRef();
   const blade1Refs   = useRef([]);
@@ -27,7 +27,15 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
   const planetRadius = size * 0.85;
   const bladeLen     = size * 1.6;
 
-  const positions = isMobile ? SCISSOR_POSITIONS.slice(0, 3) : SCISSOR_POSITIONS;
+  // Scissor count by performance tier:
+  //   high (<0.3) → all 11
+  //   med  (<0.8) → 5
+  //   low  (>=0.8)→ 2
+  const positions = perfTierFloat >= 0.8
+    ? SCISSOR_POSITIONS.slice(0, 2)
+    : perfTierFloat >= 0.3
+      ? SCISSOR_POSITIONS.slice(0, 5)
+      : SCISSOR_POSITIONS;
 
   // Pre-compute position + quaternion for each scissor (places them flat against the sphere surface).
   const scissorDefs = useMemo(() => {
@@ -76,10 +84,10 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
 
-    // Feed time to planet shader
+    // Feed time + tier to planet shader
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = t;
-      shaderMatRef.current.uIsMobile = isMobile ? 1.0 : 0.0;
+      shaderMatRef.current.uPerfTier = perfTierFloat;
     }
 
     // Slow planetary rotation
@@ -100,8 +108,8 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
-          <sphereGeometry args={[planetRadius, 48, 48]} />
-          <scissorMoonShaderMaterial ref={shaderMatRef} uIsMobile={isMobile ? 1.0 : 0.0} />
+          <sphereGeometry args={[planetRadius, perfTierFloat >= 0.8 ? 24 : 48, perfTierFloat >= 0.8 ? 24 : 48]} />
+          <scissorMoonShaderMaterial ref={shaderMatRef} uPerfTier={perfTierFloat} />
         </mesh>
 
         {/* ── 11 tiny scissors anchored directly to the rotating planet surface ── */}

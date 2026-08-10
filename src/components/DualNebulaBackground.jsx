@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import '../shaders/NebulaShaderMaterial';
 
-export function DualNebulaBackground({ isMobile }) {
+export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0 }) {
   const matRefLayer1 = useRef();
   const matRefLayer2 = useRef();
 
@@ -22,7 +22,7 @@ export function DualNebulaBackground({ isMobile }) {
         <planeGeometry args={[220, 160]} />
         <nebulaMaterial
           ref={matRefLayer1}
-          uIsMobile={isMobile ? 1.0 : 0.0}
+          uPerfTier={perfTierFloat}
           uColorSII={new THREE.Color('#9900cc')}   // Dense magenta knots
           uColorHa={new THREE.Color('#c40045')}    // Vivid crimson body
           uColorOIII={new THREE.Color('#5500bb')}  // Electric violet outer shell
@@ -42,15 +42,13 @@ export function DualNebulaBackground({ isMobile }) {
         />
       </mesh>
 
-      {/*
-        NEBULA 2 (RIGHT): Rendered on Desktop only to save mobile fragment shading overdraw
-      */}
-      {!isMobile && (
+      {/* NEBULA 2 (RIGHT): Hidden on LOW tier to save draw call + fragment cost */}
+      {perfTierFloat < 1.0 && (
         <mesh position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
           <planeGeometry args={[190, 140]} />
           <nebulaMaterial
             ref={matRefLayer2}
-            uIsMobile={0.0}
+            uPerfTier={perfTierFloat}
             uColorSII={new THREE.Color('#00f0ff')}   // Vibrant Electric Cyan Wisps
             uColorHa={new THREE.Color('#0d1b40')}    // Deep Cosmic Midnight Blue Body
             uColorOIII={new THREE.Color('#410099')}  // Rich Royal Indigo/Purple Outer Cloud
