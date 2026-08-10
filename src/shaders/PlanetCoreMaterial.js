@@ -70,7 +70,7 @@ export const PlanetCoreMaterial = shaderMaterial(
                             dot( hash3(i + vec3(1.0,1.0,1.0)), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
     }
 
-    // Adaptive 3D FBM (2 octaves on mobile vs 6 on desktop)
+    // Adaptive 3D FBM (2 octaves on mobile vs 3 on desktop)
     float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
@@ -79,8 +79,8 @@ export const PlanetCoreMaterial = shaderMaterial(
          -0.80,  0.60,  0.00,
           0.48,  0.64,  0.60
       );
-      int count = uIsMobile > 0.5 ? 2 : 6;
-      for (int i = 0; i < 6; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 3;
+      for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
@@ -103,11 +103,17 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       vec2 q = vec2(fbm(driftP * 2.0), fbm(driftP * 2.0 + vec3(5.2, 1.3, 2.9)));
       
-      vec3 driftP2 = rotY * (p * 2.5) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
-      vec2 r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
-                    fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
-
-      float cloudField = fbm(driftP * 3.0 + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
+      vec2 r;
+      float cloudField;
+      if (uIsMobile > 0.5) {
+        r = q;
+        cloudField = fbm(driftP * 2.5 + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
+      } else {
+        vec3 driftP2 = rotY * (p * 2.5) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
+        r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
+                 fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
+        cloudField = fbm(driftP * 3.0 + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
+      }
 
       // ---- 2. Latitudinal band structure ----
       float lat = vUv.y;
@@ -135,7 +141,8 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       float continentField;
       if (uIsMobile > 0.5) {
-        continentField = fbm(cP * 1.1 + vec3(8.2, 61.3, 3.4));
+        // Fast direct continent texture on mobile (cuts 2 FBM domain warp passes)
+        continentField = fbm(cP * 0.95 + vec3(8.2, 61.3, 3.4));
       } else {
         vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
                        fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));

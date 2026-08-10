@@ -95,8 +95,6 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
     });
   });
 
-  const segments = isMobile ? 32 : 64;
-
   return (
     <group>
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
