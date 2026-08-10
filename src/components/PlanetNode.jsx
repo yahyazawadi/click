@@ -23,7 +23,7 @@ function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile }) {
 
   switch (nodeType) {
     case 0:
-      return <ScissorPlanet color={color} size={size} isMobile={isMobile} />;
+      return <PlasmaTorusPlanet color={color} size={size} isMobile={isMobile} />;
     case 1:
       return <SaturnPlanet color={color} size={size} isMobile={isMobile} />;
     case 2:

@@ -296,8 +296,8 @@ export default function App() {
                 {/* Orbiting Project Planets — Progressively Unlocked as FPS Stabilizes */}
                 {SYSTEM_CONFIG.projects.map((proj, idx) => {
                   const ring = SYSTEM_CONFIG.rings[proj.ringIndex];
-                  // Priority 1: Scissor planets (shapeIndex 0 & 10) or initial indices start unlocked immediately
-                  const isPriorityPlanet = proj.shapeIndex === 0 || proj.shapeIndex === 10 || idx < 2;
+                  // Priority 1: Initial planets start unlocked immediately from frame 1
+                  const isPriorityPlanet = idx < 2;
                   const isUnlocked = isPriorityPlanet || idx < unlockedCount;
 
                   return (
