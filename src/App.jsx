@@ -337,7 +337,7 @@ export default function App() {
         <FaviconAnimator isMobile={isMobile} />
 
         {/* Battery / Low Power Warning UI */}
-        <BatteryWarning />
+        <BatteryWarning currentFps={currentFps} isMobile={isMobile} />
       </div>
     </LenisScrollProvider>
   );

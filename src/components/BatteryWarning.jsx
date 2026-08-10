@@ -3,19 +3,34 @@ import React, { useEffect, useState } from 'react';
 // Returns true if we're on the /warning preview route
 const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning';
 
-export function BatteryWarning() {
+export function BatteryWarning({ currentFps = 60, isMobile = false }) {
   // Initialize directly from pathname — no async race, always correct on frame 1
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
+  const [hasDismissed, setHasDismissed] = useState(false);
+
+  // Fallback for Brave/Firefox/Safari which block navigator.getBattery for anti-fingerprinting
+  useEffect(() => {
+    if (isPreviewRoute() || hasDismissed || isMobile) return;
+    
+    // If we're on desktop and FPS drops consistently below 35 after initial load
+    const checkFps = setInterval(() => {
+      if (currentFps < 35) {
+        setShowWarning(true);
+      }
+    }, 5000); // Check every 5 seconds to avoid initial load spikes
+
+    return () => clearInterval(checkFps);
+  }, [currentFps, hasDismissed, isMobile]);
 
   useEffect(() => {
     // If we're on the /warning preview route, always show — skip battery API
-    if (isPreviewRoute()) return;
+    if (isPreviewRoute() || hasDismissed) return;
 
     // Check actual battery status on real devices
     if ('getBattery' in navigator) {
       navigator.getBattery().then((battery) => {
         const checkBattery = () => {
-          setShowWarning(!battery.charging);
+          if (!battery.charging) setShowWarning(true);
         };
 
         checkBattery(); // Initial check
@@ -25,9 +40,9 @@ export function BatteryWarning() {
         return () => battery.removeEventListener('chargingchange', checkBattery);
       });
     }
-  }, []);
+  }, [hasDismissed]);
 
-  if (!showWarning) return null;
+  if (!showWarning || hasDismissed) return null;
 
   return (
     <div style={{
@@ -76,7 +91,7 @@ export function BatteryWarning() {
         </p>
         
         <button 
-          onClick={() => setShowWarning(false)}
+          onClick={() => setHasDismissed(true)}
           style={{
             marginTop: '0.25rem',
             background: 'transparent',
