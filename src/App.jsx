@@ -543,44 +543,50 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
             display: 'flex', flexDirection: 'column', gap: 10,
             fontFamily: 'monospace', fontSize: 11,
           }}>
-            {/* Nebula 1 — Red/Violet */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ color: 'rgba(200,60,120,0.7)', letterSpacing: 1 }}>● NEBULA 1 · RED</span>
-              {[
-                [0, '0 · Silky Wisps'],
-                [1, '1 · Deep Ocean'],
-                [2, '2 · Orion Ribbon'],
-                [3, '3 · Plasma Threads'],
-              ].map(([id, label]) => (
-                <button key={id} onClick={() => setNebulaPath1(id)} style={{
-                  padding: '4px 10px', borderRadius: 5, textAlign: 'left', cursor: 'pointer',
-                  backdropFilter: 'blur(8px)', transition: 'all 0.15s',
-                  border: nebulaPath1 === id ? '1px solid rgba(200,100,180,0.9)' : '1px solid rgba(255,255,255,0.12)',
-                  background: nebulaPath1 === id ? 'rgba(140,30,90,0.55)' : 'rgba(0,0,0,0.45)',
-                  color: nebulaPath1 === id ? '#ffb8e0' : 'rgba(255,255,255,0.45)',
-                }}>{label}</button>
-              ))}
-            </div>
-            {/* Nebula 2 — Teal/Cyan */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
-              <span style={{ color: 'rgba(0,200,220,0.7)', letterSpacing: 1 }}>● NEBULA 2 · TEAL</span>
-              {[
-                [0, '0 · Silky Wisps'],
-                [1, '1 · Deep Ocean'],
-                [2, '2 · Orion Ribbon'],
-                [3, '3 · Plasma Threads'],
-              ].map(([id, label]) => (
-                <button key={id} onClick={() => setNebulaPath2(id)} style={{
-                  padding: '4px 10px', borderRadius: 5, textAlign: 'left', cursor: 'pointer',
-                  backdropFilter: 'blur(8px)', transition: 'all 0.15s',
-                  border: nebulaPath2 === id ? '1px solid rgba(0,200,220,0.9)' : '1px solid rgba(255,255,255,0.12)',
-                  background: nebulaPath2 === id ? 'rgba(0,80,100,0.55)' : 'rgba(0,0,0,0.45)',
-                  color: nebulaPath2 === id ? '#a0f4ff' : 'rgba(255,255,255,0.45)',
-                }}>{label}</button>
-              ))}
-            </div>
+            {[
+              {
+                label: '● NEBULA 1 · RED',
+                color: 'rgba(200,60,120,0.7)',
+                active: nebulaPath1,
+                setFn: setNebulaPath1,
+                activeColor: { border: 'rgba(200,100,180,0.9)', bg: 'rgba(140,30,90,0.55)', text: '#ffb8e0' },
+              },
+              {
+                label: '● NEBULA 2 · TEAL',
+                color: 'rgba(0,200,220,0.7)',
+                active: nebulaPath2,
+                setFn: setNebulaPath2,
+                activeColor: { border: 'rgba(0,200,220,0.9)', bg: 'rgba(0,80,100,0.55)', text: '#a0f4ff' },
+              },
+            ].map(({ label, color, active, setFn, activeColor }) => (
+              <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ color, letterSpacing: 1 }}>{label}</span>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                  {[
+                    [0, 'Silky Wisps'],
+                    [1, 'Deep Ocean'],
+                    [2, 'Orion Ribbon'],
+                    [3, 'Plasma Threads'],
+                    [4, 'Polar Vortex'],
+                    [5, 'Emission Shell'],
+                    [6, 'Turb. Cascade'],
+                    [7, 'Bow Shock'],
+                  ].map(([id, name]) => (
+                    <button key={id} onClick={() => setFn(id)} style={{
+                      padding: '3px 7px', borderRadius: 4, textAlign: 'left', cursor: 'pointer',
+                      backdropFilter: 'blur(8px)', transition: 'all 0.12s',
+                      border: active === id ? `1px solid ${activeColor.border}` : '1px solid rgba(255,255,255,0.10)',
+                      background: active === id ? activeColor.bg : 'rgba(0,0,0,0.42)',
+                      color: active === id ? activeColor.text : 'rgba(255,255,255,0.4)',
+                      fontSize: 10,
+                    }}><span style={{ opacity: 0.55 }}>{id}·</span> {name}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
+
       </div>
     </LenisScrollProvider>
   );

@@ -333,6 +333,83 @@ export const NebulaMaterial = shaderMaterial(
           float filaments3 = (threadA + threadB) * smoothstep(0.12, 0.62, base3);
           // Blend: rich cloud base + glowing plasma threads on top
           density = base3 * 0.72 + filaments3;
+
+        } else if (uNebulaPath == 4) {
+          // PATH 4 — Polar Vortex: gas in rotating spiral polar coordinates
+          // The density field lives in angle-radius space and slowly rotates,
+          // creating a swirling galactic-arm cross-section feel.
+          float r4 = length(uv);
+          float theta4 = atan(uv.y, uv.x) + uTime * 0.022;
+          // Logarithmic spiral: convert back to Cartesian in spiral space
+          vec2 spiralUv = vec2(r4 * cos(theta4 * 1.4 + r4), r4 * sin(theta4 * 1.4 + r4));
+          vec2 q4;
+          q4.x = fbm(spiralUv + vec2(0.0, uTime * 0.011));
+          q4.y = fbm(spiralUv + vec2(4.1, uTime * 0.008));
+          qLen = length(q4);
+          float base4 = fbm(spiralUv + uWarp * q4 * 0.75);
+          // Radial fade: denser in mid-radii (avoids hard center/edge)
+          float radialBias4 = smoothstep(0.05, 0.25, r4) * smoothstep(0.7, 0.3, r4);
+          density = base4 * (0.6 + 0.4 * radialBias4);
+
+        } else if (uNebulaPath == 5) {
+          // PATH 5 — Emission Shell: hollow ring like a planetary nebula
+          // Peak density sits on a distorted spherical shell, not the center.
+          // Inner glow + outer halo give it layered depth like the Ring Nebula.
+          vec2 q5;
+          q5.x = fbm(uv + vec2(0.0, uTime * 0.015));
+          q5.y = fbm(uv + vec2(6.3, uTime * 0.011));
+          qLen = length(q5);
+          // FBM-distorted radius so the shell is organic, not a perfect circle
+          float r5 = length(uv + q5 * 0.18);
+          // Primary shell ring (peak at r = 0.22)
+          float shell5 = exp(-pow((r5 - 0.22) * 7.5, 2.0)) * 0.95;
+          // Inner diffuse core glow
+          float core5  = exp(-r5 * r5 * 14.0) * 0.40;
+          // Outer faint halo (wider, softer)
+          float halo5  = exp(-pow((r5 - 0.40) * 4.5, 2.0)) * 0.28;
+          // Organic surface texture on the shell itself
+          float surf5  = fbm(uv * 3.8 + q5 * 0.7 + vec2(uTime * 0.007)) * 0.18;
+          density = shell5 + core5 + halo5 + surf5 * (shell5 + halo5);
+
+        } else if (uNebulaPath == 6) {
+          // PATH 6 — Turbulent Cascade: Kolmogorov energy cascade
+          // Three warped FBM layers at frequency ratios 1:2:4, each smaller
+          // scale emerging only inside the larger scale structure.
+          // Produces the most physically accurate-looking turbulent gas.
+          vec2 q6;
+          q6.x = fbm(uv + vec2(0.0, uTime * 0.016));
+          q6.y = fbm(uv + vec2(5.2, uTime * 0.012));
+          qLen = length(q6);
+          // Large eddies — coarse flow architecture
+          float large6  = fbm(uv * 1.0 + uWarp * q6 * 0.9);
+          // Medium eddies — 2× frequency, inherit large structure
+          float medium6 = fbm(uv * 2.1 + uWarp * q6 * 0.55 + vec2(3.7, 1.2)) * 0.52;
+          // Fine eddies — 4× frequency, only where medium is present
+          float fine6   = fbm(uv * 4.4 + uWarp * q6 * 0.35 + vec2(7.1, 5.8)) * 0.26;
+          density = large6
+                  + medium6 * smoothstep(0.15, 0.45, large6)
+                  + fine6   * smoothstep(0.30, 0.60, large6);
+
+        } else {
+          // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind
+          // A slow asymmetric wind direction warps the density field into
+          // two bright compressed arcs — upwind (bright) and trailing (faint).
+          // Looks like an O-star blowing a cavity through the molecular cloud.
+          vec2 q7;
+          q7.x = fbm(uv + vec2(0.0, uTime * 0.013));
+          q7.y = fbm(uv + vec2(4.8, uTime * 0.009));
+          qLen = length(q7);
+          float base7 = fbm(uv + uWarp * q7 * 0.8);
+          // Slowly drifting wind direction (rotates once per ~8 minutes)
+          float windAngle = uTime * 0.012;
+          vec2 windDir7 = vec2(cos(windAngle) * 0.6 + 0.3, sin(windAngle) * 0.4 + 0.2);
+          float windDot7 = dot(uv + q7 * 0.18, normalize(windDir7));
+          // Primary bright upwind arc
+          float arc7a = exp(-pow(windDot7 * 3.2 + 0.35, 2.0)) * 0.60;
+          // Secondary fainter trailing shock
+          float arc7b = exp(-pow(windDot7 * 2.0 - 0.55, 2.0)) * 0.28;
+          // Arcs only appear where there is existing gas
+          density = base7 * 0.6 + (arc7a + arc7b) * smoothstep(0.08, 0.45, base7 + 0.25);
         }
 
       } else if (uPerfTier < 0.8) {
