@@ -200,6 +200,24 @@ export const SYSTEM_CONFIG = {
         'Nodes: Independent Pulsating Emissive Spheres',
         'Core: Counter-Rotating Quantum Octahedron'
       ]
+    },
+    {
+      id: 'proj-10',
+      title: 'SCISSOR WORLD',
+      ringIndex: 1,
+      shapeIndex: 10,
+      startAngle: 4.2,
+      size: 0.55,
+      color: '#00BAE3',
+      category: 'PRECISION TOOLS',
+      shortDesc: 'Compact orbital world crowned with a pair of precision cutting scissors.',
+      fullDesc: 'A smaller rogue planet defined by the iconic scissors mounted on its north pole — snapping open and closed as it orbits the system, a testament to craftsmanship at cosmic scale.',
+      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL', 'REACT THREE FIBER'],
+      specs: [
+        'Crown: Animated Snapping Scissors',
+        'Body: Glowing Icosahedral Planet',
+        'Orbit: Inner Ring Trajectory'
+      ]
     }
   ]
 };

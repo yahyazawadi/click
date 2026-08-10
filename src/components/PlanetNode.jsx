@@ -13,12 +13,13 @@ import {
   HyperCubePlanet,
   BinaryMoonPlanet,
   ScissorPlanet,
+  ScissorMoonPlanet,
   NodePlanet,
 } from './planets';
 
-// Central mesh dispatcher mapping shapeIndex to dedicated component files
+  // Central mesh dispatcher mapping shapeIndex to dedicated component files
 function ProceduralPlanetMesh({ type, color, size, isSelected }) {
-  const nodeType = typeof type === 'number' ? Math.abs(type) % 10 : 0;
+  const nodeType = typeof type === 'number' ? Math.abs(type) % 11 : 0;
 
   switch (nodeType) {
     case 0:
@@ -40,6 +41,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected }) {
     case 8:
       return <BinaryMoonPlanet color={color} size={size} />;
     case 9:
+      return <NodePlanet color={color} size={size} isFocused={isSelected} />;
+    case 10:
+      return <ScissorMoonPlanet color={color} size={size} />;
     default:
       return <NodePlanet color={color} size={size} isFocused={isSelected} />;
   }
