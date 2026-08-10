@@ -48,6 +48,11 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       frameDeltas.current.shift();
     }
 
+    const renderInfo = _state.gl?.info?.render ? {
+      calls: _state.gl.info.render.calls,
+      triangles: _state.gl.info.render.triangles,
+    } : null;
+
     // Capture STUTTER_EVENT if single frame exceeds 33.3ms (below 30 FPS)
     if (delta > 0.0333) {
       fpsLogger.logStutterEvent({
@@ -58,6 +63,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         isMobile,
         gpuTier,
         cameraPos: _state.camera.position,
+        renderInfo,
       });
     }
 
@@ -137,6 +143,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         isMobile,
         gpuTier,
         cameraPos: _state.camera.position,
+        renderInfo,
       });
 
       lastSnapshotTime.current = now;

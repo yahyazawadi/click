@@ -2,7 +2,8 @@
  * YAHYA.CLICK — COMPREHENSIVE FPS TELEMETRY & USER INTERACTION LOGGER
  * Continuously records frame timing, 1% lows, GPU tier, memory, battery, hardware telemetry,
  * USER INTERACTION EVENTS (clicks, planet focus, drags, scroll), CAMERA TRAJECTORIES,
- * and captures STUTTER_EVENTS (>33ms / >50ms frame spikes) and TIER_CHANGE events.
+ * AUTOMATIC STUTTER CATEGORIZATION (GC Sweeps, Shader Compilation, Fill-rate Overload),
+ * and WEBGL RENDER METRICS (Draw calls, Triangles).
  * Supports 1-click JSON and CSV export.
  */
 
@@ -17,6 +18,7 @@ class FPSLogger {
     this.startTime = Date.now();
     this.sessionInfo = this.getDeviceInfo();
     this.isRecording = true;
+    this.lastMemoryMB = null;
     
     // Global reference for debugging in devtools console
     if (typeof window !== 'undefined') {
@@ -68,7 +70,7 @@ class FPSLogger {
       timestamp: Date.now(),
       timestampISO: new Date().toISOString(),
       elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
-      type, // 'CLICK_PLANET' | 'CLICK_CORE' | 'RETURN_TO_ORBIT' | 'TOGGLE_PROFILER' | 'DRAG_ROTATE'
+      type,
       target: target || 'OVERVIEW',
       details: details || {},
     };
@@ -108,14 +110,25 @@ class FPSLogger {
   }
 
   // Record a per-second telemetry snapshot
-  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos }) {
+  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos, renderInfo }) {
     if (!this.isRecording) return;
 
-    const memoryInfo = (performance && performance.memory) ? {
-      totalJSHeapSizeMB: Math.round(performance.memory.totalJSHeapSize / 1048576 * 10) / 10,
-      usedJSHeapSizeMB: Math.round(performance.memory.usedJSHeapSize / 1048576 * 10) / 10,
-      jsHeapSizeLimitMB: Math.round(performance.memory.jsHeapSizeLimit / 1048576 * 10) / 10,
-    } : null;
+    let currentMemMB = null;
+    if (performance && performance.memory) {
+      currentMemMB = Math.round(performance.memory.usedJSHeapSize / 1048576 * 10) / 10;
+    }
+
+    let heapDeltaMB = 0;
+    let isGcSweep = false;
+    if (currentMemMB !== null && this.lastMemoryMB !== null) {
+      heapDeltaMB = Math.round((currentMemMB - this.lastMemoryMB) * 10) / 10;
+      if (heapDeltaMB < -4.0) {
+        isGcSweep = true;
+      }
+    }
+    if (currentMemMB !== null) {
+      this.lastMemoryMB = currentMemMB;
+    }
 
     const snapshot = {
       timestamp: Date.now(),
@@ -133,8 +146,12 @@ class FPSLogger {
         Math.round(cameraPos.y * 10) / 10,
         Math.round(cameraPos.z * 10) / 10
       ] : null,
+      drawCalls: renderInfo ? renderInfo.calls : null,
+      triangles: renderInfo ? renderInfo.triangles : null,
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
-      memoryMB: memoryInfo ? memoryInfo.usedJSHeapSizeMB : 'n/a',
+      memoryMB: currentMemMB !== null ? currentMemMB : 'n/a',
+      heapDeltaMB,
+      isGcSweep,
     };
 
     this.logs.push(snapshot);
@@ -143,12 +160,24 @@ class FPSLogger {
     }
   }
 
-  // Record an instantaneous micro-stutter event (single frame > 33ms)
-  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos }) {
+  // Record an instantaneous micro-stutter event with automatic cause categorization
+  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos, renderInfo }) {
     if (!this.isRecording) return;
 
-    const memoryInfo = (performance && performance.memory) ? 
-      Math.round(performance.memory.usedJSHeapSize / 1048576 * 10) / 10 : null;
+    let currentMemMB = null;
+    if (performance && performance.memory) {
+      currentMemMB = Math.round(performance.memory.usedJSHeapSize / 1048576 * 10) / 10;
+    }
+
+    // Categorize root cause
+    let causeCategory = 'FRAME_SPIKE';
+    if (currentMemMB !== null && this.lastMemoryMB !== null && (currentMemMB - this.lastMemoryMB) < -3.0) {
+      causeCategory = 'V8_GARBAGE_COLLECTION';
+    } else if (frameDurationMs > 100 && unlockedCount < 10) {
+      causeCategory = 'SHADER_COMPILATION';
+    } else if (selectedTarget !== 'OVERVIEW') {
+      causeCategory = 'CAMERA_ZOOM_FILL_RATE';
+    }
 
     const stutter = {
       event: 'STUTTER_EVENT',
@@ -157,6 +186,7 @@ class FPSLogger {
       elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
       frameDurationMs: Math.round(frameDurationMs * 100) / 100,
       equivalentFps: Math.round(1000 / frameDurationMs),
+      causeCategory,
       selectedTarget: selectedTarget || 'OVERVIEW',
       unlockedCount,
       isMobile,
@@ -166,8 +196,10 @@ class FPSLogger {
         Math.round(cameraPos.y * 10) / 10,
         Math.round(cameraPos.z * 10) / 10
       ] : null,
+      drawCalls: renderInfo ? renderInfo.calls : null,
+      triangles: renderInfo ? renderInfo.triangles : null,
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
-      memoryUsedMB: memoryInfo !== null ? memoryInfo : 'n/a',
+      memoryUsedMB: currentMemMB !== null ? currentMemMB : 'n/a',
     };
 
     this.stutterEvents.push(stutter);
@@ -178,11 +210,13 @@ class FPSLogger {
 
   // Export full diagnostic report as JSON file
   exportAsJson() {
+    const gcSweepCount = this.logs.filter(l => l.isGcSweep).length;
     const reportData = {
       session: this.sessionInfo,
       summary: {
         totalSnapshots: this.logs.length,
         totalStutterEvents: this.stutterEvents.length,
+        detectedGcSweeps: gcSweepCount,
         totalTierChanges: this.tierChangeEvents.length,
         totalInteractions: this.userInteractions.length,
         avgFps: this.logs.length ? Math.round(this.logs.reduce((acc, l) => acc + l.fps, 0) / this.logs.length) : 0,
@@ -211,7 +245,7 @@ class FPSLogger {
   exportAsCsv() {
     if (this.logs.length === 0) return;
 
-    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'GpuTier', 'CamX', 'CamY', 'CamZ', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB'];
+    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'GpuTier', 'DrawCalls', 'Triangles', 'CamX', 'CamY', 'CamZ', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB', 'HeapDeltaMB', 'IsGcSweep'];
     const rows = this.logs.map(l => [
       l.elapsedSeconds,
       l.fps,
@@ -221,12 +255,16 @@ class FPSLogger {
       l.selectedTarget,
       l.unlockedCount,
       l.gpuTier,
+      l.drawCalls !== null ? l.drawCalls : '',
+      l.triangles !== null ? l.triangles : '',
       l.cameraPos ? l.cameraPos[0] : '',
       l.cameraPos ? l.cameraPos[1] : '',
       l.cameraPos ? l.cameraPos[2] : '',
       l.battery.charging,
       l.battery.level,
-      l.memoryMB
+      l.memoryMB,
+      l.heapDeltaMB,
+      l.isGcSweep
     ]);
 
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
