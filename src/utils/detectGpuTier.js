@@ -3,10 +3,10 @@
  *
  * Strategy:
  *  1. Try WEBGL_debug_renderer_info (fast, works in Chrome, Firefox, Edge)
- *  2. Classify iGPUs / APUs (Radeon 760M/780M, Iris Xe, Intel HD/UHD) as 'med'/'low' by default
- *  3. Classify known high-end discrete GPUs (RTX 2060+, RX 6000+, etc.) as 'high'
+ *  2. Classify legacy / iGPUs / APUs (Radeon R9/R7/R5, Radeon 760M/780M, Iris Xe) as 'med'/'low' by default
+ *  3. Classify known high-end discrete GPUs (RTX 2060+, RX 5000+, etc.) strictly as 'high'
  *  4. Fallback: run an offscreen 600x400 FBM micro-benchmark on a WebGL canvas
- *     - < 3.0ms  → HIGH (dedicated RTX/RX GPUs)
+ *     - < 3.0ms  → HIGH (dedicated modern RTX/RX GPUs)
  *     - < 12.0ms → MED
  *     - >= 12.0ms → LOW
  *
@@ -19,23 +19,23 @@ const HIGH_TIER_PATTERNS = [
   /rtx\s*[23456789]\d{3}/i,    // RTX 2060, 3060, 4070, etc.
   /rtx\s*a\d{3,4}/i,           // RTX A4000, A5000
   /gtx\s*(10[7-9]0|1660|20[6-8]0|30[5-9]0)/i, // GTX 1070/1080/1660, etc.
-  /rx\s*[67]\d{3}/i,           // RX 6600, 6700, 7800, 7900
-  /rx\s*5[789]00/i,            // RX 5700, 5800
+  /rx\s*[567]\d{3}/i,          // RX 5700, 6600, 6700, 7800, 7900
   /quadro\s*r/i,
   /tesla/i,
 ];
 
-// iGPUs / APUs / Mobile integrated graphics → Default to 'med' or 'low' to ensure 60fps stability
+// iGPUs / APUs / Legacy mid GPUs → Default to 'med' or 'low' to ensure 60fps stability
 const MED_TIER_PATTERNS = [
-  /radeon\s*[6789]\d{2}[ms]/i, // Radeon 760M, 780M, 680M, 890M APUs
-  /radeon\s*graphics/i,        // Generic AMD APU graphics
+  /radeon\s*r[79]\s*(2|3|4|5)\d{2}/i, // Radeon R9 200/300, R7 200/300 legacy cards
+  /radeon\s*[6789]\d{2}[ms]/i,        // Radeon 760M, 780M, 680M, 890M APUs
+  /radeon\s*graphics/i,               // Generic AMD APU graphics
   /radeon\s*r[579]\s*graphics/i,
-  /vega\s*\d+/i,               // AMD Vega 8, 11
-  /iris\s*xe/i,                // Intel Iris Xe
-  /intel.*graphics/i,          // Intel UHD/HD/Arc Mobile
-  /apple\s*m[1234]/i,          // Apple Silicon integrated
-  /gtx\s*(10[56]0|1650|9[67]0)/i, // Entry/mid GTX (1050, 1060, 1650)
-  /rx\s*(4[78]0|5[789]0)/i,    // Older mid RX (RX 480, 580)
+  /vega\s*\d+/i,                      // AMD Vega 8, 11
+  /iris\s*xe/i,                       // Intel Iris Xe
+  /intel.*graphics/i,                 // Intel UHD/HD/Arc Mobile
+  /apple\s*m[1234]/i,                 // Apple Silicon integrated
+  /gtx\s*(10[56]0|1650|9[67]0)/i,     // Entry/mid GTX (1050, 1060, 1650)
+  /rx\s*(4[78]0|5[789]0)/i,           // Older mid RX (RX 480, 580)
 ];
 
 const LOW_TIER_PATTERNS = [
@@ -71,7 +71,7 @@ function classifyByName(name) {
     return { tier: 'high', reason: 'High-performance discrete GPU match' };
   }
   if (MED_TIER_PATTERNS.some((r) => r.test(n))) {
-    return { tier: 'med', reason: 'Integrated APU / Mid-range GPU match' };
+    return { tier: 'med', reason: 'Integrated APU / Legacy / Mid-range GPU match' };
   }
   if (LOW_TIER_PATTERNS.some((r) => r.test(n))) {
     return { tier: 'low', reason: 'Low-power / legacy GPU match' };
@@ -179,7 +179,7 @@ function runBenchmark() {
 }
 
 // Benchmark Thresholds (ms per frame on 600×400 canvas):
-//   Dedicated desktop GPU (RTX 3060/4060): ~0.8 – 2.5 ms  → HIGH (< 3.0ms)
+//   Dedicated modern GPU (RTX 2060/3060/4060): ~0.8 – 2.5 ms  → HIGH (< 3.0ms)
 //   Mid-range GPU / fast APU (Radeon 780M, GTX 1060): ~3.0 – 12.0 ms → MED (< 12.0ms)
 //   Low-end GPU / weak iGPU (Intel UHD 620, old laptop): >= 12.0 ms   → LOW
 const THRESH_HIGH = 3.0;

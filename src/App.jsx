@@ -57,6 +57,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         batteryStatus: batteryRef.current,
         isMobile,
         gpuTier,
+        cameraPos: _state.camera.position,
       });
     }
 
@@ -135,6 +136,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         batteryStatus: batteryRef.current,
         isMobile,
         gpuTier,
+        cameraPos: _state.camera.position,
       });
 
       lastSnapshotTime.current = now;
@@ -172,7 +174,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
       (window.location.search.includes('debug=fps') || window.location.search.includes('profiler=true'));
   });
 
-  const handleToggleProfiler = () => setIsProfilerOpen((prev) => !prev);
+  const handleToggleProfiler = () => {
+    fpsLogger.logInteraction({ type: 'TOGGLE_PROFILER', target: selectedTarget, details: { isOpen: !isProfilerOpen } });
+    setIsProfilerOpen((prev) => !prev);
+  };
 
   const handleSetTier = (tier) => {
     fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override' });
@@ -203,7 +208,14 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   };
 
   const handleUnlockNext = () => {
-    setUnlockedCount((prev) => Math.min(SYSTEM_CONFIG.projects.length, prev + 1));
+    setUnlockedCount((prev) => {
+      const nextCount = Math.min(SYSTEM_CONFIG.projects.length, prev + 1);
+      const unlockedProject = SYSTEM_CONFIG.projects[nextCount - 1];
+      if (unlockedProject) {
+        fpsLogger.logUnlock({ planetId: unlockedProject.id, unlockedCount: nextCount });
+      }
+      return nextCount;
+    });
   };
 
   // Mobile detection for targeted performance scaling
@@ -368,14 +380,15 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
 
   const handleSelect = (id) => {
     if (selectedTarget === id) {
-      // Toggle back to system overview (Index 0)
+      fpsLogger.logInteraction({ type: 'DESELECT_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: id } });
       setSelectedTarget(null);
       scrollToPlanetIndex(0);
     } else if (id === 'core') {
+      fpsLogger.logInteraction({ type: 'SELECT_CORE', target: 'core', details: {} });
       setSelectedTarget('core');
       scrollToPlanetIndex(1); // Core is Index 1
     } else {
-      // Planet selected -> find index and scroll to it smoothly via Lenis
+      fpsLogger.logInteraction({ type: 'SELECT_PLANET', target: id, details: {} });
       setSelectedTarget(id);
       const index = SYSTEM_CONFIG.projects.findIndex((p) => p.id === id);
       if (index !== -1) {
@@ -385,6 +398,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   };
 
   const handleReturn = () => {
+    fpsLogger.logInteraction({ type: 'CLICK_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: selectedTarget } });
     setSelectedTarget(null);
     scrollToPlanetIndex(0);
   };

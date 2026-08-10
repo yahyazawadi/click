@@ -1,6 +1,7 @@
 /**
- * YAHYA.CLICK — COMPREHENSIVE FPS TELEMETRY & EVENT LOGGER
+ * YAHYA.CLICK — COMPREHENSIVE FPS TELEMETRY & USER INTERACTION LOGGER
  * Continuously records frame timing, 1% lows, GPU tier, memory, battery, hardware telemetry,
+ * USER INTERACTION EVENTS (clicks, planet focus, drags, scroll), CAMERA TRAJECTORIES,
  * and captures STUTTER_EVENTS (>33ms / >50ms frame spikes) and TIER_CHANGE events.
  * Supports 1-click JSON and CSV export.
  */
@@ -10,6 +11,8 @@ class FPSLogger {
     this.logs = [];
     this.stutterEvents = [];
     this.tierChangeEvents = [];
+    this.userInteractions = [];
+    this.unlockEvents = [];
     this.maxLogs = 600; // 10 minutes at 1 snapshot/sec
     this.startTime = Date.now();
     this.sessionInfo = this.getDeviceInfo();
@@ -57,6 +60,37 @@ class FPSLogger {
     };
   }
 
+  // Record user interactions (clicks, focus, drag, navigation)
+  logInteraction({ type, target, details }) {
+    if (!this.isRecording) return;
+    const evt = {
+      event: 'USER_INTERACTION',
+      timestamp: Date.now(),
+      timestampISO: new Date().toISOString(),
+      elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
+      type, // 'CLICK_PLANET' | 'CLICK_CORE' | 'RETURN_TO_ORBIT' | 'TOGGLE_PROFILER' | 'DRAG_ROTATE'
+      target: target || 'OVERVIEW',
+      details: details || {},
+    };
+    console.log(`[Telemetry] INTERACTION [${type}]: target="${evt.target}"`);
+    this.userInteractions.push(evt);
+  }
+
+  // Record when a planet unlocks
+  logUnlock({ planetId, unlockedCount }) {
+    if (!this.isRecording) return;
+    const evt = {
+      event: 'PLANET_UNLOCKED',
+      timestamp: Date.now(),
+      timestampISO: new Date().toISOString(),
+      elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
+      planetId,
+      unlockedCount,
+    };
+    console.log(`[Telemetry] UNLOCK: ${planetId} (Count ${unlockedCount}/10)`);
+    this.unlockEvents.push(evt);
+  }
+
   // Record tier change event
   logTierChange({ from, to, reason }) {
     if (!this.isRecording) return;
@@ -74,7 +108,7 @@ class FPSLogger {
   }
 
   // Record a per-second telemetry snapshot
-  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier }) {
+  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos }) {
     if (!this.isRecording) return;
 
     const memoryInfo = (performance && performance.memory) ? {
@@ -94,6 +128,11 @@ class FPSLogger {
       unlockedCount,
       isMobile,
       gpuTier: gpuTier || 'unknown',
+      cameraPos: cameraPos ? [
+        Math.round(cameraPos.x * 10) / 10,
+        Math.round(cameraPos.y * 10) / 10,
+        Math.round(cameraPos.z * 10) / 10
+      ] : null,
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
       memoryMB: memoryInfo ? memoryInfo.usedJSHeapSizeMB : 'n/a',
     };
@@ -105,7 +144,7 @@ class FPSLogger {
   }
 
   // Record an instantaneous micro-stutter event (single frame > 33ms)
-  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier }) {
+  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos }) {
     if (!this.isRecording) return;
 
     const memoryInfo = (performance && performance.memory) ? 
@@ -122,6 +161,11 @@ class FPSLogger {
       unlockedCount,
       isMobile,
       gpuTier: gpuTier || 'unknown',
+      cameraPos: cameraPos ? [
+        Math.round(cameraPos.x * 10) / 10,
+        Math.round(cameraPos.y * 10) / 10,
+        Math.round(cameraPos.z * 10) / 10
+      ] : null,
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
       memoryUsedMB: memoryInfo !== null ? memoryInfo : 'n/a',
     };
@@ -140,10 +184,13 @@ class FPSLogger {
         totalSnapshots: this.logs.length,
         totalStutterEvents: this.stutterEvents.length,
         totalTierChanges: this.tierChangeEvents.length,
+        totalInteractions: this.userInteractions.length,
         avgFps: this.logs.length ? Math.round(this.logs.reduce((acc, l) => acc + l.fps, 0) / this.logs.length) : 0,
         lowest1PercentFps: this.logs.length ? Math.min(...this.logs.map(l => l.onePercentLow)) : 0,
         worstStutterFrameMs: this.stutterEvents.length ? Math.max(...this.stutterEvents.map(s => s.frameDurationMs)) : 0,
       },
+      userInteractions: this.userInteractions,
+      unlockEvents: this.unlockEvents,
       tierChangeEvents: this.tierChangeEvents,
       stutterEvents: this.stutterEvents,
       snapshots: this.logs,
@@ -164,7 +211,7 @@ class FPSLogger {
   exportAsCsv() {
     if (this.logs.length === 0) return;
 
-    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'GpuTier', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB'];
+    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'GpuTier', 'CamX', 'CamY', 'CamZ', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB'];
     const rows = this.logs.map(l => [
       l.elapsedSeconds,
       l.fps,
@@ -174,6 +221,9 @@ class FPSLogger {
       l.selectedTarget,
       l.unlockedCount,
       l.gpuTier,
+      l.cameraPos ? l.cameraPos[0] : '',
+      l.cameraPos ? l.cameraPos[1] : '',
+      l.cameraPos ? l.cameraPos[2] : '',
       l.battery.charging,
       l.battery.level,
       l.memoryMB
