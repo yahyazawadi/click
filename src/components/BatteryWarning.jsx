@@ -33,7 +33,7 @@ export function BatteryWarning() {
     <div style={{
       position: 'fixed',
       top: 0, left: 0, width: '100vw', height: '100vh',
-      backgroundColor: 'rgba(7, 17, 36, 0.92)',
+      backgroundColor: 'rgba(7, 17, 36, 0.95)',
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
@@ -41,7 +41,6 @@ export function BatteryWarning() {
       alignItems: 'center',
       fontFamily: 'var(--font-mono)',
       textAlign: 'center',
-      backdropFilter: 'blur(15px)',
       padding: '2rem'
     }}>
       <div style={{
