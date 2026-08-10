@@ -7,7 +7,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon-light-mode.svg?v=3" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>yahya.click — Cosmic Orbital Portfolio</title>
+    <!-- Automatic stale asset cache recovery handler -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e && e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          var key = 'stale_asset_reload';
+          var attempts = Number(sessionStorage.getItem(key) || 0);
+          if (attempts < 2) {
+            sessionStorage.setItem(key, String(attempts + 1));
+            window.location.reload();
+          }
+        }
+      }, true);
+    </script>
     <!-- Google Fonts: JetBrains Mono & Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
