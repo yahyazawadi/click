@@ -1,7 +1,7 @@
 /**
  * YAHYA.CLICK — COMPREHENSIVE FPS TELEMETRY & EVENT LOGGER
- * Continuously records frame timing, 1% lows, memory, battery, hardware telemetry,
- * and captures STUTTER_EVENTS (>33ms / >50ms frame spikes).
+ * Continuously records frame timing, 1% lows, GPU tier, memory, battery, hardware telemetry,
+ * and captures STUTTER_EVENTS (>33ms / >50ms frame spikes) and TIER_CHANGE events.
  * Supports 1-click JSON and CSV export.
  */
 
@@ -9,6 +9,7 @@ class FPSLogger {
   constructor() {
     this.logs = [];
     this.stutterEvents = [];
+    this.tierChangeEvents = [];
     this.maxLogs = 600; // 10 minutes at 1 snapshot/sec
     this.startTime = Date.now();
     this.sessionInfo = this.getDeviceInfo();
@@ -56,8 +57,24 @@ class FPSLogger {
     };
   }
 
+  // Record tier change event
+  logTierChange({ from, to, reason }) {
+    if (!this.isRecording) return;
+    const evt = {
+      event: 'TIER_CHANGE_EVENT',
+      timestamp: Date.now(),
+      timestampISO: new Date().toISOString(),
+      elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
+      from,
+      to,
+      reason: reason || 'User override or automatic adaptation',
+    };
+    console.log(`[Telemetry] TIER_CHANGE: ${from} → ${to} (${evt.reason})`);
+    this.tierChangeEvents.push(evt);
+  }
+
   // Record a per-second telemetry snapshot
-  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile }) {
+  logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier }) {
     if (!this.isRecording) return;
 
     const memoryInfo = (performance && performance.memory) ? {
@@ -76,6 +93,7 @@ class FPSLogger {
       selectedTarget: selectedTarget || 'OVERVIEW',
       unlockedCount,
       isMobile,
+      gpuTier: gpuTier || 'unknown',
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
       memoryMB: memoryInfo ? memoryInfo.usedJSHeapSizeMB : 'n/a',
     };
@@ -87,7 +105,7 @@ class FPSLogger {
   }
 
   // Record an instantaneous micro-stutter event (single frame > 33ms)
-  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile }) {
+  logStutterEvent({ frameDurationMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier }) {
     if (!this.isRecording) return;
 
     const memoryInfo = (performance && performance.memory) ? 
@@ -103,6 +121,7 @@ class FPSLogger {
       selectedTarget: selectedTarget || 'OVERVIEW',
       unlockedCount,
       isMobile,
+      gpuTier: gpuTier || 'unknown',
       battery: batteryStatus || { charging: 'unknown', level: 'unknown' },
       memoryUsedMB: memoryInfo !== null ? memoryInfo : 'n/a',
     };
@@ -120,10 +139,12 @@ class FPSLogger {
       summary: {
         totalSnapshots: this.logs.length,
         totalStutterEvents: this.stutterEvents.length,
+        totalTierChanges: this.tierChangeEvents.length,
         avgFps: this.logs.length ? Math.round(this.logs.reduce((acc, l) => acc + l.fps, 0) / this.logs.length) : 0,
         lowest1PercentFps: this.logs.length ? Math.min(...this.logs.map(l => l.onePercentLow)) : 0,
         worstStutterFrameMs: this.stutterEvents.length ? Math.max(...this.stutterEvents.map(s => s.frameDurationMs)) : 0,
       },
+      tierChangeEvents: this.tierChangeEvents,
       stutterEvents: this.stutterEvents,
       snapshots: this.logs,
     };
@@ -143,7 +164,7 @@ class FPSLogger {
   exportAsCsv() {
     if (this.logs.length === 0) return;
 
-    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB'];
+    const headers = ['ElapsedSec', 'FPS', 'OnePercentLow', 'AvgFrameTimeMs', 'MaxFrameTimeMs', 'Target', 'UnlockedCount', 'GpuTier', 'BatteryCharging', 'BatteryLevel', 'MemoryUsedMB'];
     const rows = this.logs.map(l => [
       l.elapsedSeconds,
       l.fps,
@@ -152,6 +173,7 @@ class FPSLogger {
       l.maxFrameTimeMs,
       l.selectedTarget,
       l.unlockedCount,
+      l.gpuTier,
       l.battery.charging,
       l.battery.level,
       l.memoryMB

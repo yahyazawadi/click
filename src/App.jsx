@@ -21,7 +21,7 @@ import { tierToFloat } from './utils/detectGpuTier.js';
 import { useFrame } from '@react-three/fiber';
 
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
-function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount }) {
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier }) {
   const stableTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
@@ -54,7 +54,8 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         selectedTarget,
         unlockedCount,
         batteryStatus: batteryRef.current,
-        isMobile
+        isMobile,
+        gpuTier,
       });
     }
 
@@ -118,7 +119,8 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         selectedTarget,
         unlockedCount,
         batteryStatus: batteryRef.current,
-        isMobile
+        isMobile,
+        gpuTier,
       });
 
       lastSnapshotTime.current = now;
@@ -151,6 +153,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
 
   const handleSetTier = (tier) => {
+    fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override' });
     setGpuTier(tier);
     setPerfTierFloat(tierToFloat(tier));
   };
@@ -385,6 +388,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 onMetricsUpdate={setMetrics}
                 selectedTarget={selectedTarget}
                 unlockedCount={unlockedCount}
+                gpuTier={gpuTier}
               />
 
               {/* Manual Drag & Spin (Rotates system + background together) */}
