@@ -56,8 +56,10 @@ export function SceneRotator({ children, disabled = false }) {
       dragging.current = true;
       lastX.current = e.clientX;
       lastY.current = e.clientY;
-      mouseDelta.current = { x: 0, y: 0 };
-      velocity.current = { x: 0, y: 0 };
+      mouseDelta.current.x = 0;
+      mouseDelta.current.y = 0;
+      velocity.current.x = 0;
+      velocity.current.y = 0;
       canvas.style.cursor = 'grabbing';
     };
 
@@ -137,7 +139,8 @@ export function SceneRotator({ children, disabled = false }) {
       const angleX = THREE.MathUtils.clamp(rawAngleX, -maxStep, maxStep);
       const angleY = THREE.MathUtils.clamp(rawAngleY, -maxStep, maxStep);
 
-      mouseDelta.current = { x: 0, y: 0 };
+      mouseDelta.current.x = 0;
+      mouseDelta.current.y = 0;
 
       // 2. Smoothly track velocity
       const maxVel = 0.08;
