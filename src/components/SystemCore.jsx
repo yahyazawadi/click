@@ -2,17 +2,25 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
+import '../shaders/PlanetCoreMaterial';
 
 export function SystemCore({ onSelect }) {
   const innerCoreRef = useRef();
+  const shaderMatRef = useRef();
   const outerLatticeRef = useRef();
   const ringRef1 = useRef();
   const ringRef2 = useRef();
   const [hovered, setHovered] = useState(false);
 
   useFrame((state, delta) => {
+    const time = state.clock.getElapsedTime();
+
+    if (shaderMatRef.current) {
+      shaderMatRef.current.uTime = time;
+    }
+
     if (innerCoreRef.current) {
-      innerCoreRef.current.rotation.y += delta * 0.2;
+      innerCoreRef.current.rotation.y += delta * 0.15;
     }
     if (outerLatticeRef.current) {
       outerLatticeRef.current.rotation.y -= delta * 0.15;
@@ -39,16 +47,16 @@ export function SystemCore({ onSelect }) {
       onPointerOut={() => setHovered(false)}
       style={{ cursor: 'pointer' }}
     >
-      {/* 1. Inner Solid Core (Deep Shadow Blue) */}
+      {/* 1. Procedural Sci-Fi Core Planet with Dynamic Tectonic Textures & Atmospheric Glow */}
       <mesh ref={innerCoreRef}>
-        <icosahedronGeometry args={[coreRadius, 2]} />
-        <meshStandardMaterial
-          color={SYSTEM_CONFIG.colors.deepShadow}
-          roughness={0.2}
-          metalness={0.8}
-          emissive={SYSTEM_CONFIG.colors.primaryCyan}
-          emissiveIntensity={0.5}
-          flatShading
+        <icosahedronGeometry args={[coreRadius, 32]} />
+        <planetCoreMaterial
+          ref={shaderMatRef}
+          uBaseColor={new THREE.Color('#030d22')}       // Deep cosmic space void blue
+          uSecondaryColor={new THREE.Color('#003268')}  // Deep planetary trench blue
+          uAccentColor={new THREE.Color('#00e5ff')}     // Bioluminescent cyan energy veins
+          uGlowColor={new THREE.Color('#5500aa')}       // Deep cosmic violet/magenta tectonic glow
+          uAtmosphereColor={new THREE.Color('#00BAE3')} // Glowing atmospheric rim halo
         />
       </mesh>
 
@@ -56,10 +64,10 @@ export function SystemCore({ onSelect }) {
       <mesh ref={outerLatticeRef}>
         <icosahedronGeometry args={[coreRadius * 1.25, 1]} />
         <meshStandardMaterial
-          color={SYSTEM_CONFIG.colors.primaryCyan}
+          color={hovered ? '#00e5ff' : SYSTEM_CONFIG.colors.primaryCyan}
           wireframe
           transparent
-          opacity={0.6}
+          opacity={hovered ? 0.8 : 0.5}
         />
       </mesh>
 
