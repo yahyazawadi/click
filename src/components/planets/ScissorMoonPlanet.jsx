@@ -27,7 +27,7 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
   const planetRadius = size * 0.85;
   const bladeLen     = size * 1.6;
 
-  const positions = isMobile ? SCISSOR_POSITIONS.slice(0, 4) : SCISSOR_POSITIONS;
+  const positions = isMobile ? SCISSOR_POSITIONS.slice(0, 3) : SCISSOR_POSITIONS;
 
   // Pre-compute position + quaternion for each scissor (places them flat against the sphere surface).
   const scissorDefs = useMemo(() => {
