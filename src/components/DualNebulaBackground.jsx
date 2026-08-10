@@ -16,18 +16,21 @@ export function DualNebulaBackground() {
   return (
     <group position={[0, 0, -50]}>
       {/*
-        NEBULA 1: Eagle / Carina-style Emission Nebula
-        Deep crimson H-alpha body with teal OIII ionization shell and dark dust lanes.
-        Pillar columns point upward-right like the "Pillars of Creation".
+        NEBULA 1: Deep Violet / Crimson Gas Cloud — portfolio's left-side nebula.
+        Outer wisps: electric violet  (#6600cc)
+        Mid body:    vivid crimson    (#c40045)  ← original hero color
+        Dense knots: deep magenta     (#9900cc)
+        Hot core:    pale cyan-white  (#c0f0ff)  ← matches UI accent
+        Dark dust lanes cut across giving realistic depth.
       */}
       <mesh position={[-35, 20, -40]} rotation={[0.15, 0.3, -0.1]}>
         <planeGeometry args={[220, 160]} />
         <nebulaMaterial
           ref={matRefLayer1}
-          uColorSII={new THREE.Color('#d43000')}   // Warm orange-red SII 673nm
-          uColorHa={new THREE.Color('#8b0010')}    // Deep crimson H-alpha 656nm
-          uColorOIII={new THREE.Color('#006880')}  // Teal OIII 501nm
-          uColorCore={new THREE.Color('#ffe0a0')}  // Hot ionization front
+          uColorSII={new THREE.Color('#9900cc')}   // Dense magenta knots (replaces SII orange)
+          uColorHa={new THREE.Color('#c40045')}    // Vivid crimson body  (portfolio hero color)
+          uColorOIII={new THREE.Color('#5500bb')}  // Electric violet outer shell
+          uColorCore={new THREE.Color('#c0f0ff')}  // Pale cyan-white ionization core
           uScale={3.2}
           uWarp={2.6}
           uMaskRadius={0.38}
@@ -44,18 +47,20 @@ export function DualNebulaBackground() {
       </mesh>
 
       {/*
-        NEBULA 2: Rosette / Orion-style Emission Nebula
-        Slightly bluer-teal OIII dominant shell with H-alpha filaments.
-        Different pillar axis orientation.
+        NEBULA 2: Magenta / Electric Cyan Wisps — portfolio's right-side nebula.
+        Outer wisps: deep magenta     (#cc007a)
+        Mid body:    violet           (#8800dd)
+        Dense knots: electric cyan    (#00d4ff)  ← UI ring / orbit color
+        Hot core:    bright white     (#e8f8ff)
       */}
       <mesh position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
         <planeGeometry args={[190, 140]} />
         <nebulaMaterial
           ref={matRefLayer2}
-          uColorSII={new THREE.Color('#cc2800')}   // Sulfur-II orange-red
-          uColorHa={new THREE.Color('#6a000d')}    // H-alpha deep red
-          uColorOIII={new THREE.Color('#009999')}  // Brighter OIII teal (Rosette-style)
-          uColorCore={new THREE.Color('#fff0d0')}  // Warm ionization core
+          uColorSII={new THREE.Color('#00c8e8')}   // Electric cyan dense regions
+          uColorHa={new THREE.Color('#8800dd')}    // Deep violet body
+          uColorOIII={new THREE.Color('#cc007a')}  // Magenta outer shell
+          uColorCore={new THREE.Color('#e8f8ff')}  // Near-white hot core
           uScale={4.5}
           uWarp={3.8}
           uMaskRadius={0.35}
