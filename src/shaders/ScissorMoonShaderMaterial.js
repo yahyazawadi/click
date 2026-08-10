@@ -81,7 +81,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       mat3 rot = mat3( 0.36, 0.48,-0.80,
                       -0.80, 0.60, 0.00,
                        0.48, 0.64, 0.60);
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 3; i++) {
         v += a * noise(p);
         p  = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
         a *= 0.5;

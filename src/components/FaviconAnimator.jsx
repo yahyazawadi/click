@@ -260,17 +260,19 @@ export function FaviconAnimator() {
       // Advance planet angle along the orbit
       planetAngle += 0.22;
 
-      // Force Brave/Chromium tab refresh by replacing link element
       const dataUrl = canvas.toDataURL('image/png');
       
-      const existingLinks = document.querySelectorAll("link[rel*='icon']");
-      existingLinks.forEach((el) => el.remove());
-
-      const newLink = document.createElement('link');
-      newLink.rel = 'icon';
-      newLink.type = 'image/png';
-      newLink.href = dataUrl;
-      document.head.appendChild(newLink);
+      let faviconLink = document.getElementById('dynamic-favicon');
+      if (!faviconLink) {
+        const existingLinks = document.querySelectorAll("link[rel*='icon']");
+        existingLinks.forEach((el) => el.remove());
+        faviconLink = document.createElement('link');
+        faviconLink.id = 'dynamic-favicon';
+        faviconLink.rel = 'icon';
+        faviconLink.type = 'image/png';
+        document.head.appendChild(faviconLink);
+      }
+      faviconLink.href = dataUrl;
 
     }, 250); // 4 FPS
 

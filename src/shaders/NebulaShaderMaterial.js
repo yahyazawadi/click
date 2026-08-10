@@ -75,12 +75,12 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // 8-octave gas FBM
+    // 4-octave gas FBM (optimized for high FPS)
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
-      for (int i = 0; i < 8; i++) {
+      for (int i = 0; i < 4; i++) {
         v += a * noise(p);
         p  = rot * p * 2.07 + vec2(13.4, 27.9);
         a *= 0.48;
@@ -88,12 +88,12 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // 6-octave dust FBM
+    // 3-octave dust FBM (optimized)
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.62, 0.78, -0.78, 0.62);
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 3; i++) {
         v += a * noise(p);
         p  = rot * p * 1.97 + vec2(4.1, 51.3);
         a *= 0.52;
