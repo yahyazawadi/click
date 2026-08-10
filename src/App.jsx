@@ -12,6 +12,34 @@ import { UIOverlay } from './components/UIOverlay';
 import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScrollProvider';
 import { FaviconAnimator } from './components/FaviconAnimator';
 
+import { useFrame } from '@react-three/fiber';
+
+// FPS-Stabilized Progressive Planet Unloader / Loader Controller
+function ProgressivePlanetController({ onUnlockNext }) {
+  const stableFrames = useRef(0);
+  const cooldown = useRef(0);
+
+  useFrame((_state, delta) => {
+    // Check if FPS is stable (> 30 FPS threshold)
+    if (delta < 0.033) {
+      stableFrames.current += 1;
+    } else {
+      stableFrames.current = Math.max(0, stableFrames.current - 2);
+    }
+
+    cooldown.current += delta;
+
+    // Once rendering has been stable for ~8 frames and 120ms cooldown passes, unlock next planet
+    if (stableFrames.current >= 8 && cooldown.current > 0.12) {
+      stableFrames.current = 0;
+      cooldown.current = 0;
+      onUnlockNext();
+    }
+  });
+
+  return null;
+}
+
 export default function App() {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const targetPlanetPosRef = useRef(new THREE.Vector3());
@@ -19,6 +47,11 @@ export default function App() {
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [unlockedCount, setUnlockedCount] = useState(2); // Priority 1: Core & Scissor planets start unlocked immediately
+
+  const handleUnlockNext = () => {
+    setUnlockedCount((prev) => Math.min(SYSTEM_CONFIG.projects.length, prev + 1));
+  };
 
   // Mobile detection for targeted performance scaling
   useEffect(() => {
@@ -225,6 +258,9 @@ export default function App() {
             <pointLight position={[-12, -12, -12]} intensity={0.6} color={SYSTEM_CONFIG.colors.deepShadow} />
 
             <Suspense fallback={null}>
+              {/* Dynamic FPS-Stabilized Progressive Planet Unlocker */}
+              <ProgressivePlanetController onUnlockNext={handleUnlockNext} />
+
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
@@ -238,15 +274,20 @@ export default function App() {
                   <OrbitalPath key={ring.id} {...ring} />
                 ))}
 
-                {/* Orbiting Project Planets */}
-                {SYSTEM_CONFIG.projects.map((proj) => {
+                {/* Orbiting Project Planets — Progressively Unlocked as FPS Stabilizes */}
+                {SYSTEM_CONFIG.projects.map((proj, idx) => {
                   const ring = SYSTEM_CONFIG.rings[proj.ringIndex];
+                  // Priority 1: Scissor planets (shapeIndex 0 & 10) or initial indices start unlocked immediately
+                  const isPriorityPlanet = proj.shapeIndex === 0 || proj.shapeIndex === 10 || idx < 2;
+                  const isUnlocked = isPriorityPlanet || idx < unlockedCount;
+
                   return (
                     <PlanetNode
                       key={proj.id}
                       project={proj}
                       ring={ring}
                       isMobile={isMobile}
+                      isUnlocked={isUnlocked}
                       onSelect={handleSelect}
                       isSelected={selectedTarget === proj.id}
                       hasSelection={!!selectedTarget}

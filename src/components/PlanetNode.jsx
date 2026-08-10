@@ -49,9 +49,11 @@ function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile }) {
   }
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile }) {
+export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
+  const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
+  const [shouldRenderMesh, setShouldRenderMesh] = useState(isUnlocked);
 
   const angleRef = useRef(project.startAngle || 0);
 
@@ -72,13 +74,24 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
     euler.current.set(ring.tiltX || 0, ring.tiltY || 0, ring.tiltZ || 0);
     localPos.current.applyEuler(euler.current);
 
+    // Smooth scale lerp for progressive fade-in
+    const targetScale = isUnlocked ? 1.0 : 0.0;
+    currentScaleRef.current = THREE.MathUtils.lerp(currentScaleRef.current, targetScale, Math.min(1.0, delta * 5.0));
+
     if (groupRef.current) {
       groupRef.current.position.copy(localPos.current);
+      groupRef.current.scale.setScalar(currentScaleRef.current);
 
       if (isSelected && targetPlanetPosRef) {
         groupRef.current.getWorldPosition(worldPos.current);
         targetPlanetPosRef.current.copy(worldPos.current);
       }
+    }
+
+    if (currentScaleRef.current > 0.02 && !shouldRenderMesh) {
+      setShouldRenderMesh(true);
+    } else if (currentScaleRef.current <= 0.01 && shouldRenderMesh && !isUnlocked) {
+      setShouldRenderMesh(false);
     }
   });
 
@@ -92,25 +105,26 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
       ref={groupRef}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect(project.id);
+        if (isUnlocked) onSelect(project.id);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
-        setHovered(true);
+        if (isUnlocked) setHovered(true);
       }}
       onPointerOut={(e) => {
         e.stopPropagation();
         setHovered(false);
       }}
     >
-      <ProceduralPlanetMesh
-        type={shapeIndex}
-        color={planetColor}
-        size={project.size || 0.5}
-        isSelected={isSelected}
-      />
-
-      {/* Floating HTML Title Label */}
+      {shouldRenderMesh && (
+        <ProceduralPlanetMesh
+          type={shapeIndex}
+          color={planetColor}
+          size={project.size || 0.5}
+          isSelected={isSelected}
+          isMobile={isMobile}
+        />
+      )}{/* Floating HTML Title Label */}
       {!hasSelection && (
         <Html distanceFactor={15} center style={{ pointerEvents: 'none' }}>
           <div className={`planet-label ${hovered || showTitle ? 'visible pulse' : ''}`}>
