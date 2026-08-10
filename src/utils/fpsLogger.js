@@ -29,9 +29,24 @@ class FPSLogger {
     else if (ua.includes('Chrome/')) browser = 'Chrome';
     else if (ua.includes('Safari/')) browser = 'Safari';
 
+    let gpuRenderer = 'Unknown';
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (gl) {
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+          gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        }
+      }
+    } catch (e) {
+      gpuRenderer = 'Error querying GPU';
+    }
+
     return {
       userAgent: ua,
       browser,
+      gpuRenderer,
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
       devicePixelRatio: window.devicePixelRatio || 1,
