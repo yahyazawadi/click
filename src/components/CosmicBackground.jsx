@@ -7,12 +7,14 @@ import { SYSTEM_CONFIG } from '../config';
 export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0 }) {
   const starsRef = useRef();
 
-  // Very slow background rotation for deep space ambiance
+  // Very slow background rotation for deep space ambiance (skipped on LOW tier)
   useFrame((state, delta) => {
-    if (starsRef.current) {
+    if (starsRef.current && perfTierFloat < 0.8) {
       starsRef.current.rotation.y += delta * 0.01;
     }
   });
+
+  const starCount = perfTierFloat >= 0.8 ? 600 : perfTierFloat >= 0.3 ? 1200 : (isMobile ? 1000 : 2500);
 
   return (
     <>
@@ -21,7 +23,7 @@ export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0
         <Stars
           radius={100}
           depth={50}
-          count={isMobile ? 1000 : 2500}
+          count={starCount}
           factor={4}
           saturation={0}
           fade

@@ -55,7 +55,7 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
     >
       {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <sphereGeometry args={[coreRadius, 48, 48]} />
+        <sphereGeometry args={[coreRadius, perfTierFloat >= 0.8 ? 24 : 48, perfTierFloat >= 0.8 ? 24 : 48]} />
         <planetCoreMaterial
           ref={shaderMatRef}
           uPerfTier={perfTierFloat}
@@ -71,22 +71,30 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
 
       {/* 3. Concentric Core Orbit Ring 1 */}
       <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[coreRadius * 1.5, 0.03, 12, 48]} />
-        <meshStandardMaterial
-          color={SYSTEM_CONFIG.colors.primaryCyan}
-          emissive={SYSTEM_CONFIG.colors.primaryCyan}
-          emissiveIntensity={0.6}
-        />
+        <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+        {perfTierFloat >= 0.8 ? (
+          <meshBasicMaterial color={SYSTEM_CONFIG.colors.primaryCyan} />
+        ) : (
+          <meshStandardMaterial
+            color={SYSTEM_CONFIG.colors.primaryCyan}
+            emissive={SYSTEM_CONFIG.colors.primaryCyan}
+            emissiveIntensity={0.6}
+          />
+        )}
       </mesh>
 
       {/* 4. Concentric Core Orbit Ring 2 */}
       <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
-        <torusGeometry args={[coreRadius * 1.7, 0.02, 12, 48]} />
-        <meshStandardMaterial
-          color={SYSTEM_CONFIG.colors.secondaryBlue}
-          transparent
-          opacity={0.5}
-        />
+        <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+        {perfTierFloat >= 0.8 ? (
+          <meshBasicMaterial color={SYSTEM_CONFIG.colors.secondaryBlue} transparent opacity={0.5} />
+        ) : (
+          <meshStandardMaterial
+            color={SYSTEM_CONFIG.colors.secondaryBlue}
+            transparent
+            opacity={0.5}
+          />
+        )}
       </mesh>
     </group>
   );
