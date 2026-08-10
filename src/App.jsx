@@ -178,8 +178,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // DEV: switch nebula HIGH-tier warp path live (0=Silky Wisps 1=Deep Ocean 2=Orion Ribbon 3=Veins)
-  const [nebulaPath, setNebulaPath] = useState(0);
+  // DEV: independent path per nebula (1=Deep Ocean for red, 3=Plasma Filaments for teal)
+  const [nebulaPath1, setNebulaPath1] = useState(1);
+  const [nebulaPath2, setNebulaPath2] = useState(3);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
@@ -459,7 +460,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} nebulaPath={nebulaPath} />
+                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />
 
                 {/* Central Sphere Core */}
                 <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} isSelected={selectedTarget === 'core'} />
@@ -535,38 +536,49 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         <BatteryWarning isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
         <PerformanceWarning currentFps={currentFps} isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
 
-        {/* DEV — Nebula Path Switcher (floating, bottom-left) */}
-        {import.meta.env.DEV && (
+        {/* Nebula Lab — Path Switcher (floating, bottom-left, always visible) */}
+        {(
           <div style={{
             position: 'fixed', bottom: 18, left: 18, zIndex: 9999,
-            display: 'flex', flexDirection: 'column', gap: 6,
+            display: 'flex', flexDirection: 'column', gap: 10,
             fontFamily: 'monospace', fontSize: 11,
           }}>
-            <span style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: 1, marginBottom: 2 }}>NEBULA PATH</span>
-            {[
-              [0, '0 · Silky Wisps'],
-              [1, '1 · Deep Ocean'],
-              [2, '2 · Orion Ribbon'],
-              [3, '3 · Bio Veins'],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                onClick={() => setNebulaPath(id)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 5,
-                  border: nebulaPath === id ? '1px solid rgba(150,120,255,0.9)' : '1px solid rgba(255,255,255,0.15)',
-                  background: nebulaPath === id ? 'rgba(100,60,200,0.55)' : 'rgba(0,0,0,0.45)',
-                  color: nebulaPath === id ? '#d4b8ff' : 'rgba(255,255,255,0.5)',
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(8px)',
-                  transition: 'all 0.15s',
-                  textAlign: 'left',
-                }}
-              >
-                {label}
-              </button>
-            ))}
+            {/* Nebula 1 — Red/Violet */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ color: 'rgba(200,60,120,0.7)', letterSpacing: 1 }}>● NEBULA 1 · RED</span>
+              {[
+                [0, '0 · Silky Wisps'],
+                [1, '1 · Deep Ocean'],
+                [2, '2 · Orion Ribbon'],
+                [3, '3 · Plasma Threads'],
+              ].map(([id, label]) => (
+                <button key={id} onClick={() => setNebulaPath1(id)} style={{
+                  padding: '4px 10px', borderRadius: 5, textAlign: 'left', cursor: 'pointer',
+                  backdropFilter: 'blur(8px)', transition: 'all 0.15s',
+                  border: nebulaPath1 === id ? '1px solid rgba(200,100,180,0.9)' : '1px solid rgba(255,255,255,0.12)',
+                  background: nebulaPath1 === id ? 'rgba(140,30,90,0.55)' : 'rgba(0,0,0,0.45)',
+                  color: nebulaPath1 === id ? '#ffb8e0' : 'rgba(255,255,255,0.45)',
+                }}>{label}</button>
+              ))}
+            </div>
+            {/* Nebula 2 — Teal/Cyan */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+              <span style={{ color: 'rgba(0,200,220,0.7)', letterSpacing: 1 }}>● NEBULA 2 · TEAL</span>
+              {[
+                [0, '0 · Silky Wisps'],
+                [1, '1 · Deep Ocean'],
+                [2, '2 · Orion Ribbon'],
+                [3, '3 · Plasma Threads'],
+              ].map(([id, label]) => (
+                <button key={id} onClick={() => setNebulaPath2(id)} style={{
+                  padding: '4px 10px', borderRadius: 5, textAlign: 'left', cursor: 'pointer',
+                  backdropFilter: 'blur(8px)', transition: 'all 0.15s',
+                  border: nebulaPath2 === id ? '1px solid rgba(0,200,220,0.9)' : '1px solid rgba(255,255,255,0.12)',
+                  background: nebulaPath2 === id ? 'rgba(0,80,100,0.55)' : 'rgba(0,0,0,0.45)',
+                  color: nebulaPath2 === id ? '#a0f4ff' : 'rgba(255,255,255,0.45)',
+                }}>{label}</button>
+              ))}
+            </div>
           </div>
         )}
       </div>

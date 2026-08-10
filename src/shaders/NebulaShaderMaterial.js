@@ -274,7 +274,11 @@ export const NebulaMaterial = shaderMaterial(
           density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
 
         } else if (uNebulaPath == 1) {
-          // PATH 1 — Deep Ocean Pillars: two soft warp passes blended gently
+          // PATH 1 — Deep Ocean Pillars v2
+          // Two independent warp fields at different speeds give layered depth.
+          // A low-frequency envelope floor eliminates gaps by ensuring the cloud
+          // never hits zero in both layers simultaneously. A third micro-detail
+          // pass targets the Ha density range to enrich the crimson-to-violet gradient.
           vec2 q1;
           q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
           q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
@@ -282,9 +286,14 @@ export const NebulaMaterial = shaderMaterial(
           vec2 r1;
           r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
           r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
-          float base1 = fbm(uv + uWarp * q1);
-          float deep1 = fbm(uv + uWarp * r1 * 0.5);
-          density = mix(base1, deep1, 0.32);
+          float base1  = fbm(uv + uWarp * q1);
+          float deep1  = fbm(uv + uWarp * r1 * 0.5);
+          // Envelope: large-scale low-frequency cloud fills in structural gaps
+          float envelope1 = fbm(uv * 0.55 + vec2(3.1, uTime * 0.004)) * 0.22 + 0.08;
+          float blend1 = mix(base1, deep1, 0.32);
+          // Micro-detail: targets mid-density range (Ha→SII crimson transition)
+          float micro1 = fbm(uv * 3.1 + q1 * 0.55 + vec2(uTime * 0.005)) * 0.12;
+          density = max(blend1 + micro1 * smoothstep(0.25, 0.65, blend1), envelope1);
 
         } else if (uNebulaPath == 2) {
           // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
@@ -299,17 +308,31 @@ export const NebulaMaterial = shaderMaterial(
           density = base2 * (0.7 + 0.3 * ribbonMask);
 
         } else {
-          // PATH 3 — Bioluminescent Veins: sinusoidal lattice inside gas
+          // PATH 3 — Organic Plasma Filaments v2
+          // Replaces the mathematical sin() crosshatch with FBM-ridge filaments
+          // warped by the gas flow itself. Two crossing ridge families at different
+          // scales and orientations create branching, non-repeating plasma threads.
+          // A base cloud underneath stops filaments from floating on nothing.
           vec2 q3;
           q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
           q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
           qLen = length(q3);
           float base3 = fbm(uv + uWarp * q3);
-          vec2 veinUv = uv * 4.5 + q3 * 1.2;
-          float veinX = abs(sin(veinUv.x * 3.14159));
-          float veinY = abs(sin(veinUv.y * 3.14159 + 1.1));
-          float veins = pow(max(veinX, veinY), 6.0) * 0.22;
-          density = base3 + veins * smoothstep(0.2, 0.75, base3);
+          // Warp filament space by gas flow so threads follow the cloud shape
+          vec2 fUv = uv * 5.8 + q3 * 2.1 + vec2(uTime * 0.0035, uTime * 0.0028);
+          // Primary filament family: FBM ridge sharpened into a bright thread
+          float ridgeA = fbm(fUv);
+          float threadA = pow(1.0 - abs(ridgeA - 0.48) * 3.8, 5.0);
+          threadA = max(0.0, threadA) * 0.30;
+          // Secondary filament family: rotated 50° so threads cross organically
+          vec2 fUvB = fUv.yx * vec2(0.64, 1.0) + vec2(8.3, 2.7);
+          float ridgeB = fbm(fUvB + vec2(uTime * 0.0022));
+          float threadB = pow(1.0 - abs(ridgeB - 0.52) * 4.2, 5.0);
+          threadB = max(0.0, threadB) * 0.18;
+          // Filaments only glow inside the gas cloud (masked to dense regions)
+          float filaments3 = (threadA + threadB) * smoothstep(0.12, 0.62, base3);
+          // Blend: rich cloud base + glowing plasma threads on top
+          density = base3 * 0.72 + filaments3;
         }
 
       } else if (uPerfTier < 0.8) {
