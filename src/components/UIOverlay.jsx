@@ -1,10 +1,13 @@
 import React from 'react';
 import { SYSTEM_CONFIG } from '../config';
 
-export function UIOverlay({ selectedTarget, selectedProject, onReturn }) {
+export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false }) {
   const isCore = selectedTarget === 'core';
   const isProject = Boolean(selectedProject);
   const isOpen = isCore || isProject;
+
+  const targetFps = isMobile ? 24 : 45;
+  const isFpsStable = currentFps >= targetFps;
 
   return (
     <>
@@ -15,8 +18,17 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn }) {
             <div className="brand-dot"></div>
             <span className="brand-title">YAHYA.CLICK</span>
           </div>
-          <div className="header-status">
-            SYSTEM // {selectedTarget ? 'TARGET_ENGAGED' : 'MACRO_ORBIT'}
+
+          <div className="top-right-hud">
+            <div className="header-status">
+              SYSTEM // {selectedTarget ? 'TARGET_ENGAGED' : 'MACRO_ORBIT'}
+            </div>
+
+            <div className="fps-hud-counter">
+              <span className={`fps-indicator ${isFpsStable ? 'stable' : 'warning'}`} />
+              <span className="fps-val">{currentFps} FPS</span>
+              <span className="fps-badge">{isMobile ? 'MOB-24' : '60Hz'}</span>
+            </div>
           </div>
         </header>
 

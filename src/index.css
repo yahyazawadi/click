@@ -93,11 +93,62 @@ html, body, #root {
   color: var(--text-pure);
 }
 
+.top-right-hud {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .header-status {
   font-size: 0.75rem;
   color: var(--secondary-blue);
   opacity: 0.8;
   letter-spacing: 0.1em;
+}
+
+.fps-hud-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(7, 17, 36, 0.7);
+  border: 1px solid rgba(0, 186, 227, 0.35);
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(0, 186, 227, 0.15);
+}
+
+.fps-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--primary-cyan);
+}
+
+.fps-indicator.stable {
+  background-color: #00BAE3;
+  box-shadow: 0 0 8px #00BAE3;
+}
+
+.fps-indicator.warning {
+  background-color: #FF4500;
+  box-shadow: 0 0 8px #FF4500;
+}
+
+.fps-val {
+  color: var(--text-pure);
+  font-weight: 700;
+}
+
+.fps-badge {
+  color: var(--secondary-blue);
+  opacity: 0.75;
+  font-size: 0.65rem;
+  border-left: 1px solid rgba(93, 186, 225, 0.3);
+  padding-left: 0.4rem;
 }
 
 /* Return to Orbit Floating Action Button */

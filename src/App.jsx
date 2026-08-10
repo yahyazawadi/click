@@ -15,19 +15,33 @@ import { FaviconAnimator } from './components/FaviconAnimator';
 import { useFrame } from '@react-three/fiber';
 
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller
-function ProgressivePlanetController({ onUnlockNext }) {
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate }) {
   const stableFrames = useRef(0);
   const cooldown = useRef(0);
+  const fpsAcc = useRef(0);
+  const frameCount = useRef(0);
 
   useFrame((_state, delta) => {
-    // Check if FPS is stable (> 30 FPS threshold)
-    if (delta < 0.033) {
+    // Target threshold: Mobile aims for 24 FPS (delta <= 0.043s), Desktop aims for 45 FPS (delta <= 0.022s)
+    const thresholdDelta = isMobile ? 0.043 : 0.022;
+
+    if (delta <= thresholdDelta) {
       stableFrames.current += 1;
     } else {
       stableFrames.current = Math.max(0, stableFrames.current - 2);
     }
 
     cooldown.current += delta;
+    fpsAcc.current += delta;
+    frameCount.current += 1;
+
+    // Report FPS every 0.35s to UI Overlay
+    if (fpsAcc.current >= 0.35) {
+      const fps = Math.round(frameCount.current / fpsAcc.current);
+      onFpsUpdate(fps);
+      fpsAcc.current = 0;
+      frameCount.current = 0;
+    }
 
     // Once rendering has been stable for ~8 frames and 120ms cooldown passes, unlock next planet
     if (stableFrames.current >= 8 && cooldown.current > 0.12) {
@@ -48,6 +62,7 @@ export default function App() {
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [unlockedCount, setUnlockedCount] = useState(2); // Priority 1: Core & Scissor planets start unlocked immediately
+  const [currentFps, setCurrentFps] = useState(60);
 
   const handleUnlockNext = () => {
     setUnlockedCount((prev) => Math.min(SYSTEM_CONFIG.projects.length, prev + 1));
@@ -259,7 +274,11 @@ export default function App() {
 
             <Suspense fallback={null}>
               {/* Dynamic FPS-Stabilized Progressive Planet Unlocker */}
-              <ProgressivePlanetController onUnlockNext={handleUnlockNext} />
+              <ProgressivePlanetController
+                onUnlockNext={handleUnlockNext}
+                isMobile={isMobile}
+                onFpsUpdate={setCurrentFps}
+              />
 
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
@@ -309,6 +328,8 @@ export default function App() {
           selectedTarget={selectedTarget}
           selectedProject={selectedProject}
           onReturn={handleReturn}
+          currentFps={currentFps}
+          isMobile={isMobile}
         />
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
