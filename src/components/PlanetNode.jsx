@@ -27,7 +27,8 @@ function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile, perfTie
     case 1:
       return <SaturnPlanet color={color} size={size} isMobile={isMobile} />;
     case 2:
-      return <MobiusPlanet color={color} size={size} isMobile={isMobile} />;
+      // MobiusPlanet disabled for performance — fallback to GyroscopePlanet
+      return <GyroscopePlanet color={color} size={size} isMobile={isMobile} />;
     case 3:
       return <CrystalPlanet color={color} size={size} isMobile={isMobile} />;
     case 4:
@@ -61,6 +62,8 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
   const localPos = useRef(new THREE.Vector3());
   const euler = useRef(new THREE.Euler());
   const worldPos = useRef(new THREE.Vector3());
+  const projScreenMatrix = useRef(new THREE.Matrix4());
+  const frustum = useRef(new THREE.Frustum());
 
   useFrame((state, delta) => {
     if (!ring) return;
@@ -86,6 +89,17 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
         groupRef.current.getWorldPosition(worldPos.current);
         targetPlanetPosRef.current.copy(worldPos.current);
       }
+
+      // Frustum Culling / Viewport Check: Skip rendering when planet is offscreen
+      groupRef.current.getWorldPosition(worldPos.current);
+      projScreenMatrix.current.multiplyMatrices(state.camera.projectionMatrix, state.camera.matrixWorldInverse);
+      frustum.current.setFromProjectionMatrix(projScreenMatrix.current);
+      // Sphere radius check (size + margin)
+      const boundingRadius = (project.size || 0.5) * 2.5;
+      const isVisibleInFrustum = frustum.current.intersectsSphere(
+        new THREE.Sphere(worldPos.current, boundingRadius)
+      );
+      groupRef.current.visible = isVisibleInFrustum;
     }
 
     if (currentScaleRef.current > 0.02 && !shouldRenderMesh) {

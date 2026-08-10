@@ -397,7 +397,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
-            dpr={[1, 1]}
+            dpr={gpuTier === 'low' ? [0.75, 0.85] : [1, 1.25]}
             camera={{ position: [0, 25, 55], fov: 45 }}
             gl={{ antialias: !isMobile, alpha: false, powerPreference: 'high-performance' }}
             onDoubleClick={(e) => e.preventDefault()}
