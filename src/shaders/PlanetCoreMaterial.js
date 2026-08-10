@@ -5,6 +5,7 @@ import { extend } from '@react-three/fiber';
 export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
+    uIsMobile: 0.0,
     uDeepOcean:      new THREE.Color('#041830'),  // Deep space blue
     uMidOcean:       new THREE.Color('#0a4070'),  // Visible ocean mid-tone
     uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt teal-blue
@@ -33,6 +34,7 @@ export const PlanetCoreMaterial = shaderMaterial(
   // Fragment Shader — World-space lighting aligned with Nebula 1 (Top-Left)
   /* glsl */ `
     uniform float uTime;
+    uniform float uIsMobile;
     uniform vec3 uDeepOcean;
     uniform vec3 uMidOcean;
     uniform vec3 uCloudBand;
@@ -68,7 +70,7 @@ export const PlanetCoreMaterial = shaderMaterial(
                             dot( hash3(i + vec3(1.0,1.0,1.0)), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
     }
 
-    // FBM — organic turbulence (optimized to 3 octaves)
+    // Adaptive 3D FBM (2 octaves on mobile vs 3 on desktop)
     float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
@@ -77,7 +79,9 @@ export const PlanetCoreMaterial = shaderMaterial(
          -0.80,  0.60,  0.00,
           0.48,  0.64,  0.60
       );
+      int count = uIsMobile > 0.5 ? 2 : 3;
       for (int i = 0; i < 3; i++) {
+        if (i >= count) break;
         v += a * noise(p);
         p = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
         a *= 0.5;

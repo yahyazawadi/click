@@ -48,6 +48,7 @@ export function SystemCore({ onSelect, isMobile }) {
         <sphereGeometry args={[coreRadius, segments, segments]} />
         <planetCoreMaterial
           ref={shaderMatRef}
+          uIsMobile={isMobile ? 1.0 : 0.0}
           uDeepOcean={new THREE.Color('#041830')}        // Deep space blue
           uMidOcean={new THREE.Color('#0a4070')}         // Visible ocean mid-tone
           uCloudBand={new THREE.Color('#1a7aaa')}        // Cloud belt teal-blue

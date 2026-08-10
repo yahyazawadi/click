@@ -5,6 +5,7 @@ import { extend } from '@react-three/fiber';
 export const NebulaMaterial = shaderMaterial(
   {
     uTime: 0,
+    uIsMobile: 0.0,
     // Hubble SHO palette: Sulfur-II → H-alpha → OIII
     uColorSII:  new THREE.Color('#ff4500'), // Sulfur-II  — warm orange-red (SII emission 673nm)
     uColorHa:   new THREE.Color('#c0001a'), // H-alpha    — deep crimson  (Ha  emission 656nm)
@@ -34,6 +35,7 @@ export const NebulaMaterial = shaderMaterial(
   // Fragment Shader — Full Realistic Nebula with Stars + Volumetric Glow
   /* glsl */ `
     uniform float uTime;
+    uniform float uIsMobile;
     uniform vec3 uColorSII;
     uniform vec3 uColorHa;
     uniform vec3 uColorOIII;
@@ -75,12 +77,14 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // 4-octave gas FBM (optimized for high FPS)
+    // Adaptive Gas FBM (2 octaves on mobile vs 4 on desktop)
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
+      int count = uIsMobile > 0.5 ? 2 : 4;
       for (int i = 0; i < 4; i++) {
+        if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 2.07 + vec2(13.4, 27.9);
         a *= 0.48;
@@ -88,12 +92,14 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // 3-octave dust FBM (optimized)
+    // Adaptive Dust FBM (2 octaves on mobile vs 3 on desktop)
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.62, 0.78, -0.78, 0.62);
+      int count = uIsMobile > 0.5 ? 2 : 3;
       for (int i = 0; i < 3; i++) {
+        if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 1.97 + vec2(4.1, 51.3);
         a *= 0.52;

@@ -5,6 +5,7 @@ import { extend } from '@react-three/fiber';
 export const ScissorMoonShaderMaterial = shaderMaterial(
   {
     uTime:       0,
+    uIsMobile:   0.0,
     uDeepSea:    new THREE.Color('#031224'),
     uMidSea:     new THREE.Color('#07304d'),
     uShallowSea: new THREE.Color('#0f5d75'),
@@ -37,6 +38,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   // ── Fragment Shader ─────────────────────────────────────────────────────────
   /* glsl */ `
     uniform float uTime;
+    uniform float uIsMobile;
     uniform vec3  uDeepSea;
     uniform vec3  uMidSea;
     uniform vec3  uShallowSea;
@@ -81,7 +83,9 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       mat3 rot = mat3( 0.36, 0.48,-0.80,
                       -0.80, 0.60, 0.00,
                        0.48, 0.64, 0.60);
+      int count = uIsMobile > 0.5 ? 2 : 3;
       for (int i = 0; i < 3; i++) {
+        if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
         a *= 0.5;

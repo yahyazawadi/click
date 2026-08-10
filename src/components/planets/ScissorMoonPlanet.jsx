@@ -18,7 +18,7 @@ const SCISSOR_POSITIONS = [
   { phi: 1.45, theta: 5.70, rotZ: 2.6, speedMult: 1.30, ampMult: 1.05 },
 ];
 
-export function ScissorMoonPlanet({ color, size }) {
+export function ScissorMoonPlanet({ color, size, isMobile }) {
   const planetRef    = useRef();
   const shaderMatRef = useRef();
   const blade1Refs   = useRef([]);
@@ -27,19 +27,21 @@ export function ScissorMoonPlanet({ color, size }) {
   const planetRadius = size * 0.85;
   const bladeLen     = size * 1.6;
 
+  const positions = isMobile ? SCISSOR_POSITIONS.slice(0, 4) : SCISSOR_POSITIONS;
+
   // Pre-compute position + quaternion for each scissor (places them flat against the sphere surface).
   const scissorDefs = useMemo(() => {
     const zAxis = new THREE.Vector3(0, 0, 1);
-    return SCISSOR_POSITIONS.map(({ phi, theta, rotZ, speedMult, ampMult }, i) => {
+    return positions.map(({ phi, theta, rotZ, speedMult, ampMult }, i) => {
       const x      = Math.sin(phi) * Math.cos(theta);
       const y      = Math.cos(phi);
       const z      = Math.sin(phi) * Math.sin(theta);
       const normal = new THREE.Vector3(x, y, z).normalize();
       const pos    = normal.clone().multiplyScalar(planetRadius * 1.025);
       const quat   = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
-      return { pos, quat, rotZ, speedMult, ampMult, phase: i * ((Math.PI * 2) / 11) };
+      return { pos, quat, rotZ, speedMult, ampMult, phase: i * ((Math.PI * 2) / positions.length) };
     });
-  }, [planetRadius]);
+  }, [planetRadius, positions]);
 
   // Shared continuous blade & shank extrude geometry (reused by all scissors)
   const bladeGeo = useMemo(() => {
@@ -65,9 +67,9 @@ export function ScissorMoonPlanet({ color, size }) {
       bevelEnabled: true,
       bevelThickness: size * 0.01,
       bevelSize: size * 0.008,
-      bevelSegments: 4,
+      bevelSegments: isMobile ? 1 : 4,
     });
-  }, [bladeLen, size]);
+  }, [bladeLen, size, isMobile]);
 
   useEffect(() => () => bladeGeo.dispose(), [bladeGeo]);
 
@@ -75,7 +77,10 @@ export function ScissorMoonPlanet({ color, size }) {
     const t = state.clock.getElapsedTime();
 
     // Feed time to planet shader
-    if (shaderMatRef.current) shaderMatRef.current.uTime = t;
+    if (shaderMatRef.current) {
+      shaderMatRef.current.uTime = t;
+      shaderMatRef.current.uIsMobile = isMobile ? 1.0 : 0.0;
+    }
 
     // Slow planetary rotation
     if (planetRef.current) planetRef.current.rotation.y += delta * 0.14;
@@ -90,13 +95,15 @@ export function ScissorMoonPlanet({ color, size }) {
     });
   });
 
+  const segments = isMobile ? 32 : 64;
+
   return (
     <group>
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
-          <sphereGeometry args={[planetRadius, 64, 64]} />
-          <scissorMoonShaderMaterial ref={shaderMatRef} />
+          <sphereGeometry args={[planetRadius, segments, segments]} />
+          <scissorMoonShaderMaterial ref={shaderMatRef} uIsMobile={isMobile ? 1.0 : 0.0} />
         </mesh>
 
         {/* ── 11 tiny scissors anchored directly to the rotating planet surface ── */}

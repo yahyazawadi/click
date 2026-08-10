@@ -246,6 +246,7 @@ export default function App() {
                       key={proj.id}
                       project={proj}
                       ring={ring}
+                      isMobile={isMobile}
                       onSelect={handleSelect}
                       isSelected={selectedTarget === proj.id}
                       hasSelection={!!selectedTarget}

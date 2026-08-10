@@ -18,38 +18,38 @@ import {
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex to dedicated component files
-function ProceduralPlanetMesh({ type, color, size, isSelected }) {
+function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile }) {
   const nodeType = typeof type === 'number' ? Math.abs(type) % 11 : 0;
 
   switch (nodeType) {
     case 0:
-      return <ScissorPlanet color={color} size={size} />;
+      return <ScissorPlanet color={color} size={size} isMobile={isMobile} />;
     case 1:
-      return <SaturnPlanet color={color} size={size} />;
+      return <SaturnPlanet color={color} size={size} isMobile={isMobile} />;
     case 2:
-      return <MobiusPlanet color={color} size={size} />;
+      return <MobiusPlanet color={color} size={size} isMobile={isMobile} />;
     case 3:
-      return <CrystalPlanet color={color} size={size} />;
+      return <CrystalPlanet color={color} size={size} isMobile={isMobile} />;
     case 4:
-      return <GyroscopePlanet color={color} size={size} />;
+      return <GyroscopePlanet color={color} size={size} isMobile={isMobile} />;
     case 5:
-      return <PlasmaTorusPlanet color={color} size={size} />;
+      return <PlasmaTorusPlanet color={color} size={size} isMobile={isMobile} />;
     case 6:
-      return <VortexShellPlanet color={color} size={size} />;
+      return <VortexShellPlanet color={color} size={size} isMobile={isMobile} />;
     case 7:
-      return <HyperCubePlanet color={color} size={size} />;
+      return <HyperCubePlanet color={color} size={size} isMobile={isMobile} />;
     case 8:
-      return <BinaryMoonPlanet color={color} size={size} />;
+      return <BinaryMoonPlanet color={color} size={size} isMobile={isMobile} />;
     case 9:
-      return <NodePlanet color={color} size={size} isFocused={isSelected} />;
+      return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
     case 10:
-      return <ScissorMoonPlanet color={color} size={size} />;
+      return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} />;
     default:
-      return <NodePlanet color={color} size={size} isFocused={isSelected} />;
+      return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
   }
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef }) {
+export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
 
