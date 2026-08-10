@@ -118,12 +118,10 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       col = mix(col, uMidSea,     smoothstep(-0.25, 0.20, oceanField));
       col = mix(col, uShallowSea, smoothstep( 0.10, 0.42, oceanField));
 
-      // ── 2. Continents ────────────────────────────────────────────────────
-      vec3  cP  = rotY(uTime * 0.003) * p;
-      vec2  cq  = vec2(fbm(cP * 0.65 + vec3(31.7, 12.5, 4.1)),
-                       fbm(cP * 0.65 + vec3(14.3, 47.8, 2.2)));
-      float cont  = fbm(cP * 1.05 + vec3(0.5*cq.x, 0.5*cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
-      float terr  = fbm(cP * 3.8  + vec3(14.0, 7.0, 22.0));
+      // ── 2. Continents (smooth single-pass FBM) ──────────────────────────
+      vec3  cP    = rotY(uTime * 0.003) * p;
+      float cont  = fbm(cP * 1.1 + vec3(8.2, 61.3, 3.4));
+      float terr  = fbm(cP * 3.8 + vec3(14.0, 7.0, 22.0));
 
       float seaLvl    = -0.09;
       float landH     = smoothstep(seaLvl, seaLvl + 0.28, cont);

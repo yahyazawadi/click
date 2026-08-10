@@ -31,7 +31,6 @@ export function SystemCore({ onSelect, isMobile }) {
   });
 
   const coreRadius = SYSTEM_CONFIG.core.radius || 1.8;
-  const segments = isMobile ? 32 : 64;
 
   return (
     <group
@@ -45,7 +44,7 @@ export function SystemCore({ onSelect, isMobile }) {
     >
       {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <sphereGeometry args={[coreRadius, segments, segments]} />
+        <sphereGeometry args={[coreRadius, 64, 64]} />
         <planetCoreMaterial
           ref={shaderMatRef}
           uIsMobile={isMobile ? 1.0 : 0.0}

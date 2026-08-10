@@ -126,16 +126,14 @@ export const PlanetCoreMaterial = shaderMaterial(
       float stormMask = smoothstep(0.3, 0.7, stormIntensity) * smoothstep(0.6, 0.85, bands);
       col = mix(col, uStormHighlight, stormMask * 0.7);
 
-      // ---- 3b. Continent landmasses ----
+      // ---- 3b. Continent landmasses (smooth single-pass FBM) ----
       float continentDrift = uTime * 0.004;
       float cC = cos(continentDrift);
       float cS = sin(continentDrift);
       mat3 rotCY = mat3(cC, 0.0, cS, 0.0, 1.0, 0.0, -cS, 0.0, cC);
       vec3 cP = rotCY * p;
 
-      vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
-                     fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));
-      float continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
+      float continentField = fbm(cP * 1.1 + vec3(8.2, 61.3, 3.4));
 
       float seaLevel   = -0.10;
       float landHeight = smoothstep(seaLevel, seaLevel + 0.30, continentField);
