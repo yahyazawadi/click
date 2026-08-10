@@ -9,7 +9,7 @@ export const NebulaMaterial = shaderMaterial(
     uColorSII:  new THREE.Color('#ff4500'), // Sulfur-II  — warm orange-red (SII emission 673nm)
     uColorHa:   new THREE.Color('#c0001a'), // H-alpha    — deep crimson  (Ha  emission 656nm)
     uColorOIII: new THREE.Color('#00b4c8'), // OIII       — ionized teal  (OIII emission 501nm)
-    uColorCore: new THREE.Color('#00e5ff'), // Hot core   — electric cyan (portfolio orbit color)
+    uColorCore: new THREE.Color('#ffe8c0'), // Hot core   — near-white yellow (ionization front)
     uScale: 3.5,
     uWarp: 2.5,
     uMaskRadius: 0.38,
@@ -168,24 +168,30 @@ export const NebulaMaterial = shaderMaterial(
       float density = fbm(uv + uWarp * r);
       float gasDensity = smoothstep(0.0, 0.5, density);
 
-      // 4. Gas Density & Pillar Structures
+      // 4. Dark dust absorption lanes
+      vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
+      float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
+      float absorption = pow(dustField, 2.5) * uDustStrength;
+      float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
+
+      // 5. Pillar structures
       vec2 pillarUv = centeredUv * 3.0;
       float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.14, 1.0);
       float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.11, 0.85);
       float pillars = (p1 + p2 * 0.75) * uPillarStrength;
-      float finalDensity = clamp(gasDensity + pillars * organicMask, 0.0, 1.0);
+      float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
 
-      // 5. Pure Saturated Color Science (No dust absorption desaturation / grey channels)
+      // 6. Hubble SHO color science
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
       float qLen     = length(q);
 
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.15, 0.65, finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.55, 0.90, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.80, 1.0,  finalDensity) + coreGlow * 0.4);
+      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
 
-      // 6. Volumetric scatter halo (soft inner glow)
+      // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
       col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
@@ -194,13 +200,11 @@ export const NebulaMaterial = shaderMaterial(
       // 8. Embedded young star field
       //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
       float stars = starField(vUv, uStarCount, uTime);
-      // Stars: electric cyan <-> hot violet — zero grey, fully on-palette
+      // Stars only show where there IS gas (inside nebula) and are brightest on dust pillars
       float starMask = organicMask * planeEdgeFade;
-      float starHue = hash1(floor(vUv * uStarCount));
-      vec3 starColor = mix(vec3(0.0, 0.88, 1.0),   // electric cyan  #00e0ff
-                           vec3(0.72, 0.0,  1.0),   // hot violet     #b800ff
-                           starHue);
-      col = mix(col, col + starColor * 2.0, stars * starMask);
+      vec3 starColor = mix(vec3(0.9, 0.95, 1.0), vec3(1.0, 0.9, 0.7),
+                           hash1(floor(vUv * uStarCount))); // warm/cool mix per star
+      col = mix(col, col + starColor * 1.8, stars * starMask);
 
       // 9. Final alpha
       float alpha = clamp(finalDensity * organicMask * planeEdgeFade * uAlpha, 0.0, 1.0);

@@ -18,9 +18,11 @@ export const PlanetCoreMaterial = shaderMaterial(
     varying vec2 vUv;
     varying vec3 vWorldNormal;
     varying vec3 vWorldPosition;
+    varying vec3 vPosition;
 
     void main() {
       vUv = uv;
+      vPosition = position;
       vec4 worldPos = modelMatrix * vec4(position, 1.0);
       vWorldPosition = worldPos.xyz;
       // Transform normal into world space using modelMatrix
@@ -42,34 +44,42 @@ export const PlanetCoreMaterial = shaderMaterial(
     varying vec2 vUv;
     varying vec3 vWorldNormal;
     varying vec3 vWorldPosition;
+    varying vec3 vPosition;
 
     // ---- Noise infrastructure ----
-    vec2 hash2(vec2 p) {
-      p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+    vec3 hash3(vec3 p) {
+      p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+               dot(p, vec3(269.5, 183.3, 246.1)),
+               dot(p, vec3(113.5, 271.9, 124.6)));
       return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
     }
 
-    float noise(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      return mix(
-        mix(dot(hash2(i + vec2(0.0,0.0)), f - vec2(0.0,0.0)),
-            dot(hash2(i + vec2(1.0,0.0)), f - vec2(1.0,0.0)), u.x),
-        mix(dot(hash2(i + vec2(0.0,1.0)), f - vec2(0.0,1.0)),
-            dot(hash2(i + vec2(1.0,1.0)), f - vec2(1.0,1.0)), u.x),
-        u.y
-      );
+    float noise(vec3 p) {
+      vec3 i = floor(p);
+      vec3 f = fract(p);
+      vec3 u = f * f * (3.0 - 2.0 * f);
+      return mix( mix( mix( dot( hash3(i + vec3(0.0,0.0,0.0)), f - vec3(0.0,0.0,0.0) ),
+                            dot( hash3(i + vec3(1.0,0.0,0.0)), f - vec3(1.0,0.0,0.0) ), u.x),
+                       mix( dot( hash3(i + vec3(0.0,1.0,0.0)), f - vec3(0.0,1.0,0.0) ),
+                            dot( hash3(i + vec3(1.0,1.0,0.0)), f - vec3(1.0,1.0,0.0) ), u.x), u.y),
+                  mix( mix( dot( hash3(i + vec3(0.0,0.0,1.0)), f - vec3(0.0,0.0,1.0) ),
+                            dot( hash3(i + vec3(1.0,0.0,1.0)), f - vec3(1.0,0.0,1.0) ), u.x),
+                       mix( dot( hash3(i + vec3(0.0,1.0,1.0)), f - vec3(0.0,1.0,1.0) ),
+                            dot( hash3(i + vec3(1.0,1.0,1.0)), f - vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
     }
 
     // FBM — organic turbulence
-    float fbm(vec2 p) {
+    float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
-      mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
+      mat3 rot = mat3(
+          0.36,  0.48, -0.80,
+         -0.80,  0.60,  0.00,
+          0.48,  0.64,  0.60
+      );
       for (int i = 0; i < 6; i++) {
         v += a * noise(p);
-        p = rot * p * 2.03 + vec2(3.1, 7.4);
+        p = rot * p * 2.03 + vec3(3.1, 7.4, 1.9);
         a *= 0.5;
       }
       return v;
@@ -81,12 +91,19 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       // ---- 1. Organic atmospheric cloud bands ----
       float drift = uTime * 0.025;
-      vec2 uv = vec2(vUv.x + drift, vUv.y);
-      vec2 q = vec2(fbm(uv * 2.0), fbm(uv * 2.0 + vec2(5.2, 1.3)));
-      vec2 r = vec2(fbm(uv * 2.5 + 1.7 * q + vec2(1.7, 9.2) + drift * 0.5),
-                    fbm(uv * 2.5 + 1.7 * q + vec2(8.3, 2.8)));
+      float c = cos(drift);
+      float s = sin(drift);
+      mat3 rotY = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c);
+      vec3 p = normalize(vPosition);
+      vec3 driftP = rotY * p;
 
-      float cloudField = fbm(uv * 3.0 + 1.8 * r);
+      vec2 q = vec2(fbm(driftP * 2.0), fbm(driftP * 2.0 + vec3(5.2, 1.3, 2.9)));
+      
+      vec3 driftP2 = rotY * (p * 2.5) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
+      vec2 r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
+                    fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
+
+      float cloudField = fbm(driftP * 3.0 + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
 
       // ---- 2. Latitudinal band structure ----
       float lat = vUv.y;
@@ -107,11 +124,14 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       // ---- 3b. Continent landmasses ----
       float continentDrift = uTime * 0.004;
-      vec2 cUv = vec2(vUv.x + continentDrift, vUv.y);
+      float cC = cos(continentDrift);
+      float cS = sin(continentDrift);
+      mat3 rotCY = mat3(cC, 0.0, cS, 0.0, 1.0, 0.0, -cS, 0.0, cC);
+      vec3 cP = rotCY * p;
 
-      vec2 cq = vec2(fbm(cUv * 0.7 + vec2(31.7, 12.5)),
-                     fbm(cUv * 0.7 + vec2(14.3, 47.8)));
-      float continentField = fbm(cUv * 0.9 + 0.5 * cq + vec2(8.2, 61.3));
+      vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
+                     fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));
+      float continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
 
       float seaLevel   = -0.10;
       float landHeight = smoothstep(seaLevel, seaLevel + 0.30, continentField);
