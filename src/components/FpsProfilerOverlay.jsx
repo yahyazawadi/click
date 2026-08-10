@@ -108,7 +108,7 @@ export function FpsProfilerOverlay({
         }}
         title="Open FPS Diagnostic Profiler (~)"
       >
-        [ ⚡ PROFILER HUD ]
+        [ PROFILER HUD ]
       </button>
     );
   }
@@ -135,7 +135,7 @@ export function FpsProfilerOverlay({
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', pb: '0.4rem' }}>
         <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)' }}>
-          ⚡ TELEMETRY PROFILER
+          TELEMETRY PROFILER
         </span>
         <button 
           onClick={() => setVisible(false)}
@@ -219,7 +219,7 @@ export function FpsProfilerOverlay({
             boxShadow: '0 0 12px rgba(0, 186, 227, 0.4)'
           }}
         >
-          📥 LOG (.JSON)
+          LOG (.JSON)
         </button>
 
         <button 
@@ -237,7 +237,7 @@ export function FpsProfilerOverlay({
             cursor: 'pointer'
           }}
         >
-          📊 LOG (.CSV)
+          LOG (.CSV)
         </button>
       </div>
     </div>
