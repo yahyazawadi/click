@@ -16,37 +16,37 @@ import { useFrame } from '@react-three/fiber';
 
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller
 function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate }) {
-  const stableFrames = useRef(0);
-  const cooldown = useRef(0);
+  const stableTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
 
   useFrame((_state, delta) => {
-    // Target threshold: Mobile aims for 24 FPS (delta <= 0.043s), Desktop aims for 45 FPS (delta <= 0.022s)
-    const thresholdDelta = isMobile ? 0.043 : 0.022;
+    // Rule: On phone, FPS must stay above 30 FPS (delta <= 0.034s) continuously for 2.0 seconds
+    // On desktop, FPS must stay above 45 FPS (delta <= 0.022s) continuously for 0.25 seconds
+    const thresholdDelta = isMobile ? 0.034 : 0.022;
+    const requiredDuration = isMobile ? 2.0 : 0.25;
 
     if (delta <= thresholdDelta) {
-      stableFrames.current += 1;
+      stableTimer.current += delta;
     } else {
-      stableFrames.current = Math.max(0, stableFrames.current - 2);
+      // Reset timer to 0 if FPS dips below threshold
+      stableTimer.current = 0;
     }
 
-    cooldown.current += delta;
     fpsAcc.current += delta;
     frameCount.current += 1;
 
-    // Report FPS every 0.35s to UI Overlay
-    if (fpsAcc.current >= 0.35) {
+    // Report live FPS every 0.3s to UI Overlay
+    if (fpsAcc.current >= 0.3) {
       const fps = Math.round(frameCount.current / fpsAcc.current);
       onFpsUpdate(fps);
       fpsAcc.current = 0;
       frameCount.current = 0;
     }
 
-    // Once rendering has been stable for ~8 frames and 120ms cooldown passes, unlock next planet
-    if (stableFrames.current >= 8 && cooldown.current > 0.12) {
-      stableFrames.current = 0;
-      cooldown.current = 0;
+    // Unlock next planet once FPS has stayed continuously stable for requiredDuration
+    if (stableTimer.current >= requiredDuration) {
+      stableTimer.current = 0;
       onUnlockNext();
     }
   });

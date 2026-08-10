@@ -6,7 +6,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
   const isProject = Boolean(selectedProject);
   const isOpen = isCore || isProject;
 
-  const targetFps = isMobile ? 24 : 45;
+  const targetFps = isMobile ? 30 : 45;
   const isFpsStable = currentFps >= targetFps;
 
   return (
@@ -27,7 +27,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
             <div className="fps-hud-counter">
               <span className={`fps-indicator ${isFpsStable ? 'stable' : 'warning'}`} />
               <span className="fps-val">{currentFps} FPS</span>
-              <span className="fps-badge">{isMobile ? 'MOB-24' : '60Hz'}</span>
+              <span className="fps-badge">{isMobile ? 'MOB-30' : '60Hz'}</span>
             </div>
           </div>
         </header>
