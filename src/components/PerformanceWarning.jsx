@@ -71,9 +71,6 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
         alignItems: 'center',
         gap: '1rem'
       }}>
-        <span style={{ fontSize: '0.65rem', color: 'var(--primary-cyan)', letterSpacing: '0.2em' }}>
-          [ PERFORMANCE WARNING ]
-        </span>
 
         <h2 style={{ 
           fontFamily: 'var(--font-sans)', 
