@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFactor = 1.0 }) {
+export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFactor = 1.0, isMobile = false }) {
   const { camera, pointer } = useThree();
   const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
   
@@ -16,8 +16,6 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
   const upOffset = useRef(new THREE.Vector3(0, 0.5, 0));
 
   useFrame((state, delta) => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-
     if (selectedTarget || (selectedTarget && targetPlanetPosRef)) {
       // While tracking a planet, continuously save our current angle
       // so when we release, we pull straight back from this exact angle!

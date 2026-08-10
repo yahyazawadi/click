@@ -100,7 +100,7 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
-          <sphereGeometry args={[planetRadius, 64, 64]} />
+          <sphereGeometry args={[planetRadius, 48, 48]} />
           <scissorMoonShaderMaterial ref={shaderMatRef} uIsMobile={isMobile ? 1.0 : 0.0} />
         </mesh>
 
@@ -112,7 +112,7 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
 
             {/* Central pivot bolt */}
             <mesh>
-              <sphereGeometry args={[size * 0.22, 16, 16]} />
+              <sphereGeometry args={[size * 0.22, 10, 10]} />
               <meshStandardMaterial
                 color="#001F3F"
                 emissive="#00BAE3"
@@ -227,7 +227,7 @@ export function ScissorMoonPlanet({ color, size, isMobile }) {
 
       {/* Atmospheric glow backside shell */}
       <mesh>
-        <sphereGeometry args={[planetRadius * 1.09, 32, 32]} />
+        <sphereGeometry args={[planetRadius * 1.09, 24, 24]} />
         <meshStandardMaterial
           color="#4a90c8"
           transparent

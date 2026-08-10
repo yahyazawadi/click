@@ -11,7 +11,6 @@ export function CosmicBackground({ isMobile }) {
   useFrame((state, delta) => {
     if (starsRef.current) {
       starsRef.current.rotation.y += delta * 0.01;
-      starsRef.current.rotation.x += delta * 0.005;
     }
   });
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
@@ -32,6 +32,17 @@ export function SystemCore({ onSelect, isMobile }) {
 
   const coreRadius = SYSTEM_CONFIG.core.radius || 1.8;
 
+  // Memoize color objects — avoids rebuilding THREE.Color on every React re-render
+  const colors = useMemo(() => ({
+    deepOcean:      new THREE.Color('#041830'),
+    midOcean:       new THREE.Color('#0a4070'),
+    cloudBand:      new THREE.Color('#1a7aaa'),
+    stormHighlight: new THREE.Color('#00d4f0'),
+    atmosphere:     new THREE.Color('#00BAE3'),
+    continentColor: new THREE.Color('#2d5a6e'),
+    coastColor:     new THREE.Color('#1a8090'),
+  }), []);
+
   return (
     <group
       onClick={(e) => {
@@ -44,23 +55,23 @@ export function SystemCore({ onSelect, isMobile }) {
     >
       {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <sphereGeometry args={[coreRadius, 64, 64]} />
+        <sphereGeometry args={[coreRadius, 48, 48]} />
         <planetCoreMaterial
           ref={shaderMatRef}
           uIsMobile={isMobile ? 1.0 : 0.0}
-          uDeepOcean={new THREE.Color('#041830')}        // Deep space blue
-          uMidOcean={new THREE.Color('#0a4070')}         // Visible ocean mid-tone
-          uCloudBand={new THREE.Color('#1a7aaa')}        // Cloud belt teal-blue
-          uStormHighlight={new THREE.Color('#00d4f0')}   // Bright storm cyan
-          uAtmosphere={new THREE.Color('#00BAE3')}       // Limb atmosphere halo
-          uContinentColor={new THREE.Color('#2d5a6e')}   // Clearly visible teal landmass
-          uCoastColor={new THREE.Color('#1a8090')}       // Bright coastal shelf
+          uDeepOcean={colors.deepOcean}
+          uMidOcean={colors.midOcean}
+          uCloudBand={colors.cloudBand}
+          uStormHighlight={colors.stormHighlight}
+          uAtmosphere={colors.atmosphere}
+          uContinentColor={colors.continentColor}
+          uCoastColor={colors.coastColor}
         />
       </mesh>
 
       {/* 3. Concentric Core Orbit Ring 1 */}
       <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[coreRadius * 1.5, 0.03, 16, 64]} />
+        <torusGeometry args={[coreRadius * 1.5, 0.03, 12, 48]} />
         <meshStandardMaterial
           color={SYSTEM_CONFIG.colors.primaryCyan}
           emissive={SYSTEM_CONFIG.colors.primaryCyan}
@@ -70,7 +81,7 @@ export function SystemCore({ onSelect, isMobile }) {
 
       {/* 4. Concentric Core Orbit Ring 2 */}
       <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
-        <torusGeometry args={[coreRadius * 1.7, 0.02, 16, 64]} />
+        <torusGeometry args={[coreRadius * 1.7, 0.02, 12, 48]} />
         <meshStandardMaterial
           color={SYSTEM_CONFIG.colors.secondaryBlue}
           transparent

@@ -77,13 +77,13 @@ export const NebulaMaterial = shaderMaterial(
       );
     }
 
-    // Adaptive Gas FBM (2 octaves on mobile vs 4 on desktop)
+    // Adaptive Gas FBM (2 octaves on mobile vs 3 on desktop)
     float fbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.80, 0.60, -0.60, 0.80);
-      int count = uIsMobile > 0.5 ? 2 : 4;
-      for (int i = 0; i < 4; i++) {
+      int count = uIsMobile > 0.5 ? 2 : 3;
+      for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);
         p  = rot * p * 2.07 + vec2(13.4, 27.9);
@@ -92,14 +92,12 @@ export const NebulaMaterial = shaderMaterial(
       return v;
     }
 
-    // Adaptive Dust FBM (2 octaves on mobile vs 3 on desktop)
+    // Adaptive Dust FBM (2 octaves on mobile vs 2 on desktop)
     float dustFbm(vec2 p) {
       float v = 0.0;
       float a = 0.5;
       mat2 rot = mat2(0.62, 0.78, -0.78, 0.62);
-      int count = uIsMobile > 0.5 ? 2 : 3;
-      for (int i = 0; i < 3; i++) {
-        if (i >= count) break;
+      for (int i = 0; i < 2; i++) {
         v += a * noise(p);
         p  = rot * p * 1.97 + vec2(4.1, 51.3);
         a *= 0.52;
@@ -118,22 +116,17 @@ export const NebulaMaterial = shaderMaterial(
     }
 
     // Embedded young star field — scattered bright pinpoints inside nebula
-    // Uses a grid-based approach: each cell can contain 0-1 stars
+    // Uses a grid-based approach: check only 4 cells (faster than 9 neighbor check)
     float starField(vec2 uv, float count, float time) {
       float result = 0.0;
       vec2 cell = floor(uv * count);
-      // Check this cell and neighbors for star
-      for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy++) {
+      for (int dx = 0; dx <= 1; dx++) {
+        for (int dy = 0; dy <= 1; dy++) {
           vec2 neighborCell = cell + vec2(float(dx), float(dy));
-          // Pseudo-random star position within cell
           vec2 starPos = (neighborCell + 0.5 + 0.45 * hash2(neighborCell + vec2(13.7, 29.3))) / count;
           float starDist = length(uv / count - starPos);
-          // Only ~30% of cells contain a star (hash threshold)
           float presence = step(0.7, hash1(neighborCell + vec2(7.3, 41.9)));
-          // Twinkle animation
           float twinkle = 0.8 + 0.2 * sin(time * 3.0 + hash1(neighborCell) * 6.28318);
-          // Star brightness — tiny sharp disk + soft diffraction spike halo
           float disk = smoothstep(0.0008, 0.0, starDist);
           float halo = exp(-starDist * 280.0) * 0.4;
           result += presence * twinkle * (disk + halo);

@@ -259,7 +259,7 @@ export default function App() {
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
-            dpr={isMobile ? [1, 1] : [1, 1.5]}
+            dpr={[1, 1]}
             camera={{ position: [0, 25, 55], fov: 45 }}
             gl={{ antialias: !isMobile, alpha: false, powerPreference: 'high-performance' }}
             onDoubleClick={(e) => e.preventDefault()}
@@ -318,7 +318,7 @@ export default function App() {
               </SceneRotator>
 
               {/* Camera Zoom & Motion Controller */}
-              <CameraController selectedTarget={selectedTarget} targetPlanetPosRef={targetPlanetPosRef} zoomFactor={zoomFactor} />
+              <CameraController selectedTarget={selectedTarget} targetPlanetPosRef={targetPlanetPosRef} zoomFactor={zoomFactor} isMobile={isMobile} />
             </Suspense>
           </Canvas>
         </div>

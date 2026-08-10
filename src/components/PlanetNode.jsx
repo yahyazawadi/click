@@ -124,10 +124,11 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
           isSelected={isSelected}
           isMobile={isMobile}
         />
-      )}{/* Floating HTML Title Label */}
-      {!hasSelection && (
+      )}
+      {/* Floating HTML Title Label — only mounted when actually visible */}
+      {!hasSelection && (hovered || showTitle) && (
         <Html distanceFactor={15} center style={{ pointerEvents: 'none' }}>
-          <div className={`planet-label ${hovered || showTitle ? 'visible pulse' : ''}`}>
+          <div className={`planet-label visible pulse`}>
             {project.title}
           </div>
         </Html>
