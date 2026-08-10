@@ -56,9 +56,6 @@ export function BatteryWarning() {
         alignItems: 'center',
         gap: '1rem'
       }}>
-        <span style={{ fontSize: '0.65rem', color: 'var(--primary-cyan)', letterSpacing: '0.2em' }}>
-          [ SYSTEM WARNING ]
-        </span>
 
         <h2 style={{ 
           fontFamily: 'var(--font-sans)', 
