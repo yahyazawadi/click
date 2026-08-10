@@ -5,13 +5,13 @@ import { extend } from '@react-three/fiber';
 export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
-    uDeepOcean:      new THREE.Color('#010d1f'),  // Abyssal deep space black-blue
-    uMidOcean:       new THREE.Color('#003268'),  // Dark ocean mid-tone
-    uCloudBand:      new THREE.Color('#005f8a'),  // Cool cloud belt teal-blue
-    uStormHighlight: new THREE.Color('#00b4d8'),  // Bright storm highlight cyan
+    uDeepOcean:      new THREE.Color('#041830'),  // Deep space blue (raised so planet isn't pitch black)
+    uMidOcean:       new THREE.Color('#0a4070'),  // Visible ocean mid-tone
+    uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt teal-blue
+    uStormHighlight: new THREE.Color('#00d4f0'),  // Bright storm cyan
     uAtmosphere:     new THREE.Color('#00BAE3'),  // Limb atmosphere glow
-    uContinentColor: new THREE.Color('#0a2a3a'),  // Dark teal landmass (above sea level)
-    uCoastColor:     new THREE.Color('#005577'),  // Shallow coastal shelf highlight
+    uContinentColor: new THREE.Color('#2d5a6e'),  // Clearly visible teal landmass — much lighter than ocean
+    uCoastColor:     new THREE.Color('#1a8090'),  // Bright coastal shallow-water shelf
   },
   /* glsl */ `
     varying vec2 vUv;
@@ -121,20 +121,21 @@ export const PlanetCoreMaterial = shaderMaterial(
       float continentDrift = uTime * 0.004; // much slower than clouds
       vec2 cUv = vec2(vUv.x + continentDrift, vUv.y);
 
-      // Coarse warp for large blob shapes
-      vec2 cq = vec2(fbm(cUv * 0.9 + vec2(31.7, 12.5)),
-                     fbm(cUv * 0.9 + vec2(14.3, 47.8)));
+      // Coarse warp — SMALL multiplier keeps big blob shapes intact
+      vec2 cq = vec2(fbm(cUv * 0.7 + vec2(31.7, 12.5)),
+                     fbm(cUv * 0.7 + vec2(14.3, 47.8)));
       // Continent field — low frequency → large continent-sized blobs
-      float continentField = fbm(cUv * 1.1 + 2.0 * cq + vec2(8.2, 61.3));
-      // Remap so ~35% of surface is land
-      float seaLevel   = 0.05;
-      float landHeight = smoothstep(seaLevel,         seaLevel + 0.22, continentField);
-      float coastShelf = smoothstep(seaLevel - 0.08,  seaLevel + 0.05, continentField)
-                       * (1.0 - landHeight); // only the transition ring
+      // Smaller warp (0.5 instead of 2.0) so the field doesn't get smashed into uniform noise
+      float continentField = fbm(cUv * 0.9 + 0.5 * cq + vec2(8.2, 61.3));
+      // FBM output is in ~[-0.97, 0.97]. seaLevel=-0.1 gives ~45% land coverage.
+      float seaLevel   = -0.10;
+      float landHeight = smoothstep(seaLevel, seaLevel + 0.30, continentField);
+      float coastShelf = smoothstep(seaLevel - 0.15, seaLevel + 0.05, continentField)
+                       * (1.0 - landHeight);
 
-      // Paint coast shallow shelf first, then land on top
-      col = mix(col, uCoastColor,     coastShelf * 0.75);
-      col = mix(col, uContinentColor, landHeight * 0.9);
+      // Paint coast shelf (bright shallow water) then landmass on top
+      col = mix(col, uCoastColor,     coastShelf * 0.85);
+      col = mix(col, uContinentColor, landHeight);
 
       // Polar darkening (poles are darker and calmer on real gas giants)
       float polarFade = pow(sin(lat * 3.14159), 0.4);
@@ -145,7 +146,8 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       float diffuse = max(0.0, dot(N, lightDir));
       // Hemisphere ambient — space is not completely dark on shadow side
-      float ambient = 0.12;
+      // Raised ambient so dark side remains visible — previous 0.12 made planet pitch-black
+      float ambient = 0.30;
       float light = ambient + diffuse * 0.88;
 
       col *= light;

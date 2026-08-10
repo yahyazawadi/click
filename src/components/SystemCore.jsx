@@ -52,13 +52,13 @@ export function SystemCore({ onSelect }) {
         <icosahedronGeometry args={[coreRadius, 20]} />
         <planetCoreMaterial
           ref={shaderMatRef}
-          uDeepOcean={new THREE.Color('#010d1f')}        // Abyssal void blue-black
-          uMidOcean={new THREE.Color('#003268')}         // Dark planetary ocean
-          uCloudBand={new THREE.Color('#005f8a')}        // Cool cloud belt teal-blue
-          uStormHighlight={new THREE.Color('#00b4d8')}   // Bright storm cyan
+          uDeepOcean={new THREE.Color('#041830')}        // Deep space blue
+          uMidOcean={new THREE.Color('#0a4070')}         // Visible ocean mid-tone
+          uCloudBand={new THREE.Color('#1a7aaa')}        // Cloud belt teal-blue
+          uStormHighlight={new THREE.Color('#00d4f0')}   // Bright storm cyan
           uAtmosphere={new THREE.Color('#00BAE3')}       // Limb atmosphere halo
-          uContinentColor={new THREE.Color('#0a2a3a')}   // Dark teal landmass
-          uCoastColor={new THREE.Color('#005577')}       // Shallow coastal shelf
+          uContinentColor={new THREE.Color('#2d5a6e')}   // Clearly visible teal landmass
+          uCoastColor={new THREE.Color('#1a8090')}       // Bright coastal shelf
         />
       </mesh>
 
