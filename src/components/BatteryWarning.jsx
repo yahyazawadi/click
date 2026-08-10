@@ -1,34 +1,28 @@
 import React, { useEffect, useState } from 'react';
 
+// Returns true if we're on the /warning preview route
+const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning';
+
 export function BatteryWarning() {
-  const [showWarning, setShowWarning] = useState(false);
+  // Initialize directly from pathname — no async race, always correct on frame 1
+  const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
 
   useEffect(() => {
-    // 1. Force show on /warning route for UI testing
-    if (window.location.pathname === '/warning') {
-      setShowWarning(true);
-      return;
-    }
+    // If we're on the /warning preview route, always show — skip battery API
+    if (isPreviewRoute()) return;
 
-    // 2. Check actual battery status
+    // Check actual battery status on real devices
     if ('getBattery' in navigator) {
       navigator.getBattery().then((battery) => {
         const checkBattery = () => {
-          // If the device is not charging and has a battery, show the warning
-          if (!battery.charging) {
-            setShowWarning(true);
-          } else {
-            setShowWarning(false);
-          }
+          setShowWarning(!battery.charging);
         };
-        
+
         checkBattery(); // Initial check
 
-        // Listen for when they plug/unplug the charger
+        // Reactively update when they plug/unplug the charger
         battery.addEventListener('chargingchange', checkBattery);
-        return () => {
-          battery.removeEventListener('chargingchange', checkBattery);
-        };
+        return () => battery.removeEventListener('chargingchange', checkBattery);
       });
     }
   }, []);
