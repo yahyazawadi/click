@@ -14,6 +14,7 @@ import { FaviconAnimator } from './components/FaviconAnimator';
 import { BatteryWarning } from './components/BatteryWarning';
 import { PerformanceWarning } from './components/PerformanceWarning';
 import { FpsProfilerOverlay } from './components/FpsProfilerOverlay';
+import { ShaderWarmup } from './components/ShaderWarmup';
 import { fpsLogger } from './utils/fpsLogger';
 import { tierToFloat } from './utils/detectGpuTier.js';
 
@@ -373,6 +374,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
             <pointLight position={[-12, -12, -12]} intensity={0.6} color={SYSTEM_CONFIG.colors.deepShadow} />
 
             <Suspense fallback={null}>
+              {/* Pre-compile heavy custom GLSL shaders gradually after page load */}
+              <ShaderWarmup perfTierFloat={perfTierFloat} />
+
               {/* Dynamic FPS-Stabilized Progressive Planet Unlocker & Telemetry Observer */}
               <ProgressivePlanetController
                 onUnlockNext={handleUnlockNext}
