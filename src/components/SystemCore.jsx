@@ -47,16 +47,16 @@ export function SystemCore({ onSelect }) {
       onPointerOut={() => setHovered(false)}
       style={{ cursor: 'pointer' }}
     >
-      {/* 1. Procedural Sci-Fi Core Planet with Dynamic Tectonic Textures & Atmospheric Glow */}
+      {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <icosahedronGeometry args={[coreRadius, 32]} />
+        <icosahedronGeometry args={[coreRadius, 20]} />
         <planetCoreMaterial
           ref={shaderMatRef}
-          uBaseColor={new THREE.Color('#030d22')}       // Deep cosmic space void blue
-          uSecondaryColor={new THREE.Color('#003268')}  // Deep planetary trench blue
-          uAccentColor={new THREE.Color('#00e5ff')}     // Bioluminescent cyan energy veins
-          uGlowColor={new THREE.Color('#5500aa')}       // Deep cosmic violet/magenta tectonic glow
-          uAtmosphereColor={new THREE.Color('#00BAE3')} // Glowing atmospheric rim halo
+          uDeepOcean={new THREE.Color('#010d1f')}        // Abyssal void blue-black
+          uMidOcean={new THREE.Color('#003268')}         // Dark planetary ocean
+          uCloudBand={new THREE.Color('#005f8a')}        // Cool cloud belt teal-blue
+          uStormHighlight={new THREE.Color('#00b4d8')}   // Bright storm cyan
+          uAtmosphere={new THREE.Color('#00BAE3')}       // Limb atmosphere halo
         />
       </mesh>
 
