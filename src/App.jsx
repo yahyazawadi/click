@@ -12,6 +12,7 @@ import { UIOverlay } from './components/UIOverlay';
 import { LenisScrollProvider, scrollToPlanetIndex } from './components/LenisScrollProvider';
 import { FaviconAnimator } from './components/FaviconAnimator';
 import { BatteryWarning } from './components/BatteryWarning';
+import { PerformanceWarning } from './components/PerformanceWarning';
 
 import { useFrame } from '@react-three/fiber';
 
@@ -337,7 +338,8 @@ export default function App() {
         <FaviconAnimator isMobile={isMobile} />
 
         {/* Battery / Low Power Warning UI */}
-        <BatteryWarning currentFps={currentFps} isMobile={isMobile} />
+        <BatteryWarning />
+        <PerformanceWarning currentFps={currentFps} isMobile={isMobile} />
       </div>
     </LenisScrollProvider>
   );

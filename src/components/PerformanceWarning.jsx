@@ -1,32 +1,47 @@
 import React, { useEffect, useState } from 'react';
 
-// Returns true if we're on the /warning preview route
-const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning';
+// Returns true if we're on the /warning-performance preview route
+const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning-performance';
 
-export function BatteryWarning() {
-  // Initialize directly from pathname — no async race, always correct on frame 1
+export function PerformanceWarning({ currentFps = 60, isMobile = false }) {
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
   const [hasDismissed, setHasDismissed] = useState(false);
+  const [isBatteryKnown, setIsBatteryKnown] = useState(false);
 
   useEffect(() => {
-    // If we're on the /warning preview route, always show — skip battery API
-    if (isPreviewRoute() || hasDismissed) return;
-
-    // Check actual battery status on real devices
-    if ('getBattery' in navigator) {
-      navigator.getBattery().then((battery) => {
-        const checkBattery = () => {
-          if (!battery.charging) setShowWarning(true);
-        };
-
-        checkBattery(); // Initial check
-
-        // Reactively update when they plug/unplug the charger
-        battery.addEventListener('chargingchange', checkBattery);
-        return () => battery.removeEventListener('chargingchange', checkBattery);
+    // Determine if we confidently know the battery status. 
+    // Firefox blocks it entirely (getBattery is undefined or throws).
+    // Brave spoofs it (always returns charging: true, level: 1).
+    // It's hard to detect spoofing perfectly, but we know if it's completely missing.
+    if (!('getBattery' in navigator)) {
+      setIsBatteryKnown(false);
+    } else {
+      navigator.getBattery().then(b => {
+        setIsBatteryKnown(true);
+      }).catch(() => {
+        setIsBatteryKnown(false);
       });
     }
-  }, [hasDismissed]);
+  }, []);
+
+  useEffect(() => {
+    // If preview route or already dismissed, do nothing
+    if (isPreviewRoute() || hasDismissed) return;
+    
+    // Only target Desktops/Laptops. 
+    if (isMobile) return;
+
+    // Check FPS drops continuously for a few seconds
+    const checkFps = setInterval(() => {
+      // If FPS drops below 35 AND we either don't know the battery status 
+      // (or we assume we might be in a spoofed browser like Brave where the Battery API is useless)
+      if (currentFps < 35) {
+        setShowWarning(true);
+      }
+    }, 5000);
+
+    return () => clearInterval(checkFps);
+  }, [currentFps, hasDismissed, isMobile, isBatteryKnown]);
 
   if (!showWarning || hasDismissed) return null;
 
@@ -35,7 +50,7 @@ export function BatteryWarning() {
       position: 'fixed',
       top: 0, left: 0, width: '100vw', height: '100vh',
       backgroundColor: 'rgba(7, 17, 36, 0.95)',
-      zIndex: 9999,
+      zIndex: 9998,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
@@ -56,6 +71,9 @@ export function BatteryWarning() {
         alignItems: 'center',
         gap: '1rem'
       }}>
+        <span style={{ fontSize: '0.65rem', color: 'var(--primary-cyan)', letterSpacing: '0.2em' }}>
+          [ PERFORMANCE WARNING ]
+        </span>
 
         <h2 style={{ 
           fontFamily: 'var(--font-sans)', 
@@ -63,7 +81,7 @@ export function BatteryWarning() {
           letterSpacing: '0.1em',
           color: 'var(--text-pure)',
         }}>
-          SYSTEM POWER LIMITED
+          FPS DEGRADATION DETECTED
         </h2>
         
         <p style={{ 
@@ -72,8 +90,9 @@ export function BatteryWarning() {
           color: 'rgba(252, 252, 252, 0.75)',
           letterSpacing: '0.03em'
         }}>
-          Your device is running on battery power. Browsers restrict GPU performance to save power — 
-          plug in your charger to experience this simulation at 60+ FPS.
+          Your system is struggling to render this simulation smoothly ({currentFps} FPS). <br/><br/>
+          If you are on a laptop, <strong>please plug in your charger</strong>. 
+          Some browsers (like Brave) block battery detection, but hardware often severely throttles 3D graphics on battery power.
         </p>
         
         <button 
