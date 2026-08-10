@@ -26,8 +26,10 @@ export function FaviconAnimator({ isMobile = false, enabled = true }) {
       mediaQuery.addEventListener('change', handleThemeChange);
     }
 
-    // 4 FPS update interval (250ms per frame)
+    // 4 FPS update interval (250ms per frame) — skip if tab is backgrounded
     const interval = setInterval(() => {
+      if (document.hidden) return;
+
       ctx.clearRect(0, 0, 64, 64);
 
       // Color Palette mapping for Light Mode vs Dark Mode
