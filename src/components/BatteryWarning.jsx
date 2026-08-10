@@ -11,20 +11,39 @@ export function BatteryWarning({ isDismissed = false, onDismiss = () => {} }) {
     // If we're on the /warning preview route, always show — skip battery API
     if (isPreviewRoute() || isDismissed) return;
 
-    // Check actual battery status on real devices
+    let batteryInstance = null;
+    let handleBatteryChange = null;
+
+    // Check actual battery status on real devices supporting Battery Status API (Chrome, Edge, Opera)
     if ('getBattery' in navigator) {
       navigator.getBattery().then((battery) => {
-        const checkBattery = () => {
-          if (!battery.charging) setShowWarning(true);
+        batteryInstance = battery;
+
+        handleBatteryChange = () => {
+          // Show warning if device is not charging OR if battery is 25% or lower
+          if (!battery.charging || battery.level <= 0.25) {
+            setShowWarning(true);
+          } else {
+            setShowWarning(false);
+          }
         };
 
-        checkBattery(); // Initial check
+        handleBatteryChange(); // Initial check
 
-        // Reactively update when they plug/unplug the charger
-        battery.addEventListener('chargingchange', checkBattery);
-        return () => battery.removeEventListener('chargingchange', checkBattery);
+        // Reactively update when charger is plugged/unplugged or level changes
+        battery.addEventListener('chargingchange', handleBatteryChange);
+        battery.addEventListener('levelchange', handleBatteryChange);
+      }).catch(() => {
+        // Battery API blocked or unavailable
       });
     }
+
+    return () => {
+      if (batteryInstance && handleBatteryChange) {
+        batteryInstance.removeEventListener('chargingchange', handleBatteryChange);
+        batteryInstance.removeEventListener('levelchange', handleBatteryChange);
+      }
+    };
   }, [isDismissed]);
 
   if (!showWarning || isDismissed) return null;
