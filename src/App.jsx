@@ -80,11 +80,15 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       const worstFrameMs = sortedDeltas[onePercentIndex - 1] || 16.6;
       const onePercentLow = Math.round(1000 / worstFrameMs);
 
-      onFpsUpdate(liveFps);
-      onMetricsUpdate({
-        onePercentLow,
-        stutterCount: fpsLogger.stutterEvents.length
-      });
+      if (typeof onFpsUpdate === 'function') {
+        onFpsUpdate(liveFps);
+      }
+      if (typeof onMetricsUpdate === 'function') {
+        onMetricsUpdate({
+          onePercentLow,
+          stutterCount: fpsLogger.stutterEvents?.length || 0
+        });
+      }
 
       fpsAcc.current = 0;
       frameCount.current = 0;
