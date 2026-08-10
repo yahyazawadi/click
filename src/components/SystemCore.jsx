@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
 import '../shaders/PlanetCoreMaterial';
 
-export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
+export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected = false }) {
   const innerCoreRef = useRef();
   const shaderMatRef = useRef();
   const ringRef1 = useRef();
@@ -58,7 +58,7 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
         <sphereGeometry args={[coreRadius, perfTierFloat >= 0.8 ? 24 : 48, perfTierFloat >= 0.8 ? 24 : 48]} />
         <planetCoreMaterial
           ref={shaderMatRef}
-          uPerfTier={perfTierFloat}
+          uPerfTier={isSelected ? Math.max(perfTierFloat, 0.5) : perfTierFloat}
           uDeepOcean={colors.deepOcean}
           uMidOcean={colors.midOcean}
           uCloudBand={colors.cloudBand}
@@ -69,33 +69,37 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0 }) {
         />
       </mesh>
 
-      {/* 3. Concentric Core Orbit Ring 1 */}
-      <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-        {perfTierFloat >= 0.8 ? (
-          <meshBasicMaterial color={SYSTEM_CONFIG.colors.primaryCyan} />
-        ) : (
-          <meshStandardMaterial
-            color={SYSTEM_CONFIG.colors.primaryCyan}
-            emissive={SYSTEM_CONFIG.colors.primaryCyan}
-            emissiveIntensity={0.6}
-          />
-        )}
-      </mesh>
+      {/* 3. Concentric Core Orbit Ring 1 (Hidden on core focus to eliminate near-lens transparent overdraw) */}
+      {!isSelected && (
+        <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
+          <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+          {perfTierFloat >= 0.8 ? (
+            <meshBasicMaterial color={SYSTEM_CONFIG.colors.primaryCyan} />
+          ) : (
+            <meshStandardMaterial
+              color={SYSTEM_CONFIG.colors.primaryCyan}
+              emissive={SYSTEM_CONFIG.colors.primaryCyan}
+              emissiveIntensity={0.6}
+            />
+          )}
+        </mesh>
+      )}
 
-      {/* 4. Concentric Core Orbit Ring 2 */}
-      <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
-        <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-        {perfTierFloat >= 0.8 ? (
-          <meshBasicMaterial color={SYSTEM_CONFIG.colors.secondaryBlue} transparent opacity={0.5} />
-        ) : (
-          <meshStandardMaterial
-            color={SYSTEM_CONFIG.colors.secondaryBlue}
-            transparent
-            opacity={0.5}
-          />
-        )}
-      </mesh>
+      {/* 4. Concentric Core Orbit Ring 2 (Hidden on core focus to eliminate near-lens transparent overdraw) */}
+      {!isSelected && (
+        <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
+          <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+          {perfTierFloat >= 0.8 ? (
+            <meshBasicMaterial color={SYSTEM_CONFIG.colors.secondaryBlue} transparent opacity={0.5} />
+          ) : (
+            <meshStandardMaterial
+              color={SYSTEM_CONFIG.colors.secondaryBlue}
+              transparent
+              opacity={0.5}
+            />
+          )}
+        </mesh>
+      )}
     </group>
   );
 }

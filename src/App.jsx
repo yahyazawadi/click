@@ -432,7 +432,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} />
 
                 {/* Central Sphere Core */}
-                <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} />
+                <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} isSelected={selectedTarget === 'core'} />
 
                 {/* Tilted Macro Orbital Rings */}
                 {SYSTEM_CONFIG.rings.map((ring) => (
