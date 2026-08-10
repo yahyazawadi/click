@@ -142,9 +142,10 @@ export const PlanetCoreMaterial = shaderMaterial(
       col *= mix(0.45, 1.0, polarFade);
 
       // ---- 4. Physically-based lighting ----
-      // Light comes FROM upper-left to match Nebula 1 position [-35, 20, -40]
-      // so the bright lit face of the planet looks toward the nebulas
-      vec3 lightDir = normalize(vec3(-2.5, 1.5, 2.0));
+      // Light comes strongly from the LEFT to match the nebula positions.
+      // Nebulas are at roughly the same height as the planet, so Y is minimal.
+      // -X: toward left nebula, +Z: forward so the lit face is viewer-visible.
+      vec3 lightDir = normalize(vec3(-3.5, 0.2, 1.5));
 
       float diffuse = max(0.0, dot(N, lightDir));
       // Hemisphere ambient — space is not completely dark on shadow side
