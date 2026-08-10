@@ -95,7 +95,7 @@ export function ScissorMoonPlanet({ color, size }) {
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
-          <icosahedronGeometry args={[planetRadius, 4]} />
+          <sphereGeometry args={[planetRadius, 64, 64]} />
           <scissorMoonShaderMaterial ref={shaderMatRef} />
         </mesh>
 

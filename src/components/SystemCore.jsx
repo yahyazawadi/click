@@ -44,7 +44,7 @@ export function SystemCore({ onSelect }) {
     >
       {/* 1. Real Gas Giant Planet — organic cloud belts, storm swirls, limb atmosphere glow */}
       <mesh ref={innerCoreRef}>
-        <icosahedronGeometry args={[coreRadius, 4]} />
+        <sphereGeometry args={[coreRadius, 64, 64]} />
         <planetCoreMaterial
           ref={shaderMatRef}
           uDeepOcean={new THREE.Color('#041830')}        // Deep space blue
