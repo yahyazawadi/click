@@ -5,11 +5,13 @@ import { extend } from '@react-three/fiber';
 export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
-    uDeepOcean:   new THREE.Color('#010d1f'),  // Abyssal deep space black-blue
-    uMidOcean:    new THREE.Color('#003268'),  // Dark ocean mid-tone
-    uCloudBand:   new THREE.Color('#005f8a'),  // Cool cloud belt teal-blue
-    uStormHighlight: new THREE.Color('#00b4d8'), // Bright storm highlight cyan
-    uAtmosphere:  new THREE.Color('#00BAE3'),  // Limb atmosphere glow
+    uDeepOcean:      new THREE.Color('#010d1f'),  // Abyssal deep space black-blue
+    uMidOcean:       new THREE.Color('#003268'),  // Dark ocean mid-tone
+    uCloudBand:      new THREE.Color('#005f8a'),  // Cool cloud belt teal-blue
+    uStormHighlight: new THREE.Color('#00b4d8'),  // Bright storm highlight cyan
+    uAtmosphere:     new THREE.Color('#00BAE3'),  // Limb atmosphere glow
+    uContinentColor: new THREE.Color('#0a2a3a'),  // Dark teal landmass (above sea level)
+    uCoastColor:     new THREE.Color('#005577'),  // Shallow coastal shelf highlight
   },
   /* glsl */ `
     varying vec2 vUv;
@@ -31,6 +33,8 @@ export const PlanetCoreMaterial = shaderMaterial(
     uniform vec3 uCloudBand;
     uniform vec3 uStormHighlight;
     uniform vec3 uAtmosphere;
+    uniform vec3 uContinentColor;
+    uniform vec3 uCoastColor;
 
     varying vec2 vUv;
     varying vec3 vNormal;
@@ -110,6 +114,27 @@ export const PlanetCoreMaterial = shaderMaterial(
       float stormIntensity = length(r) * 0.5;
       float stormMask = smoothstep(0.3, 0.7, stormIntensity) * smoothstep(0.6, 0.85, bands);
       col = mix(col, uStormHighlight, stormMask * 0.7);
+
+      // ---- 3b. Continent landmasses ----
+      // Use a very slow, coarse, independent FBM with a DIFFERENT seed so continents
+      // don't align with the cloud bands — they drift at their own rate.
+      float continentDrift = uTime * 0.004; // much slower than clouds
+      vec2 cUv = vec2(vUv.x + continentDrift, vUv.y);
+
+      // Coarse warp for large blob shapes
+      vec2 cq = vec2(fbm(cUv * 0.9 + vec2(31.7, 12.5)),
+                     fbm(cUv * 0.9 + vec2(14.3, 47.8)));
+      // Continent field — low frequency → large continent-sized blobs
+      float continentField = fbm(cUv * 1.1 + 2.0 * cq + vec2(8.2, 61.3));
+      // Remap so ~35% of surface is land
+      float seaLevel   = 0.05;
+      float landHeight = smoothstep(seaLevel,         seaLevel + 0.22, continentField);
+      float coastShelf = smoothstep(seaLevel - 0.08,  seaLevel + 0.05, continentField)
+                       * (1.0 - landHeight); // only the transition ring
+
+      // Paint coast shallow shelf first, then land on top
+      col = mix(col, uCoastColor,     coastShelf * 0.75);
+      col = mix(col, uContinentColor, landHeight * 0.9);
 
       // Polar darkening (poles are darker and calmer on real gas giants)
       float polarFade = pow(sin(lat * 3.14159), 0.4);

@@ -57,6 +57,8 @@ export function SystemCore({ onSelect }) {
           uCloudBand={new THREE.Color('#005f8a')}        // Cool cloud belt teal-blue
           uStormHighlight={new THREE.Color('#00b4d8')}   // Bright storm cyan
           uAtmosphere={new THREE.Color('#00BAE3')}       // Limb atmosphere halo
+          uContinentColor={new THREE.Color('#0a2a3a')}   // Dark teal landmass
+          uCoastColor={new THREE.Color('#005577')}       // Shallow coastal shelf
         />
       </mesh>
 
