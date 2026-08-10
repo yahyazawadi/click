@@ -21,25 +21,39 @@ export function FpsProfilerOverlay({
   // GPU tier props
   gpuTier = 'high',
   onSetTier,
+  // Visibility control props
+  isOpen,
+  onToggle,
 }) {
   // Check if URL has ?debug=fps or ?profiler=true
   const isDebugUrl = typeof window !== 'undefined' && 
     (window.location.search.includes('debug=fps') || window.location.search.includes('profiler=true'));
 
-  const [visible, setVisible] = useState(() => isDebugUrl);
-  const [frameHistory, setFrameHistory] = useState([]);
-  const canvasRef = useRef(null);
+  const [internalVisible, setInternalVisible] = useState(() => isDebugUrl);
+
+  const visible = isOpen !== undefined ? isOpen : internalVisible;
+
+  const toggleVisibility = () => {
+    if (onToggle) {
+      onToggle();
+    } else {
+      setInternalVisible((prev) => !prev);
+    }
+  };
 
   // Keyboard shortcut listener (~ Tilde or Shift+D)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '`' || e.key === '~') {
-        setVisible((prev) => !prev);
+        toggleVisibility();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [onToggle]);
+
+  const [frameHistory, setFrameHistory] = useState([]);
+  const canvasRef = useRef(null);
 
   // Update mini frame time graph
   useEffect(() => {
@@ -95,31 +109,9 @@ export function FpsProfilerOverlay({
     ctx.stroke();
   }, [visible, frameHistory]);
 
+  // Completely hide when not active — no bottom-right button!
   if (!visible) {
-    return (
-      <button 
-        onClick={() => setVisible(true)}
-        style={{
-          position: 'fixed',
-          bottom: '12px',
-          right: '12px',
-          zIndex: 9990,
-          background: 'rgba(7, 17, 36, 0.85)',
-          border: '1px solid rgba(0, 186, 227, 0.4)',
-          color: 'var(--primary-cyan)',
-          padding: '4px 10px',
-          borderRadius: '6px',
-          fontSize: '0.65rem',
-          fontFamily: 'var(--font-mono)',
-          cursor: 'pointer',
-          boxShadow: '0 0 10px rgba(0, 186, 227, 0.2)',
-          opacity: 0.7,
-        }}
-        title="Open FPS Diagnostic Profiler (~)"
-      >
-        [ PROFILER HUD ]
-      </button>
-    );
+    return null;
   }
 
   return (
@@ -147,7 +139,7 @@ export function FpsProfilerOverlay({
           TELEMETRY PROFILER
         </span>
         <button 
-          onClick={() => setVisible(false)}
+          onClick={toggleVisibility}
           style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem' }}
         >
           X

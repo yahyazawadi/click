@@ -152,6 +152,14 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
 
+  // Telemetry profiler overlay visibility (open via clicking FPS badge or pressing ~)
+  const [isProfilerOpen, setIsProfilerOpen] = useState(() => {
+    return typeof window !== 'undefined' && 
+      (window.location.search.includes('debug=fps') || window.location.search.includes('profiler=true'));
+  });
+
+  const handleToggleProfiler = () => setIsProfilerOpen((prev) => !prev);
+
   const handleSetTier = (tier) => {
     fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override' });
     setGpuTier(tier);
@@ -442,6 +450,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           onReturn={handleReturn}
           currentFps={currentFps}
           isMobile={isMobile}
+          onToggleProfiler={handleToggleProfiler}
         />
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
@@ -461,6 +470,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           onToggleNebula={() => setIsNebulaEnabled((prev) => !prev)}
           gpuTier={gpuTier}
           onSetTier={handleSetTier}
+          isOpen={isProfilerOpen}
+          onToggle={handleToggleProfiler}
         />
 
         {/* Battery / Low Power Warning UI */}

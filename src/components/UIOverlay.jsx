@@ -1,7 +1,7 @@
 import React from 'react';
 import { SYSTEM_CONFIG } from '../config';
 
-export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false }) {
+export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false, onToggleProfiler }) {
   const isCore = selectedTarget === 'core';
   const isProject = Boolean(selectedProject);
   const isOpen = isCore || isProject;
@@ -24,7 +24,12 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
               SYSTEM // {selectedTarget ? 'TARGET_ENGAGED' : 'MACRO_ORBIT'}
             </div>
 
-            <div className="fps-hud-counter">
+            <div 
+              className="fps-hud-counter"
+              onClick={onToggleProfiler}
+              style={{ cursor: 'pointer' }}
+              title="Click to toggle Telemetry Profiler HUD (~)"
+            >
               <span className={`fps-indicator ${isFpsStable ? 'stable' : 'warning'}`} />
               <span className="fps-val">{currentFps} FPS</span>
               <span className="fps-badge">{isMobile ? 'MOB-30' : '60Hz'}</span>
