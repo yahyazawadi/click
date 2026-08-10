@@ -2,10 +2,13 @@
  * detectGpuTier.js — GPU Performance Tier Detection
  *
  * Strategy:
- *  1. Try WEBGL_debug_renderer_info (fast, works in Chrome, Firefox, etc.)
- *  2. Classify iGPUs / APUs (Radeon 760M/780M, Iris Xe, Vega) as 'med' by default
- *  3. Classify known high-end discrete GPUs (RTX, RX 6000/7000, etc.) as 'high'
- *  4. Fallback: run an offscreen FBM micro-benchmark on a WebGL canvas (< 4.5ms → high, < 18ms → med, else low)
+ *  1. Try WEBGL_debug_renderer_info (fast, works in Chrome, Firefox, Edge)
+ *  2. Classify iGPUs / APUs (Radeon 760M/780M, Iris Xe, Intel HD/UHD) as 'med'/'low' by default
+ *  3. Classify known high-end discrete GPUs (RTX 2060+, RX 6000+, etc.) as 'high'
+ *  4. Fallback: run an offscreen 600x400 FBM micro-benchmark on a WebGL canvas
+ *     - < 3.0ms  → HIGH (dedicated RTX/RX GPUs)
+ *     - < 12.0ms → MED
+ *     - >= 12.0ms → LOW
  *
  * Returns: 'high' | 'med' | 'low'
  */
@@ -15,13 +18,14 @@
 const HIGH_TIER_PATTERNS = [
   /rtx\s*[23456789]\d{3}/i,    // RTX 2060, 3060, 4070, etc.
   /rtx\s*a\d{3,4}/i,           // RTX A4000, A5000
+  /gtx\s*(10[7-9]0|1660|20[6-8]0|30[5-9]0)/i, // GTX 1070/1080/1660, etc.
   /rx\s*[67]\d{3}/i,           // RX 6600, 6700, 7800, 7900
   /rx\s*5[789]00/i,            // RX 5700, 5800
   /quadro\s*r/i,
   /tesla/i,
 ];
 
-// iGPUs / APUs / Mobile integrated graphics → Default to 'med' to ensure 60fps stability
+// iGPUs / APUs / Mobile integrated graphics → Default to 'med' or 'low' to ensure 60fps stability
 const MED_TIER_PATTERNS = [
   /radeon\s*[6789]\d{2}[ms]/i, // Radeon 760M, 780M, 680M, 890M APUs
   /radeon\s*graphics/i,        // Generic AMD APU graphics
@@ -30,7 +34,7 @@ const MED_TIER_PATTERNS = [
   /iris\s*xe/i,                // Intel Iris Xe
   /intel.*graphics/i,          // Intel UHD/HD/Arc Mobile
   /apple\s*m[1234]/i,          // Apple Silicon integrated
-  /gtx\s*(10[5-8]|16[56]|9[78])/i, // Mid-range GTX (1060, 1660, 1050Ti)
+  /gtx\s*(10[56]0|1650|9[67]0)/i, // Entry/mid GTX (1050, 1060, 1650)
   /rx\s*(4[78]0|5[789]0)/i,    // Older mid RX (RX 480, 580)
 ];
 
@@ -44,6 +48,7 @@ const LOW_TIER_PATTERNS = [
   /videocore/i,
   /llvmpipe/i,
   /swiftshader/i,
+  /microsoft\s*basic\s*render/i,
 ];
 
 function tryReadGpuName(gl) {
@@ -51,7 +56,7 @@ function tryReadGpuName(gl) {
     const ext = gl.getExtension('WEBGL_debug_renderer_info');
     if (!ext) return null;
     const renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
-    if (!renderer || renderer.length < 4) return null; // Brave returns empty or generic
+    if (!renderer || renderer.length < 4) return null;
     return renderer;
   } catch {
     return null;
@@ -114,8 +119,8 @@ void main() {
 }
 `;
 
-const BENCH_CANVAS_W = 400;
-const BENCH_CANVAS_H = 300;
+const BENCH_CANVAS_W = 600;
+const BENCH_CANVAS_H = 400;
 const BENCH_FRAMES   = 5;
 
 function compileShader(gl, type, src) {
@@ -173,12 +178,12 @@ function runBenchmark() {
   return totalMs / BENCH_FRAMES;
 }
 
-// Benchmark Thresholds (ms per frame on 400×300 canvas):
-//   High-end discrete GPU (RTX 3060/4060): ~1.0 – 3.0 ms  → HIGH (< 4.5ms)
-//   Mid-range / fast APU (Radeon 760M, GTX 1060): ~4.5 – 18.0 ms → MED (< 18.0ms)
-//   Low-end iGPU (Intel UHD 620): > 18.0 ms               → LOW
-const THRESH_HIGH = 4.5;
-const THRESH_MED  = 18.0;
+// Benchmark Thresholds (ms per frame on 600×400 canvas):
+//   Dedicated desktop GPU (RTX 3060/4060): ~0.8 – 2.5 ms  → HIGH (< 3.0ms)
+//   Mid-range GPU / fast APU (Radeon 780M, GTX 1060): ~3.0 – 12.0 ms → MED (< 12.0ms)
+//   Low-end GPU / weak iGPU (Intel UHD 620, old laptop): >= 12.0 ms   → LOW
+const THRESH_HIGH = 3.0;
+const THRESH_MED  = 12.0;
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 

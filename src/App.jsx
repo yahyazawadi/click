@@ -21,8 +21,9 @@ import { tierToFloat } from './utils/detectGpuTier.js';
 import { useFrame } from '@react-three/fiber';
 
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
-function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier }) {
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier, onAutoDemoteTier }) {
   const stableTimer = useRef(0);
+  const lowFpsTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
   const frameDeltas = useRef([]);
@@ -68,6 +69,19 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       stableTimer.current += delta;
     } else {
       stableTimer.current = 0;
+    }
+
+    // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s, demote GPU tier automatically!
+    if (delta >= 0.040 && gpuTier !== 'low') {
+      lowFpsTimer.current += delta;
+      if (lowFpsTimer.current >= 1.5) {
+        lowFpsTimer.current = 0;
+        if (typeof onAutoDemoteTier === 'function') {
+          onAutoDemoteTier();
+        }
+      }
+    } else {
+      lowFpsTimer.current = 0;
     }
 
     fpsAcc.current += delta;
@@ -164,6 +178,18 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override' });
     setGpuTier(tier);
     setPerfTierFloat(tierToFloat(tier));
+  };
+
+  const handleAutoDemoteTier = () => {
+    if (gpuTier === 'high') {
+      fpsLogger.logTierChange({ from: 'high', to: 'med', reason: 'Automatic performance demotion (live FPS < 25 FPS for 1.5s)' });
+      setGpuTier('med');
+      setPerfTierFloat(tierToFloat('med'));
+    } else if (gpuTier === 'med') {
+      fpsLogger.logTierChange({ from: 'med', to: 'low', reason: 'Automatic performance demotion (live FPS < 25 FPS for 1.5s)' });
+      setGpuTier('low');
+      setPerfTierFloat(tierToFloat('low'));
+    }
   };
   
   // Track if any warning was dismissed this session to prevent spamming
@@ -397,6 +423,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 selectedTarget={selectedTarget}
                 unlockedCount={unlockedCount}
                 gpuTier={gpuTier}
+                onAutoDemoteTier={handleAutoDemoteTier}
               />
 
               {/* Manual Drag & Spin (Rotates system + background together) */}
