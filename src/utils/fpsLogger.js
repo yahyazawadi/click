@@ -71,6 +71,7 @@ class FPSLogger {
     } : { online: navigator.onLine };
 
     return {
+      commitHash: typeof __COMMIT_HASH__ !== 'undefined' ? __COMMIT_HASH__ : 'unknown',
       userAgent: ua,
       browser,
       gpuRenderer,
@@ -251,6 +252,7 @@ class FPSLogger {
     const reportData = {
       session: this.sessionInfo,
       summary: {
+        commitHash: this.sessionInfo.commitHash,
         totalSnapshots: this.logs.length,
         totalStutterEvents: this.stutterEvents.length,
         severeOrCriticalStutters: severeStutters,
