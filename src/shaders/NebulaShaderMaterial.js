@@ -10,9 +10,11 @@ export const NebulaMaterial = shaderMaterial(
     uColor3: new THREE.Color('#a100ff'), // Violet Emission Glow
     uScale: 3.5,
     uWarp: 2.5,
+    uMaskRadius: 0.45,
+    uEdgeWarp: 0.25,
     uParallaxOffset: new THREE.Vector2(0, 0),
     uAlpha: 1.0,
-    uBrightness: 2.0,
+    uBrightness: 2.2,
   },
   // Vertex Shader
   /* glsl */ `
@@ -23,7 +25,7 @@ export const NebulaMaterial = shaderMaterial(
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-  // Fragment Shader - High-contrast smooth gas clouds & luminous tendrils
+  // Fragment Shader - Organic, Non-Square Nebula Cloud Boundary with Noise Edge Masking
   /* glsl */ `
     uniform float uTime;
     uniform vec3 uColor1;
@@ -31,6 +33,8 @@ export const NebulaMaterial = shaderMaterial(
     uniform vec3 uColor3;
     uniform float uScale;
     uniform float uWarp;
+    uniform float uMaskRadius;
+    uniform float uEdgeWarp;
     uniform vec2 uParallaxOffset;
     uniform float uAlpha;
     uniform float uBrightness;
@@ -69,14 +73,18 @@ export const NebulaMaterial = shaderMaterial(
     }
 
     void main() {
-      // Centered UVs with scale & parallax offset
-      vec2 uv = (vUv - vec2(0.5)) * uScale + uParallaxOffset;
+      vec2 centeredUv = vUv - vec2(0.5);
+      vec2 uv = centeredUv * uScale + uParallaxOffset;
 
-      // Soft vignette mask around canvas edges
-      float dist = length(vUv - vec2(0.5));
-      float vignette = smoothstep(0.9, 0.05, dist);
+      // 1. Organic irregular cloud shape mask (eliminates all box/square edges)
+      float angle = atan(centeredUv.y, centeredUv.x);
+      float edgeDistortion = fbm(vec2(angle * 2.5, uTime * 0.015) + centeredUv * 2.0) * uEdgeWarp;
+      float dist = length(centeredUv) + edgeDistortion;
 
-      // Domain Warping for fluid cosmic gas swirls
+      // Smooth organic falloff curve
+      float organicShapeMask = smoothstep(uMaskRadius, uMaskRadius * 0.15, dist);
+
+      // 2. Domain Warping for fluid cosmic gas swirls
       vec2 q = vec2(0.0);
       q.x = fbm(uv + vec2(0.0, uTime * 0.02));
       q.y = fbm(uv + vec2(5.2, uTime * 0.015));
@@ -88,7 +96,7 @@ export const NebulaMaterial = shaderMaterial(
       float density = fbm(uv + uWarp * r);
 
       // Sharpen cloud contrast for defined gas structures & wisps
-      float cloudVal = smoothstep(-0.25, 0.35, density);
+      float cloudVal = smoothstep(-0.2, 0.4, density);
 
       // Color composition
       vec3 col = mix(uColor1, uColor2, smoothstep(-0.3, 0.4, length(q)));
@@ -99,7 +107,9 @@ export const NebulaMaterial = shaderMaterial(
       col += uColor3 * glow * 1.2;
 
       col *= uBrightness;
-      float alpha = clamp(cloudVal * vignette * uAlpha, 0.0, 1.0);
+
+      // 3. Combined organic gas alpha transparency (completely seamless dissipation into deep space)
+      float alpha = clamp(cloudVal * organicShapeMask * uAlpha, 0.0, 1.0);
 
       gl_FragColor = vec4(col, alpha);
     }

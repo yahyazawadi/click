@@ -10,7 +10,6 @@ export function DualNebulaBackground() {
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // Slow fluid gas motion inside the nebulae
     if (matRefLayer1.current) {
       matRefLayer1.current.uTime = time * 0.35;
     }
@@ -21,24 +20,26 @@ export function DualNebulaBackground() {
 
   return (
     <group position={[0, 0, -50]}>
-      {/* NEBULA 1: Deep Crimson & Violet Cloud Cluster (Rotates with planet system) */}
+      {/* NEBULA 1: Organic Crimson & Violet Cloud Sector (Billowing Organic Shape) */}
       <mesh position={[-45, 25, -40]} rotation={[0.15, 0.3, -0.1]}>
         <planeGeometry args={[260, 190]} />
         <nebulaMaterial
           ref={matRefLayer1}
           uColor1={new THREE.Color('#08001a')} // Dark Indigo Base
-          uColor2={new THREE.Color('#c40045')} // Vibrant Crimson Gas Mass
+          uColor2={new THREE.Color('#c40045')} // Vibrant Crimson Gas Cloud Mass
           uColor3={new THREE.Color('#9900ff')} // Bright Violet Core Glow
-          uScale={3.5}
+          uScale={3.2}
           uWarp={2.6}
-          uAlpha={0.92}
-          uBrightness={2.2}
+          uMaskRadius={0.42}
+          uEdgeWarp={0.35} // High organic edge displacement
+          uAlpha={0.95}
+          uBrightness={2.4}
           transparent
           depthWrite={false}
         />
       </mesh>
 
-      {/* NEBULA 2: Magenta & Cyan Filament Cluster (Rotates with planet system) */}
+      {/* NEBULA 2: Organic Magenta & Cyan Wisps (Filament Tendrils) */}
       <mesh position={[50, -20, -30]} rotation={[-0.1, -0.4, 0.15]}>
         <planeGeometry args={[220, 160]} />
         <nebulaMaterial
@@ -46,10 +47,12 @@ export function DualNebulaBackground() {
           uColor1={new THREE.Color('#000000')} // Transparent Base
           uColor2={new THREE.Color('#ff007f')} // Electric Magenta Wisps
           uColor3={new THREE.Color('#00f0ff')} // Glowing Cyan Highlights
-          uScale={5.0}
+          uScale={4.8}
           uWarp={3.8}
-          uAlpha={0.85}
-          uBrightness={2.4}
+          uMaskRadius={0.38}
+          uEdgeWarp={0.45} // Wispy tendril edge displacement
+          uAlpha={0.88}
+          uBrightness={2.6}
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}
