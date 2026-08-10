@@ -11,20 +11,21 @@ export const PlanetCoreMaterial = shaderMaterial(
     uGlowColor: new THREE.Color('#7000ff'),      // Deep cosmic violet energy accent
     uAtmosphereColor: new THREE.Color('#00BAE3'),// Glowing atmospheric rim
   },
-  // Vertex Shader
+  // Vertex Shader — passes world normal and view direction properly
   /* glsl */ `
     varying vec2 vUv;
     varying vec3 vNormal;
-    varying vec3 vPosition;
+    varying vec3 vWorldPosition;
 
     void main() {
       vUv = uv;
       vNormal = normalize(normalMatrix * normal);
-      vPosition = position;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      vWorldPosition = worldPos.xyz;
+      gl_Position = projectionMatrix * viewMatrix * worldPos;
     }
   `,
-  // Fragment Shader — Procedural Sci-Fi Planetary Surface with Continent Swirls & Atmosphere Glow
+  // Fragment Shader — Clean Smooth Gas Giant Bands & Bioluminescent Grid Veins
   /* glsl */ `
     uniform float uTime;
     uniform vec3 uBaseColor;
@@ -35,120 +36,77 @@ export const PlanetCoreMaterial = shaderMaterial(
 
     varying vec2 vUv;
     varying vec3 vNormal;
-    varying vec3 vPosition;
+    varying vec3 vWorldPosition;
 
-    // 3D Simplex-like noise helper
-    vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
-    float snoise(vec3 v) {
-      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-
-      // First corner
-      vec3 i  = floor(v + dot(v, C.yyy));
-      vec3 x0 = v - i + dot(i, C.xxx);
-
-      // Other corners
-      vec3 g = step(x0.yzx, x0.xyz);
-      vec3 l = 1.0 - g;
-      vec3 i1 = min(g.xyz, l.zxy);
-      vec3 i2 = max(g.xyz, l.zxy);
-
-      vec3 x1 = x0 - i1 + C.xxx;
-      vec3 x2 = x0 - i2 + C.yyy;
-      vec3 x3 = x0 - D.yyy;
-
-      // Permutations
-      i = mod(i, 289.0);
-      vec4 p = permute(permute(permute(
-                i.z + vec4(0.0, i1.z, i2.z, 1.0))
-              + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-              + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-
-      // Gradients
-      float n_ = 0.142857142857; // 1.0/7.0
-      vec3 ns = n_ * D.wyz - D.xzx;
-
-      vec4 j = p - 49.0 * floor(p * ns.z); // mod(p,7*7)
-
-      vec4 x_ = floor(j * ns.z);
-      vec4 y_ = floor(j - 7.0 * x_); // mod(j,N)
-
-      vec4 x = x_ *ns.x + ns.yyyy;
-      vec4 y = y_ *ns.x + ns.yyyy;
-      vec4 h = 1.0 - abs(x) - abs(y);
-
-      vec4 b0 = vec4(x.xy, y.xy);
-      vec4 b1 = vec4(x.zw, y.zw);
-
-      vec4 s0 = floor(b0)*2.0 + 1.0;
-      vec4 s1 = floor(b1)*2.0 + 1.0;
-      vec4 sh = -step(h, vec4(0.0));
-
-      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
-      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
-
-      vec3 p0 = vec3(a0.xy, h.x);
-      vec3 p1 = vec3(a0.zw, h.y);
-      vec3 p2 = vec3(a1.xy, h.z);
-      vec3 p3 = vec3(a1.zw, h.w);
-
-      // Normalise gradients
-      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-      p0 *= norm.x;
-      p1 *= norm.y;
-      p2 *= norm.z;
-      p3 *= norm.w;
-
-      // Mix final noise value
-      vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-      m = m * m;
-      return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+    // Smooth 2D Noise
+    vec2 hash2(vec2 p) {
+      p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+      return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
     }
 
-    // 3D Fractal Brownian Motion for rich surface details
-    float fbm3D(vec3 p) {
-      float value = 0.0;
-      float amplitude = 0.5;
-      for (int i = 0; i < 5; i++) {
-        value += amplitude * snoise(p);
-        p *= 2.02;
-        amplitude *= 0.5;
+    float noise2D(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(dot(hash2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
+            dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
+        mix(dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
+            dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x),
+        u.y
+      );
+    }
+
+    float fbm2D(vec2 p) {
+      float v = 0.0;
+      float a = 0.5;
+      mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
+      for (int i = 0; i < 4; i++) {
+        v += a * noise2D(p);
+        p = rot * p * 2.02 + vec2(1.7, 9.2);
+        a *= 0.5;
       }
-      return value;
+      return v;
     }
 
     void main() {
-      vec3 pos = vPosition * 1.5;
+      // Normalize normal vector
+      vec3 N = normalize(vNormal);
+
+      // 1. Smooth Gas Giant Horizontal Cloud Belts (Jupiter / Neptune style)
+      float t = uTime * 0.05;
+      vec2 uv = vec2(vUv.x * 2.0 + t, vUv.y * 4.0);
       
-      // 1. Slow planetary rotation swirl
-      float time = uTime * 0.08;
-      vec3 animPos = vec3(pos.x * cos(time) - pos.z * sin(time), pos.y, pos.x * sin(time) + pos.z * cos(time));
+      // Gentle atmospheric turbulence
+      float warp = fbm2D(uv * 1.5 + vec2(t * 0.2, 0.0));
+      float bandPattern = sin((vUv.y + warp * 0.15) * 25.0) * 0.5 + 0.5;
 
-      // 2. Domain-warped surface landmasses & tectonic textures
-      float n1 = fbm3D(animPos);
-      float n2 = fbm3D(animPos + vec3(n1 * 1.8, 2.5, n1 * 1.2));
-      float continentShape = fbm3D(animPos * 1.2 + vec3(n2 * 2.0));
-
-      // 3. Color layering based on terrain elevation
-      vec3 finalColor = uBaseColor;
+      // 2. Base planet shading using smooth gradient bands
+      vec3 finalColor = mix(uBaseColor, uSecondaryColor, bandPattern);
       
-      // Deep ocean / shadow trench
-      finalColor = mix(finalColor, uSecondaryColor, smoothstep(-0.4, 0.1, continentShape));
+      // Soft cosmic violet storm wisps
+      float storm = smoothstep(0.2, 0.6, fbm2D(uv * 3.0 + vec2(0.0, t * 0.1)));
+      finalColor = mix(finalColor, uGlowColor * 0.7, storm * 0.6);
 
-      // Tectonic ridges & plateaus
-      finalColor = mix(finalColor, uGlowColor * 0.8, smoothstep(0.1, 0.4, continentShape));
+      // 3. Crisp Sci-Fi Grid Line Overlay (Bioluminescent Quantum Core pattern)
+      vec2 gridUv = fract(vUv * 16.0) - 0.5;
+      float gridDist = min(abs(gridUv.x), abs(gridUv.y));
+      float gridLines = smoothstep(0.03, 0.01, gridDist);
+      
+      // Pulse energy along grid
+      float pulse = sin(vUv.y * 30.0 + uTime * 2.0) * 0.5 + 0.5;
+      finalColor += uAccentColor * gridLines * pulse * 0.4;
 
-      // Bioluminescent energy veins running through the planet
-      float veinPattern = smoothstep(0.02, 0.08, abs(snoise(animPos * 4.0 + n2 * 1.5)));
-      float veinGlow = (1.0 - veinPattern) * smoothstep(0.0, 0.5, continentShape);
-      finalColor += uAccentColor * veinGlow * 1.5;
-
-      // 4. Fresnel Rim Lighting (Cosmic Atmospheric Glow)
-      vec3 viewDir = normalize(-vPosition); // In object space approximation
-      float fresnel = pow(1.0 - max(0.0, dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.5);
-      finalColor += uAtmosphereColor * fresnel * 1.4;
+      // 4. Smooth Specular & Fresnel Rim Lighting
+      vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+      float fresnel = pow(1.0 - max(0.0, dot(N, viewDir)), 3.0);
+      
+      // Soft light direction
+      vec3 lightDir = normalize(vec3(1.0, 1.0, 2.0));
+      float diff = max(0.25, dot(N, lightDir)); // Ambient minimum 0.25
+      
+      finalColor *= diff;
+      finalColor += uAtmosphereColor * fresnel * 1.5;
 
       gl_FragColor = vec4(finalColor, 1.0);
     }
