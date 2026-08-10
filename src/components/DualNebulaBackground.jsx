@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import '../shaders/NebulaShaderMaterial';
@@ -13,20 +13,33 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0 }) {
     if (matRefLayer2.current) matRefLayer2.current.uTime = time * 0.55;
   });
 
+  // Memoize colors ONCE to prevent allocation on React re-renders
+  const nebula1Colors = useMemo(() => ({
+    sii:  new THREE.Color('#9900cc'),
+    ha:   new THREE.Color('#c40045'),
+    oiii: new THREE.Color('#5500bb'),
+    core: new THREE.Color('#c0f0ff'),
+  }), []);
+
+  const nebula2Colors = useMemo(() => ({
+    sii:  new THREE.Color('#00f0ff'),
+    ha:   new THREE.Color('#0d1b40'),
+    oiii: new THREE.Color('#410099'),
+    core: new THREE.Color('#a6f6ff'),
+  }), []);
+
   return (
     <group position={[0, 0, -50]}>
-      {/*
-        NEBULA 1 (LEFT): Deep Violet / Crimson Gas Cloud
-      */}
+      {/* NEBULA 1 (LEFT): Deep Violet / Crimson Gas Cloud */}
       <mesh position={[-35, 20, -40]} rotation={[0.15, 0.3, -0.1]}>
         <planeGeometry args={[220, 160]} />
         <nebulaMaterial
           ref={matRefLayer1}
           uPerfTier={perfTierFloat}
-          uColorSII={new THREE.Color('#9900cc')}   // Dense magenta knots
-          uColorHa={new THREE.Color('#c40045')}    // Vivid crimson body
-          uColorOIII={new THREE.Color('#5500bb')}  // Electric violet outer shell
-          uColorCore={new THREE.Color('#c0f0ff')}  // Pale cyan-white ionization core
+          uColorSII={nebula1Colors.sii}
+          uColorHa={nebula1Colors.ha}
+          uColorOIII={nebula1Colors.oiii}
+          uColorCore={nebula1Colors.core}
           uScale={3.2}
           uWarp={2.6}
           uMaskRadius={0.38}
@@ -49,10 +62,10 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0 }) {
           <nebulaMaterial
             ref={matRefLayer2}
             uPerfTier={perfTierFloat}
-            uColorSII={new THREE.Color('#00f0ff')}   // Vibrant Electric Cyan Wisps
-            uColorHa={new THREE.Color('#0d1b40')}    // Deep Cosmic Midnight Blue Body
-            uColorOIII={new THREE.Color('#410099')}  // Rich Royal Indigo/Purple Outer Cloud
-            uColorCore={new THREE.Color('#a6f6ff')}  // Bright Glowing Cyan-White Core
+            uColorSII={nebula2Colors.sii}
+            uColorHa={nebula2Colors.ha}
+            uColorOIII={nebula2Colors.oiii}
+            uColorCore={nebula2Colors.core}
             uScale={4.5}
             uWarp={3.8}
             uMaskRadius={0.35}

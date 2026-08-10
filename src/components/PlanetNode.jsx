@@ -64,6 +64,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
   const worldPos = useRef(new THREE.Vector3());
   const projScreenMatrix = useRef(new THREE.Matrix4());
   const frustum = useRef(new THREE.Frustum());
+  const boundingSphereRef = useRef(new THREE.Sphere());
 
   useFrame((state, delta) => {
     if (!ring) return;
@@ -94,11 +95,10 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
       groupRef.current.getWorldPosition(worldPos.current);
       projScreenMatrix.current.multiplyMatrices(state.camera.projectionMatrix, state.camera.matrixWorldInverse);
       frustum.current.setFromProjectionMatrix(projScreenMatrix.current);
-      // Sphere radius check (size + margin)
+      // Sphere radius check (size + margin) - zero allocation
       const boundingRadius = (project.size || 0.5) * 2.5;
-      const isVisibleInFrustum = frustum.current.intersectsSphere(
-        new THREE.Sphere(worldPos.current, boundingRadius)
-      );
+      boundingSphereRef.current.set(worldPos.current, boundingRadius);
+      const isVisibleInFrustum = frustum.current.intersectsSphere(boundingSphereRef.current);
       groupRef.current.visible = isVisibleInFrustum;
     }
 
