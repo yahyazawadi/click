@@ -127,7 +127,7 @@ export const NebulaMaterial = shaderMaterial(
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
-    uniform float uNebulaPath; // 0–7, selects visual formula at runtime
+    uniform int   uNebulaPath; // 0–3, selects HIGH-tier formula at runtime
     uniform vec3 uColorSII;
     uniform vec3 uColorHa;
     uniform vec3 uColorOIII;
@@ -250,7 +250,7 @@ export const NebulaMaterial = shaderMaterial(
 
       // 2. Organic boundary mask
       float angle   = atan(centeredUv.y, centeredUv.x);
-      float edgeN   = fbm(vec2(angle * 2.0, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
+      float edgeN   = fbm(vec2(angle * 2.5, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
@@ -261,9 +261,9 @@ export const NebulaMaterial = shaderMaterial(
       float density;
       float qLen = 0.0;
 
-      int path = int(uNebulaPath + 0.5);
-
-      if (path == 0) {
+      if (uPerfTier < 0.3) {
+        // ── HIGH tier: runtime path selected by uNebulaPath uniform (0–3) ──
+        if (uNebulaPath == 0) {
           // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
           vec2 q0;
           q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
@@ -273,8 +273,12 @@ export const NebulaMaterial = shaderMaterial(
           float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
           density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
 
-        } else if (path == 1) {
-          // PATH 1 — Deep Ocean Pillars v2 (Gap-fixed + rich crimson micro-filaments)
+        } else if (uNebulaPath == 1) {
+          // PATH 1 — Deep Ocean Pillars v2
+          // Two independent warp fields at different speeds give layered depth.
+          // A low-frequency envelope floor eliminates gaps by ensuring the cloud
+          // never hits zero in both layers simultaneously. A third micro-detail
+          // pass targets the Ha density range to enrich the crimson-to-violet gradient.
           vec2 q1;
           q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
           q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
@@ -284,12 +288,14 @@ export const NebulaMaterial = shaderMaterial(
           r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
           float base1  = fbm(uv + uWarp * q1);
           float deep1  = fbm(uv + uWarp * r1 * 0.5);
+          // Envelope: large-scale low-frequency cloud fills in structural gaps
           float envelope1 = fbm(uv * 0.55 + vec2(3.1, uTime * 0.004)) * 0.22 + 0.08;
           float blend1 = mix(base1, deep1, 0.32);
+          // Micro-detail: targets mid-density range (Ha→SII crimson transition)
           float micro1 = fbm(uv * 3.1 + q1 * 0.55 + vec2(uTime * 0.005)) * 0.12;
           density = max(blend1 + micro1 * smoothstep(0.25, 0.65, blend1), envelope1);
 
-        } else if (path == 2) {
+        } else if (uNebulaPath == 2) {
           // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
           float bowAngle = uTime * 0.006;
           mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
@@ -301,7 +307,7 @@ export const NebulaMaterial = shaderMaterial(
           float base2 = fbm(uv + uWarp * q2);
           density = base2 * (0.7 + 0.3 * ribbonMask);
 
-        } else if (path == 3) {
+        } else {
           // PATH 3 — Organic Plasma Filaments v2
           // Replaces the mathematical sin() crosshatch with FBM-ridge filaments
           // warped by the gas flow itself. Two crossing ridge families at different
@@ -328,56 +334,94 @@ export const NebulaMaterial = shaderMaterial(
           // Blend: rich cloud base + glowing plasma threads on top
           density = base3 * 0.72 + filaments3;
 
-        } else if (path == 4) {
-          // PATH 4 — Ionization Cavern: deep gas cloud with central cavity
-          // Domain warp driven by a low-frequency expansion field, creating an
-          // organic cavern carved out by young hot star winds.
+        } else if (uNebulaPath == 4) {
+          // PATH 4 — Polar Vortex: gas in rotating spiral polar coordinates
+          // The density field lives in angle-radius space and slowly rotates,
+          // creating a swirling galactic-arm cross-section feel.
+          float r4 = length(uv);
+          float theta4 = atan(uv.y, uv.x) + uTime * 0.022;
+          // Logarithmic spiral: convert back to Cartesian in spiral space
+          vec2 spiralUv = vec2(r4 * cos(theta4 * 1.4 + r4), r4 * sin(theta4 * 1.4 + r4));
           vec2 q4;
-          q4.x = fbm(uv + vec2(0.0, uTime * 0.015));
-          q4.y = fbm(uv + vec2(4.2, uTime * 0.011));
+          q4.x = fbm(spiralUv + vec2(0.0, uTime * 0.011));
+          q4.y = fbm(spiralUv + vec2(4.1, uTime * 0.008));
           qLen = length(q4);
-          float base4 = fbm(uv + uWarp * q4);
-          // Organic cavern carved into the cloud center
-          float carve4 = fbm(uv * 1.8 + q4 * 0.6 + vec2(uTime * 0.008));
-          density = base4 * smoothstep(0.12, 0.58, carve4 + 0.15);
+          float base4 = fbm(spiralUv + uWarp * q4 * 0.75);
+          // Radial fade: denser in mid-radii (avoids hard center/edge)
+          float radialBias4 = smoothstep(0.05, 0.25, r4) * smoothstep(0.7, 0.3, r4);
+          density = base4 * (0.6 + 0.4 * radialBias4);
 
-        } else if (path == 5) {
-          // PATH 5 — Tarantula Filament Web: fine spiderweb gas tendrils
-          // Multi-frequency FBM warp where fine micro-filaments flow along
-          // the primary density ridges. Pure organic fluid dynamics.
+        } else if (uNebulaPath == 5) {
+          // PATH 5 — Emission Shell: hollow ring like a planetary nebula
+          // Peak density sits on a distorted spherical shell, not the center.
+          // Inner glow + outer halo give it layered depth like the Ring Nebula.
           vec2 q5;
-          q5.x = fbm(uv + vec2(0.0, uTime * 0.016));
-          q5.y = fbm(uv + vec2(6.1, uTime * 0.012));
+          q5.x = fbm(uv + vec2(0.0, uTime * 0.015));
+          q5.y = fbm(uv + vec2(6.3, uTime * 0.011));
           qLen = length(q5);
-          float base5 = fbm(uv + uWarp * q5);
-          // Tendril layer: fine noise warped by primary flow
-          float tendrils5 = fbm(uv * 3.4 + q5 * 1.2 + vec2(uTime * 0.006)) * 0.22;
-          density = base5 * 0.68 + tendrils5 * smoothstep(0.18, 0.65, base5);
+          // FBM-distorted radius so the shell is organic, not a perfect circle
+          float r5 = length(uv + q5 * 0.18);
+          // Primary shell ring (peak at r = 0.22)
+          float shell5 = exp(-pow((r5 - 0.22) * 7.5, 2.0)) * 0.95;
+          // Inner diffuse core glow
+          float core5  = exp(-r5 * r5 * 14.0) * 0.40;
+          // Outer faint halo (wider, softer)
+          float halo5  = exp(-pow((r5 - 0.40) * 4.5, 2.0)) * 0.28;
+          // Organic surface texture on the shell itself
+          float surf5  = fbm(uv * 3.8 + q5 * 0.7 + vec2(uTime * 0.007)) * 0.18;
+          density = shell5 + core5 + halo5 + surf5 * (shell5 + halo5);
 
-        } else if (path == 6) {
-          // PATH 6 — Kolmogorov Cascade: 3-scale turbulent fluid flow
-          // Large eddies drive medium eddies, which drive fine wisps.
+        } else if (uNebulaPath == 6) {
+          // PATH 6 — Turbulent Cascade: Kolmogorov energy cascade
+          // Three warped FBM layers at frequency ratios 1:2:4, each smaller
+          // scale emerging only inside the larger scale structure.
+          // Produces the most physically accurate-looking turbulent gas.
           vec2 q6;
-          q6.x = fbm(uv + vec2(0.0, uTime * 0.014));
-          q6.y = fbm(uv + vec2(5.2, uTime * 0.010));
+          q6.x = fbm(uv + vec2(0.0, uTime * 0.016));
+          q6.y = fbm(uv + vec2(5.2, uTime * 0.012));
           qLen = length(q6);
-          float large6  = fbm(uv * 0.95 + uWarp * q6 * 0.85);
-          float medium6 = fbm(uv * 2.2 + uWarp * q6 * 0.5 + vec2(3.7, 1.2)) * 0.35;
-          float fine6   = fbm(uv * 4.6 + q6 * 0.4 + vec2(7.1, 5.8)) * 0.18;
-          density = large6 * 0.65 + medium6 * smoothstep(0.15, 0.50, large6) + fine6 * smoothstep(0.25, 0.60, large6);
+          // Large eddies — coarse flow architecture
+          float large6  = fbm(uv * 1.0 + uWarp * q6 * 0.9);
+          // Medium eddies — 2× frequency, inherit large structure
+          float medium6 = fbm(uv * 2.1 + uWarp * q6 * 0.55 + vec2(3.7, 1.2)) * 0.52;
+          // Fine eddies — 4× frequency, only where medium is present
+          float fine6   = fbm(uv * 4.4 + uWarp * q6 * 0.35 + vec2(7.1, 5.8)) * 0.26;
+          density = large6
+                  + medium6 * smoothstep(0.15, 0.45, large6)
+                  + fine6   * smoothstep(0.30, 0.60, large6);
 
         } else {
-          // PATH 7 — Supersonic Shock Front: compressed gas sheets & dust
-          // Slow directional drift creates compressed, high-contrast gas fronts
-          // that look like supersonic shockwaves propagating through space.
+          // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind
+          // A slow asymmetric wind direction warps the density field into
+          // two bright compressed arcs — upwind (bright) and trailing (faint).
+          // Looks like an O-star blowing a cavity through the molecular cloud.
           vec2 q7;
-          q7.x = fbm(uv + vec2(uTime * 0.012, uTime * 0.015));
-          q7.y = fbm(uv + vec2(4.8 + uTime * 0.008, -uTime * 0.010));
+          q7.x = fbm(uv + vec2(0.0, uTime * 0.013));
+          q7.y = fbm(uv + vec2(4.8, uTime * 0.009));
           qLen = length(q7);
-          float base7 = fbm(uv + uWarp * q7 * 0.9);
-          float front7 = fbm(uv * 2.5 + q7 * 0.8 + vec2(1.8, 3.4)) * 0.25;
-          density = base7 * 0.62 + front7 * smoothstep(0.20, 0.60, base7);
+          float base7 = fbm(uv + uWarp * q7 * 0.8);
+          // Slowly drifting wind direction (rotates once per ~8 minutes)
+          float windAngle = uTime * 0.012;
+          vec2 windDir7 = vec2(cos(windAngle) * 0.6 + 0.3, sin(windAngle) * 0.4 + 0.2);
+          float windDot7 = dot(uv + q7 * 0.18, normalize(windDir7));
+          // Primary bright upwind arc
+          float arc7a = exp(-pow(windDot7 * 3.2 + 0.35, 2.0)) * 0.60;
+          // Secondary fainter trailing shock
+          float arc7b = exp(-pow(windDot7 * 2.0 - 0.55, 2.0)) * 0.28;
+          // Arcs only appear where there is existing gas
+          density = base7 * 0.6 + (arc7a + arc7b) * smoothstep(0.08, 0.45, base7 + 0.25);
         }
+
+      } else if (uPerfTier < 0.8) {
+        // MED — Single domain warp (smooth organic gas flow)
+        vec2 q;
+        q.x = fbm(uv + vec2(0.0, uTime * 0.018));
+        q.y = fbm(uv + vec2(5.2, uTime * 0.013));
+        density = fbm(uv + uWarp * q);
+      } else {
+        // LOW — Direct fbm (flat performance mode)
+        density = fbm(uv + vec2(uTime * 0.015));
+      }
       float gasDensity = smoothstep(0.0, 0.5, density);
 
       // 4. Dark dust absorption lanes
@@ -402,7 +446,10 @@ export const NebulaMaterial = shaderMaterial(
       col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
       col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
       col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
-      col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
+      // Volumetric light scatter active on HIGH tier when qLen is calculated
+      if (uPerfTier < 0.3) {
+        col += uColorOIII * pow(max(0.0, qLen - 0.28), 2.0) * 0.4;
+      }
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);

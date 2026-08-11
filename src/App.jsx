@@ -178,9 +178,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // Independent path per nebula (1=Deep Ocean for red, 1=Deep Ocean for blue)
+  // DEV: independent path per nebula (1=Deep Ocean for red, 3=Plasma Filaments for teal)
   const [nebulaPath1, setNebulaPath1] = useState(1);
-  const [nebulaPath2, setNebulaPath2] = useState(1);
+  const [nebulaPath2, setNebulaPath2] = useState(3);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
@@ -567,10 +567,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                     [1, 'Deep Ocean'],
                     [2, 'Orion Ribbon'],
                     [3, 'Plasma Threads'],
-                    [4, 'Ion. Cavern'],
-                    [5, 'Tarantula Web'],
+                    [4, 'Polar Vortex'],
+                    [5, 'Emission Shell'],
                     [6, 'Turb. Cascade'],
-                    [7, 'Shock Front'],
+                    [7, 'Bow Shock'],
                   ].map(([id, name]) => (
                     <button key={id} onClick={() => setFn(id)} style={{
                       padding: '3px 7px', borderRadius: 4, textAlign: 'left', cursor: 'pointer',
