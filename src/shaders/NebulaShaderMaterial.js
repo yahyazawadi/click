@@ -320,9 +320,9 @@ export const NebulaMaterial = shaderMaterial(
       col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
 
-      // 7. Volumetric scatter halo (rich multi-spectral gas glow)
+      // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
-      col += uColorOIII * glow * 0.5 + uColorHa * glow * 0.35 + uColorSII * glow * 0.25;
+      col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
       col *= (uBrightness * pathBrightness);
 

@@ -27,17 +27,17 @@ export function DualNebulaBackground({
 
   // Memoize colors ONCE to prevent allocation on React re-renders
   const nebula1Colors = useMemo(() => ({
-    sii:  new THREE.Color('#8a00e6'), // Rich deep purple-violet
-    ha:   new THREE.Color('#e6004c'), // Glowing crimson ruby
-    oiii: new THREE.Color('#4000b3'), // Deep violet-ultramarine
-    core: new THREE.Color('#ffeaee'), // Warm luminous pinkish-gold core highlight
+    sii:  new THREE.Color('#9900cc'),
+    ha:   new THREE.Color('#c40045'),
+    oiii: new THREE.Color('#5500bb'),
+    core: new THREE.Color('#ffd4e5'), // Luminous Whitish-Crimson core highlight (not stark white)
   }), []);
 
   const nebula2Colors = useMemo(() => ({
-    sii:  new THREE.Color('#00f5ff'), // Electric cyan-turquoise
-    ha:   new THREE.Color('#0f225c'), // Deep rich cobalt-indigo
-    oiii: new THREE.Color('#4d00b8'), // Vivid deep violet
-    core: new THREE.Color('#64ffff'), // Luminous electric aqua core highlight
+    sii:  new THREE.Color('#00f0ff'),
+    ha:   new THREE.Color('#0d1b40'),
+    oiii: new THREE.Color('#410099'),
+    core: new THREE.Color('#50e5f5'), // Luminous Whitish-Teal core highlight (not stark white)
   }), []);
 
   const n1 = NEBULA_CONFIG.nebula1;
