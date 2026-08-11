@@ -427,19 +427,22 @@ export const NebulaMaterial = shaderMaterial(
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
 
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
+      col = mix(col, uColorHa,   smoothstep(0.08, 0.55, finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.45, 0.82, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.88, 1.0,  finalDensity) * 0.40 + coreGlow * 0.35);
+
       // Volumetric light scatter active on HIGH tier when qLen is calculated
       if (uPerfTier < 0.3) {
-        col += uColorOIII * pow(max(0.0, qLen - 0.28), 2.0) * 0.4;
+        col += uColorOIII * pow(max(0.0, qLen - 0.32), 2.0) * 0.25;
       }
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
-      col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
+      col += uColorOIII * glow * 0.4 + uColorHa * glow * 0.25;
 
       col *= uBrightness;
+      // Soft shoulder compression to preserve color saturation and prevent RGB clipping to white
+      col = col / (vec3(1.0) + col * 0.22);
 
       // 8. Embedded young star field
       //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
