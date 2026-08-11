@@ -127,7 +127,7 @@ export const NebulaMaterial = shaderMaterial(
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
-    uniform int   uNebulaPath; // 0–3, selects HIGH-tier formula at runtime
+    uniform float uNebulaPath; // 0–7, selects visual formula at runtime
     uniform vec3 uColorSII;
     uniform vec3 uColorHa;
     uniform vec3 uColorOIII;
@@ -261,9 +261,9 @@ export const NebulaMaterial = shaderMaterial(
       float density;
       float qLen = 0.0;
 
-      if (uPerfTier < 0.3) {
-        // ── HIGH tier: runtime path selected by uNebulaPath uniform (0–3) ──
-        if (uNebulaPath == 0) {
+      int path = int(uNebulaPath + 0.5);
+
+      if (path == 0) {
           // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
           vec2 q0;
           q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
@@ -273,7 +273,7 @@ export const NebulaMaterial = shaderMaterial(
           float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
           density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
 
-        } else if (uNebulaPath == 1) {
+        } else if (path == 1) {
           // PATH 1 — Deep Ocean Pillars v2
           // Two independent warp fields at different speeds give layered depth.
           // A low-frequency envelope floor eliminates gaps by ensuring the cloud
@@ -295,7 +295,7 @@ export const NebulaMaterial = shaderMaterial(
           float micro1 = fbm(uv * 3.1 + q1 * 0.55 + vec2(uTime * 0.005)) * 0.12;
           density = max(blend1 + micro1 * smoothstep(0.25, 0.65, blend1), envelope1);
 
-        } else if (uNebulaPath == 2) {
+        } else if (path == 2) {
           // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
           float bowAngle = uTime * 0.006;
           mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
@@ -307,7 +307,7 @@ export const NebulaMaterial = shaderMaterial(
           float base2 = fbm(uv + uWarp * q2);
           density = base2 * (0.7 + 0.3 * ribbonMask);
 
-        } else if (uNebulaPath == 3) {
+        } else if (path == 3) {
           // PATH 3 — Organic Plasma Filaments v2
           // Replaces the mathematical sin() crosshatch with FBM-ridge filaments
           // warped by the gas flow itself. Two crossing ridge families at different
@@ -334,7 +334,7 @@ export const NebulaMaterial = shaderMaterial(
           // Blend: rich cloud base + glowing plasma threads on top
           density = base3 * 0.72 + filaments3;
 
-        } else if (uNebulaPath == 4) {
+        } else if (path == 4) {
           // PATH 4 — Ionization Cavern: deep gas cloud with central cavity
           // Domain warp driven by a low-frequency expansion field, creating an
           // organic cavern carved out by young hot star winds.
@@ -347,7 +347,7 @@ export const NebulaMaterial = shaderMaterial(
           float carve4 = fbm(uv * 1.8 + q4 * 0.6 + vec2(uTime * 0.008));
           density = base4 * smoothstep(0.12, 0.58, carve4 + 0.15);
 
-        } else if (uNebulaPath == 5) {
+        } else if (path == 5) {
           // PATH 5 — Tarantula Filament Web: fine spiderweb gas tendrils
           // Multi-frequency FBM warp where fine micro-filaments flow along
           // the primary density ridges. Pure organic fluid dynamics.
@@ -360,7 +360,7 @@ export const NebulaMaterial = shaderMaterial(
           float tendrils5 = fbm(uv * 3.4 + q5 * 1.2 + vec2(uTime * 0.006)) * 0.22;
           density = base5 * 0.68 + tendrils5 * smoothstep(0.18, 0.65, base5);
 
-        } else if (uNebulaPath == 6) {
+        } else if (path == 6) {
           // PATH 6 — Kolmogorov Cascade: 3-scale turbulent fluid flow
           // Large eddies drive medium eddies, which drive fine wisps.
           vec2 q6;
@@ -384,17 +384,6 @@ export const NebulaMaterial = shaderMaterial(
           float front7 = fbm(uv * 2.5 + q7 * 0.8 + vec2(1.8, 3.4)) * 0.25;
           density = base7 * 0.62 + front7 * smoothstep(0.20, 0.60, base7);
         }
-
-      } else if (uPerfTier < 0.8) {
-        // MED — Single domain warp (smooth organic gas flow)
-        vec2 q;
-        q.x = fbm(uv + vec2(0.0, uTime * 0.018));
-        q.y = fbm(uv + vec2(5.2, uTime * 0.013));
-        density = fbm(uv + uWarp * q);
-      } else {
-        // LOW — Direct fbm (flat performance mode)
-        density = fbm(uv + vec2(uTime * 0.015));
-      }
       float gasDensity = smoothstep(0.0, 0.5, density);
 
       // 4. Dark dust absorption lanes
