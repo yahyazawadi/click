@@ -2,8 +2,14 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import '../shaders/NebulaShaderMaterial';
+import { NEBULA_CONFIG } from '../config';
 
-export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath1 = 2, nebulaPath2 = 5 }) {
+export function DualNebulaBackground({ 
+  isMobile, 
+  perfTierFloat = 0.0, 
+  nebulaPath1 = NEBULA_CONFIG.nebula1Path, 
+  nebulaPath2 = NEBULA_CONFIG.nebula2Path 
+}) {
   const matRefLayer1 = useRef();
   const matRefLayer2 = useRef();
 

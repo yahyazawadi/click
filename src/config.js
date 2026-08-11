@@ -221,3 +221,28 @@ export const SYSTEM_CONFIG = {
     }
   ]
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  CENTRAL NEBULA CONFIGURATION & PRESETS
+//  Single source of truth for all nebula path selections & state locks.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const NEBULA_PRESETS = {
+  SILKY_WISPS: 0,
+  DEEP_OCEAN: 1,
+  ORION_BOW_WAVE: 2,     // 🔴 Red Nebula Master Shape (Locked)
+  PLASMA_CANOPY: 3,
+  POLAR_VORTEX: 4,
+  EMISSION_SHROUD: 5,   // 🔵 Teal Nebula Master Shape (Locked)
+  KOLMOGOROV_CASCADE: 6,
+  BOW_SHOCK_ARCS: 7,
+};
+
+export const NEBULA_CONFIG = {
+  // Master Active Paths — Centralized configuration!
+  nebula1Path: NEBULA_PRESETS.ORION_BOW_WAVE,   // Path 2 (Red Nebula)
+  nebula2Path: NEBULA_PRESETS.EMISSION_SHROUD,  // Path 5 (Teal Nebula)
+
+  // Locked Baseline Guarantee
+  isLocked: true,
+};

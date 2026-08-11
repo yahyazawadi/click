@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { SYSTEM_CONFIG } from './config';
+import { SYSTEM_CONFIG, NEBULA_CONFIG } from './config';
 import { CosmicBackground } from './components/CosmicBackground';
 import { SystemCore } from './components/SystemCore';
 import { OrbitalPath } from './components/OrbitalPath';
@@ -180,9 +180,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // Exact locked paths: Path 2 (Orion Bow Wave) for Red, Path 5 (Cosmic Emission Shroud) for Teal
-  const [nebulaPath1, setNebulaPath1] = useState(2);
-  const [nebulaPath2, setNebulaPath2] = useState(5);
+  // Centralized Nebula Configuration System — Single Source of Truth from src/config.js!
+  const [nebulaPath1, setNebulaPath1] = useState(NEBULA_CONFIG.nebula1Path);
+  const [nebulaPath2, setNebulaPath2] = useState(NEBULA_CONFIG.nebula2Path);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
