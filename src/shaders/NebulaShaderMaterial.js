@@ -158,13 +158,12 @@ export const NebulaMaterial = shaderMaterial(
       return clamp(result, 0.0, 1.0);
     }
 
-    // Volumetric scatter glow — soft halo around the densest gas regions
-    // Approximated as a blurred version of density (implemented as distance-based radial falloff
-    // centered at nebula "bright spots" found via coarse fbm)
+    // Volumetric scatter glow — dual-tier spready halo (inner core + expansive outer aura)
     float volumetricGlow(vec2 centeredUv, float density, float glowRadius) {
-      float radial = 1.0 - smoothstep(0.0, glowRadius, length(centeredUv));
-      // Glow is strong where density is high, falls off radially from center
-      return pow(radial, 1.5) * pow(density, 0.6) * 0.5;
+      float edgeDist = length(centeredUv);
+      float innerGlow = pow(1.0 - smoothstep(0.0, glowRadius, edgeDist), 1.4) * pow(density, 0.5) * 0.45;
+      float outerAura = pow(1.0 - smoothstep(0.0, glowRadius * 1.45, edgeDist), 1.8) * pow(density + 0.15, 0.4) * 0.35;
+      return innerGlow + outerAura;
     }
 
     void main() {
@@ -180,9 +179,6 @@ export const NebulaMaterial = shaderMaterial(
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
-      //   HIGH: full 5-pass warp (q → r → density)
-      //   MED:  3-pass warp (q → density, skip r)
-      //   LOW:  1-pass direct fbm (no warp)
       vec2 uv = centeredUv * uScale + uParallaxOffset;
       float density = 0.0;
       float qLen = 0.0;
@@ -192,14 +188,15 @@ export const NebulaMaterial = shaderMaterial(
       int path = uNebulaPath;
 
       if (path == 0) {
-        // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
+        // PATH 0 — Silky Wisps: single warp + spready micro-filaments
         vec2 q0;
         q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
         qLen = length(q0);
         float base0 = fbm(uv + uWarp * q0);
         float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
-        density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
+        float spreadyAura0 = fbm(uv * 0.9 + q0 * 0.3 + vec2(uTime * 0.005)) * 0.22;
+        density = base0 * 0.80 + (filament0 + spreadyAura0) * smoothstep(0.08, 0.65, base0 + 0.15);
         pathBrightness = 1.0;
         pathScatter = 0.35;
 
@@ -219,21 +216,22 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.35;
 
       } else if (path == 2) {
-        // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
+        // PATH 2 — Orion Ribbon: sweeping parabolic bow shock with wide gas wings
         float bowAngle = uTime * 0.006;
         mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
         vec2 q2;
         q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
         q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
         qLen = length(q2);
-        float ribbonMask = 1.0 - smoothstep(0.0, 0.55, abs(uv.y * 0.7 - uv.x * 0.3));
+        vec2 rUv = bowRot * uv;
+        float bowArc2 = exp(-pow((rUv.y * 0.45 - pow(rUv.x * 0.4, 2.0)), 2.0)) * 0.45;
         float base2 = fbm(uv + uWarp * q2);
-        density = base2 * (0.7 + 0.3 * ribbonMask);
-        pathBrightness = 1.0;
-        pathScatter = 0.30;
+        density = base2 * 0.65 + bowArc2 * smoothstep(0.05, 0.50, base2 + 0.20);
+        pathBrightness = 0.95;
+        pathScatter = 0.32;
 
       } else if (path == 3) {
-        // PATH 3 — Organic Plasma Filaments
+        // PATH 3 — Organic Plasma Filaments: spready glowing canopy
         vec2 q3;
         q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
@@ -241,19 +239,18 @@ export const NebulaMaterial = shaderMaterial(
         float base3 = fbm(uv + uWarp * q3);
         vec2 fUv = uv * 5.8 + q3 * 2.1 + vec2(uTime * 0.0035, uTime * 0.0028);
         float ridgeA = fbm(fUv);
-        float threadA = pow(1.0 - abs(ridgeA - 0.48) * 3.8, 5.0);
-        threadA = max(0.0, threadA) * 0.30;
+        float threadA = pow(1.0 - abs(ridgeA - 0.48) * 3.8, 5.0) * 0.30;
         vec2 fUvB = fUv.yx * vec2(0.64, 1.0) + vec2(8.3, 2.7);
         float ridgeB = fbm(fUvB + vec2(uTime * 0.0022));
-        float threadB = pow(1.0 - abs(ridgeB - 0.52) * 4.2, 5.0);
-        threadB = max(0.0, threadB) * 0.18;
-        float filaments3 = (threadA + threadB) * smoothstep(0.12, 0.62, base3);
-        density = base3 * 0.72 + filaments3;
+        float threadB = pow(1.0 - abs(ridgeB - 0.52) * 4.2, 5.0) * 0.18;
+        float filaments3 = (max(0.0, threadA) + max(0.0, threadB)) * smoothstep(0.10, 0.60, base3);
+        float spreadyCanopy3 = fbm(uv * 0.85 + q3 * 0.4) * 0.25;
+        density = base3 * 0.65 + filaments3 + spreadyCanopy3;
         pathBrightness = 0.95;
         pathScatter = 0.30;
 
       } else if (path == 4) {
-        // PATH 4 — Polar Vortex: gas in rotating spiral polar coordinates
+        // PATH 4 — Polar Vortex: expanding galactic aura spiral arms
         float r4 = length(uv);
         float theta4 = atan(uv.y, uv.x) + uTime * 0.022;
         vec2 spiralUv = vec2(r4 * cos(theta4 * 2.0 + r4), r4 * sin(theta4 * 2.0 + r4));
@@ -262,13 +259,14 @@ export const NebulaMaterial = shaderMaterial(
         q4.y = fbm(spiralUv + vec2(4.1, uTime * 0.008));
         qLen = length(q4);
         float base4 = fbm(spiralUv + uWarp * q4 * 0.75);
-        float radialBias4 = smoothstep(0.05, 0.25, r4) * smoothstep(0.7, 0.3, r4);
-        density = base4 * (0.6 + 0.4 * radialBias4);
+        float radialBias4 = smoothstep(0.02, 0.35, r4) * smoothstep(0.75, 0.25, r4);
+        float spreadyAura4 = fbm(uv * 0.7 + q4 * 0.4) * 0.22;
+        density = base4 * (0.55 + 0.45 * radialBias4) + spreadyAura4;
         pathBrightness = 0.95;
         pathScatter = 0.30;
 
       } else if (path == 5) {
-        // PATH 5 — Emission Shell: Ring / Helix Nebula planetary shell (soft deep gas)
+        // PATH 5 — Emission Shell: Ring Nebula with broad spready outer aura
         vec2 q5;
         q5.x = fbm(uv + vec2(0.0, uTime * 0.015));
         q5.y = fbm(uv + vec2(6.3, uTime * 0.011));
@@ -276,16 +274,16 @@ export const NebulaMaterial = shaderMaterial(
         float r5 = length(centeredUv + q5 * 0.08);
         float shell5 = exp(-pow((r5 - 0.20) * 8.5, 2.0)) * 0.30;
         float inner5 = exp(-r5 * r5 * 25.0) * 0.08;
-        float halo5  = exp(-pow((r5 - 0.32) * 5.0, 2.0)) * 0.08;
+        float halo5  = exp(-pow((r5 - 0.30) * 4.0, 2.0)) * 0.18;
         float detail5 = fbm(uv * 2.8 + q5 * 0.6 + vec2(uTime * 0.006)) * 0.12;
         float angle5 = atan(centeredUv.y, centeredUv.x);
         float ringClump = 0.75 + 0.25 * sin(angle5 * 3.0 + fbm(uv * 1.5) * 4.0);
-        density = (shell5 * ringClump + inner5 + halo5 + detail5 * shell5) * 0.36;
-        pathBrightness = 0.45;
-        pathScatter = 0.08;
+        density = (shell5 * ringClump + inner5 + halo5 + detail5 * shell5) * 0.38;
+        pathBrightness = 0.50;
+        pathScatter = 0.12;
 
       } else if (path == 6) {
-        // PATH 6 — Kolmogorov Cascade: 3-scale turbulent fluid flow
+        // PATH 6 — Kolmogorov Cascade: 3-scale turbulent flow with wind drift
         vec2 q6;
         q6.x = fbm(uv + vec2(0.0, uTime * 0.016));
         q6.y = fbm(uv + vec2(5.2, uTime * 0.012));
@@ -293,12 +291,13 @@ export const NebulaMaterial = shaderMaterial(
         float large6  = fbm(uv * 1.0 + uWarp * q6 * 0.9);
         float medium6 = fbm(uv * 2.1 + uWarp * q6 * 0.55 + vec2(3.7, 1.2)) * 0.42;
         float fine6   = fbm(uv * 4.4 + uWarp * q6 * 0.35 + vec2(7.1, 5.8)) * 0.20;
-        density = (large6 + medium6 * smoothstep(0.15, 0.45, large6) + fine6 * smoothstep(0.30, 0.60, large6)) * 0.72;
+        float spreadyWind6 = fbm(uv * 0.8 + q6 * 0.5 + vec2(uTime * 0.008, uTime * 0.004)) * 0.24;
+        density = (large6 + medium6 * smoothstep(0.15, 0.45, large6) + fine6 * smoothstep(0.30, 0.60, large6)) * 0.65 + spreadyWind6;
         pathBrightness = 0.90;
-        pathScatter = 0.25;
+        pathScatter = 0.28;
 
       } else {
-        // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind
+        // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD)
         vec2 q7;
         q7.x = fbm(uv + vec2(0.0, uTime * 0.013));
         q7.y = fbm(uv + vec2(4.8, uTime * 0.009));
