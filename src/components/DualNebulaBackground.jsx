@@ -37,7 +37,7 @@ export function DualNebulaBackground({
     sii:  new THREE.Color('#00f0ff'),
     ha:   new THREE.Color('#0d1b40'),
     oiii: new THREE.Color('#410099'),
-    core: new THREE.Color('#a6f6ff'),
+    core: new THREE.Color('#50e5f5'), // Luminous Whitish-Teal core highlight (not stark white)
   }), []);
 
   const n1 = NEBULA_CONFIG.nebula1;
