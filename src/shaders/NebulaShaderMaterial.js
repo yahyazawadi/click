@@ -283,7 +283,7 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.30;
 
       } else {
-        // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD)
+        // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD FOR TEAL)
         vec2 q7;
         q7.x = fbm(uv + vec2(0.0, uTime * 0.013));
         q7.y = fbm(uv + vec2(4.8, uTime * 0.009));
@@ -292,11 +292,11 @@ export const NebulaMaterial = shaderMaterial(
         float windAngle = uTime * 0.012;
         vec2 windDir7 = vec2(cos(windAngle) * 0.6 + 0.3, sin(windAngle) * 0.4 + 0.2);
         float windDot7 = dot(uv + q7 * 0.18, normalize(windDir7));
-        float arc7a = exp(-pow(windDot7 * 3.2 + 0.35, 2.0)) * 0.35;
-        float arc7b = exp(-pow(windDot7 * 2.0 - 0.55, 2.0)) * 0.18;
-        density = (base7 * 0.5 + (arc7a + arc7b) * smoothstep(0.08, 0.45, base7 + 0.25)) * 0.65;
-        pathBrightness = 0.85;
-        pathScatter = 0.20;
+        float arc7a = exp(-pow(windDot7 * 3.2 + 0.35, 2.0)) * 0.42;
+        float arc7b = exp(-pow(windDot7 * 2.0 - 0.55, 2.0)) * 0.24;
+        density = (base7 * 0.55 + (arc7a + arc7b) * smoothstep(0.08, 0.45, base7 + 0.25)) * 0.90;
+        pathBrightness = 1.0;
+        pathScatter = 0.25;
       }
 
       float gasDensity = smoothstep(0.0, 0.5, density);

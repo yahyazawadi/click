@@ -7,8 +7,8 @@ import { NEBULA_CONFIG } from '../config';
 export function DualNebulaBackground({ 
   isMobile, 
   perfTierFloat = 0.0, 
-  nebulaPath1 = NEBULA_CONFIG.nebula1Path, 
-  nebulaPath2 = NEBULA_CONFIG.nebula2Path 
+  nebulaPath1 = NEBULA_CONFIG.nebula1.path, 
+  nebulaPath2 = NEBULA_CONFIG.nebula2.path 
 }) {
   const matRefLayer1 = useRef();
   const matRefLayer2 = useRef();
@@ -40,6 +40,9 @@ export function DualNebulaBackground({
     core: new THREE.Color('#a6f6ff'),
   }), []);
 
+  const n1 = NEBULA_CONFIG.nebula1;
+  const n2 = NEBULA_CONFIG.nebula2;
+
   return (
     <group position={[0, 0, -50]}>
       {/* NEBULA 1 (LEFT): Deep Violet / Crimson Gas Cloud */}
@@ -52,22 +55,22 @@ export function DualNebulaBackground({
           uColorHa={nebula1Colors.ha}
           uColorOIII={nebula1Colors.oiii}
           uColorCore={nebula1Colors.core}
-          uScale={3.2}
-          uWarp={2.6}
-          uMaskRadius={0.38}
-          uEdgeWarp={0.3}
-          uAlpha={0.92}
-          uBrightness={2.4}
-          uDustStrength={0.55}
-          uPillarStrength={0.65}
-          uCoreRadius={0.16}
+          uScale={n1.scale}
+          uWarp={n1.warp}
+          uMaskRadius={n1.maskRadius}
+          uEdgeWarp={n1.edgeWarp}
+          uAlpha={n1.alpha}
+          uBrightness={n1.brightness}
+          uDustStrength={n1.dustStrength}
+          uPillarStrength={n1.pillarStrength}
+          uCoreRadius={n1.coreRadius}
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* NEBULA 2 (RIGHT): Hidden on LOW tier to save draw call + fragment cost */}
+      {/* NEBULA 2 (RIGHT): Teal / Blue Gas Cloud (Hidden on LOW tier to save draw calls) */}
       <mesh visible={perfTierFloat < 1.0} position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
         <planeGeometry args={[190, 140]} />
         <nebulaMaterial
@@ -77,15 +80,15 @@ export function DualNebulaBackground({
           uColorHa={nebula2Colors.ha}
           uColorOIII={nebula2Colors.oiii}
           uColorCore={nebula2Colors.core}
-          uScale={4.5}
-          uWarp={3.8}
-          uMaskRadius={0.35}
-          uEdgeWarp={0.4}
-          uAlpha={0.88}
-          uBrightness={2.8}
-          uDustStrength={0.35}
-          uPillarStrength={0.5}
-          uCoreRadius={0.20}
+          uScale={n2.scale}
+          uWarp={n2.warp}
+          uMaskRadius={n2.maskRadius}
+          uEdgeWarp={n2.edgeWarp}
+          uAlpha={n2.alpha}
+          uBrightness={n2.brightness}
+          uDustStrength={n2.dustStrength}
+          uPillarStrength={n2.pillarStrength}
+          uCoreRadius={n2.coreRadius}
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}

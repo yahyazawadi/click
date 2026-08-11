@@ -239,10 +239,34 @@ export const NEBULA_PRESETS = {
 };
 
 export const NEBULA_CONFIG = {
-  // Master Active Paths — Centralized configuration!
-  nebula1Path: NEBULA_PRESETS.ORION_BOW_WAVE,   // Path 2 (Red Nebula)
-  nebula2Path: NEBULA_PRESETS.EMISSION_SHROUD,  // Path 5 (Teal Nebula)
+  // 🔴 NEBULA 1 (RED / CRIMSON) — Independent Configuration
+  nebula1: {
+    path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
+    scale: 3.2,
+    warp: 2.6,
+    brightness: 2.4,
+    dustStrength: 0.55,
+    pillarStrength: 0.65,
+    maskRadius: 0.38,
+    edgeWarp: 0.30,
+    coreRadius: 0.16,
+    alpha: 0.92,
+  },
 
-  // Locked Baseline Guarantee
+  // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration (Dynamic Bow Shock!)
+  nebula2: {
+    path: NEBULA_PRESETS.BOW_SHOCK_ARCS,  // Path 7 (Supersonic Bow Shock Arcs - Gold Standard!)
+    scale: 4.5,
+    warp: 3.8,
+    brightness: 2.8,
+    dustStrength: 0.35,
+    pillarStrength: 0.50,
+    maskRadius: 0.35,
+    edgeWarp: 0.40,
+    coreRadius: 0.20,
+    alpha: 0.88,
+  },
+
+  // Locked Baseline Guard
   isLocked: true,
 };

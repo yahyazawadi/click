@@ -180,9 +180,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // Centralized Nebula Configuration System — Single Source of Truth from src/config.js!
-  const [nebulaPath1, setNebulaPath1] = useState(NEBULA_CONFIG.nebula1Path);
-  const [nebulaPath2, setNebulaPath2] = useState(NEBULA_CONFIG.nebula2Path);
+  // Centralized Nebula Configuration System — Independent per-nebula config from src/config.js!
+  const [nebulaPath1, setNebulaPath1] = useState(NEBULA_CONFIG.nebula1.path);
+  const [nebulaPath2, setNebulaPath2] = useState(NEBULA_CONFIG.nebula2.path);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
