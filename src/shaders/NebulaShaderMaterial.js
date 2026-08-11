@@ -416,11 +416,9 @@ export const NebulaMaterial = shaderMaterial(
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
-      col += uColorOIII * glow * 0.4 + uColorHa * glow * 0.25;
+      col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
       col *= uBrightness;
-      // Soft shoulder compression to preserve color saturation and prevent RGB clipping to white
-      col = col / (vec3(1.0) + col * 0.22);
 
       // 8. Embedded young star field
       //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
