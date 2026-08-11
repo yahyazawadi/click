@@ -216,85 +216,73 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.35;
 
       } else if (path == 2) {
-        // PATH 2 — Orion Ribbon: sweeping parabolic bow shock with wide gas wings
+        // PATH 2 — Orion Bow Wave: massive connected cloud with sweeping bow front
         float bowAngle = uTime * 0.006;
         mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
         vec2 q2;
         q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
         q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
         qLen = length(q2);
-        vec2 rUv = bowRot * uv;
-        float bowArc2 = exp(-pow((rUv.y * 0.45 - pow(rUv.x * 0.4, 2.0)), 2.0)) * 0.45;
         float base2 = fbm(uv + uWarp * q2);
-        density = base2 * 0.65 + bowArc2 * smoothstep(0.05, 0.50, base2 + 0.20);
-        pathBrightness = 0.95;
+        vec2 rUv = bowRot * uv;
+        float bowFront2 = exp(-pow((rUv.y * 0.35 - rUv.x * 0.25), 2.0)) * 0.35;
+        density = (base2 * 0.75 + bowFront2 * smoothstep(0.05, 0.45, base2 + 0.20)) * 0.88;
+        pathBrightness = 0.98;
         pathScatter = 0.32;
 
       } else if (path == 3) {
-        // PATH 3 — Organic Plasma Filaments: spready glowing canopy
+        // PATH 3 — Plasma Canopy: massive connected gas flow with sweeping energy streams
         vec2 q3;
         q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
         qLen = length(q3);
         float base3 = fbm(uv + uWarp * q3);
-        vec2 fUv = uv * 5.8 + q3 * 2.1 + vec2(uTime * 0.0035, uTime * 0.0028);
+        vec2 fUv = uv * 2.2 + q3 * 1.4 + vec2(uTime * 0.0035, uTime * 0.0028);
         float ridgeA = fbm(fUv);
-        float threadA = pow(1.0 - abs(ridgeA - 0.48) * 3.8, 5.0) * 0.30;
-        vec2 fUvB = fUv.yx * vec2(0.64, 1.0) + vec2(8.3, 2.7);
-        float ridgeB = fbm(fUvB + vec2(uTime * 0.0022));
-        float threadB = pow(1.0 - abs(ridgeB - 0.52) * 4.2, 5.0) * 0.18;
-        float filaments3 = (max(0.0, threadA) + max(0.0, threadB)) * smoothstep(0.10, 0.60, base3);
-        float spreadyCanopy3 = fbm(uv * 0.85 + q3 * 0.4) * 0.25;
-        density = base3 * 0.65 + filaments3 + spreadyCanopy3;
-        pathBrightness = 0.95;
-        pathScatter = 0.30;
+        float threadA = pow(1.0 - abs(ridgeA - 0.48) * 2.2, 3.0) * 0.28;
+        density = (base3 * 0.80 + threadA * smoothstep(0.08, 0.55, base3 + 0.15)) * 0.90;
+        pathBrightness = 0.96;
+        pathScatter = 0.32;
 
       } else if (path == 4) {
-        // PATH 4 — Polar Vortex: expanding galactic aura spiral arms
+        // PATH 4 — Polar Spiral Galaxy: massive continuous rotating spiral cloud
         float r4 = length(uv);
         float theta4 = atan(uv.y, uv.x) + uTime * 0.022;
-        vec2 spiralUv = vec2(r4 * cos(theta4 * 2.0 + r4), r4 * sin(theta4 * 2.0 + r4));
+        vec2 spiralUv = vec2(r4 * cos(theta4 * 1.4 + r4 * 0.8), r4 * sin(theta4 * 1.4 + r4 * 0.8));
         vec2 q4;
         q4.x = fbm(spiralUv + vec2(0.0, uTime * 0.011));
         q4.y = fbm(spiralUv + vec2(4.1, uTime * 0.008));
         qLen = length(q4);
         float base4 = fbm(spiralUv + uWarp * q4 * 0.75);
-        float radialBias4 = smoothstep(0.02, 0.35, r4) * smoothstep(0.75, 0.25, r4);
-        float spreadyAura4 = fbm(uv * 0.7 + q4 * 0.4) * 0.22;
-        density = base4 * (0.55 + 0.45 * radialBias4) + spreadyAura4;
-        pathBrightness = 0.95;
-        pathScatter = 0.30;
+        float continuousSpiral = fbm(uv * 1.2 + q4 * 0.5) * 0.35;
+        density = (base4 * 0.70 + continuousSpiral) * 0.88;
+        pathBrightness = 0.96;
+        pathScatter = 0.32;
 
       } else if (path == 5) {
-        // PATH 5 — Emission Shell: Ring Nebula with broad spready outer aura
+        // PATH 5 — Cosmic Emission Shroud: broad connected interstellar cloud shroud
         vec2 q5;
         q5.x = fbm(uv + vec2(0.0, uTime * 0.015));
         q5.y = fbm(uv + vec2(6.3, uTime * 0.011));
         qLen = length(q5);
-        float r5 = length(centeredUv + q5 * 0.08);
-        float shell5 = exp(-pow((r5 - 0.20) * 8.5, 2.0)) * 0.30;
-        float inner5 = exp(-r5 * r5 * 25.0) * 0.08;
-        float halo5  = exp(-pow((r5 - 0.30) * 4.0, 2.0)) * 0.18;
-        float detail5 = fbm(uv * 2.8 + q5 * 0.6 + vec2(uTime * 0.006)) * 0.12;
-        float angle5 = atan(centeredUv.y, centeredUv.x);
-        float ringClump = 0.75 + 0.25 * sin(angle5 * 3.0 + fbm(uv * 1.5) * 4.0);
-        density = (shell5 * ringClump + inner5 + halo5 + detail5 * shell5) * 0.38;
-        pathBrightness = 0.50;
-        pathScatter = 0.12;
+        float base5 = fbm(uv + uWarp * q5 * 0.85);
+        float r5 = length(centeredUv + q5 * 0.10);
+        float shroud5 = exp(-pow(r5 * 2.8, 2.0)) * 0.35;
+        density = (base5 * 0.75 + shroud5 * smoothstep(0.05, 0.45, base5 + 0.15)) * 0.85;
+        pathBrightness = 0.92;
+        pathScatter = 0.28;
 
       } else if (path == 6) {
-        // PATH 6 — Kolmogorov Cascade: 3-scale turbulent flow with wind drift
+        // PATH 6 — Kolmogorov Fluid Cascade: massive connected turbulent fluid streams
         vec2 q6;
         q6.x = fbm(uv + vec2(0.0, uTime * 0.016));
         q6.y = fbm(uv + vec2(5.2, uTime * 0.012));
         qLen = length(q6);
-        float large6  = fbm(uv * 1.0 + uWarp * q6 * 0.9);
-        float medium6 = fbm(uv * 2.1 + uWarp * q6 * 0.55 + vec2(3.7, 1.2)) * 0.42;
-        float fine6   = fbm(uv * 4.4 + uWarp * q6 * 0.35 + vec2(7.1, 5.8)) * 0.20;
-        float spreadyWind6 = fbm(uv * 0.8 + q6 * 0.5 + vec2(uTime * 0.008, uTime * 0.004)) * 0.24;
-        density = (large6 + medium6 * smoothstep(0.15, 0.45, large6) + fine6 * smoothstep(0.30, 0.60, large6)) * 0.65 + spreadyWind6;
-        pathBrightness = 0.90;
-        pathScatter = 0.28;
+        float large6  = fbm(uv * 0.85 + uWarp * q6 * 0.85);
+        float medium6 = fbm(uv * 1.6 + uWarp * q6 * 0.50 + vec2(3.7, 1.2)) * 0.45;
+        density = (large6 * 0.65 + medium6 * smoothstep(0.10, 0.45, large6)) * 0.90;
+        pathBrightness = 0.95;
+        pathScatter = 0.30;
 
       } else {
         // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD)
