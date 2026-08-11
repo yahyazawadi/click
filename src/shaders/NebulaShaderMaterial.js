@@ -274,11 +274,7 @@ export const NebulaMaterial = shaderMaterial(
           density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
 
         } else if (path == 1) {
-          // PATH 1 — Deep Ocean Pillars v2
-          // Two independent warp fields at different speeds give layered depth.
-          // A low-frequency envelope floor eliminates gaps by ensuring the cloud
-          // never hits zero in both layers simultaneously. A third micro-detail
-          // pass targets the Ha density range to enrich the crimson-to-violet gradient.
+          // PATH 1 — Deep Ocean Pillars: two soft warp passes blended gently
           vec2 q1;
           q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
           q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
@@ -286,14 +282,9 @@ export const NebulaMaterial = shaderMaterial(
           vec2 r1;
           r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
           r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
-          float base1  = fbm(uv + uWarp * q1);
-          float deep1  = fbm(uv + uWarp * r1 * 0.5);
-          // Envelope: large-scale low-frequency cloud fills in structural gaps
-          float envelope1 = fbm(uv * 0.55 + vec2(3.1, uTime * 0.004)) * 0.22 + 0.08;
-          float blend1 = mix(base1, deep1, 0.32);
-          // Micro-detail: targets mid-density range (Ha→SII crimson transition)
-          float micro1 = fbm(uv * 3.1 + q1 * 0.55 + vec2(uTime * 0.005)) * 0.12;
-          density = max(blend1 + micro1 * smoothstep(0.25, 0.65, blend1), envelope1);
+          float base1 = fbm(uv + uWarp * q1);
+          float deep1 = fbm(uv + uWarp * r1 * 0.5);
+          density = mix(base1, deep1, 0.32);
 
         } else if (path == 2) {
           // PATH 2 — Orion Ribbon: slow rotating bow-shock arc
@@ -405,14 +396,10 @@ export const NebulaMaterial = shaderMaterial(
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
 
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.08, 0.55, finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.45, 0.82, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.88, 1.0,  finalDensity) * 0.40 + coreGlow * 0.35);
-
-      // Volumetric light scatter active on HIGH tier when qLen is calculated
-      if (uPerfTier < 0.3) {
-        col += uColorOIII * pow(max(0.0, qLen - 0.32), 2.0) * 0.25;
-      }
+      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
+      col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * 0.35;
 
       // 7. Volumetric scatter halo (soft inner glow)
       float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
