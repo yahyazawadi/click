@@ -274,7 +274,7 @@ export const NebulaMaterial = shaderMaterial(
           density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
 
         } else if (path == 1) {
-          // PATH 1 — Deep Ocean Pillars: two soft warp passes blended gently
+          // PATH 1 — Deep Ocean Pillars v2 (Gap-fixed + rich crimson micro-filaments)
           vec2 q1;
           q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
           q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
@@ -282,9 +282,12 @@ export const NebulaMaterial = shaderMaterial(
           vec2 r1;
           r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
           r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
-          float base1 = fbm(uv + uWarp * q1);
-          float deep1 = fbm(uv + uWarp * r1 * 0.5);
-          density = mix(base1, deep1, 0.32);
+          float base1  = fbm(uv + uWarp * q1);
+          float deep1  = fbm(uv + uWarp * r1 * 0.5);
+          float envelope1 = fbm(uv * 0.55 + vec2(3.1, uTime * 0.004)) * 0.22 + 0.08;
+          float blend1 = mix(base1, deep1, 0.32);
+          float micro1 = fbm(uv * 3.1 + q1 * 0.55 + vec2(uTime * 0.005)) * 0.12;
+          density = max(blend1 + micro1 * smoothstep(0.25, 0.65, blend1), envelope1);
 
         } else if (path == 2) {
           // PATH 2 — Orion Ribbon: slow rotating bow-shock arc

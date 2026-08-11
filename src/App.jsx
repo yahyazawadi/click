@@ -178,9 +178,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // DEV: independent path per nebula (1=Deep Ocean for red, 3=Plasma Filaments for teal)
+  // Independent path per nebula (1=Deep Ocean for red, 1=Deep Ocean for blue)
   const [nebulaPath1, setNebulaPath1] = useState(1);
-  const [nebulaPath2, setNebulaPath2] = useState(3);
+  const [nebulaPath2, setNebulaPath2] = useState(1);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
