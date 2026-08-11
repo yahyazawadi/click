@@ -12,10 +12,16 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath
     if (matRefLayer1.current) {
       matRefLayer1.current.uTime = time * 0.35;
       matRefLayer1.current.uNebulaPath = nebulaPath1;
+      if (matRefLayer1.current.uniforms?.uNebulaPath) {
+        matRefLayer1.current.uniforms.uNebulaPath.value = nebulaPath1;
+      }
     }
     if (matRefLayer2.current) {
       matRefLayer2.current.uTime = time * 0.55;
       matRefLayer2.current.uNebulaPath = nebulaPath2;
+      if (matRefLayer2.current.uniforms?.uNebulaPath) {
+        matRefLayer2.current.uniforms.uNebulaPath.value = nebulaPath2;
+      }
     }
   });
 
@@ -42,6 +48,7 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath
         <nebulaMaterial
           ref={matRefLayer1}
           uPerfTier={perfTierFloat}
+          uNebulaPath={nebulaPath1}
           uColorSII={nebula1Colors.sii}
           uColorHa={nebula1Colors.ha}
           uColorOIII={nebula1Colors.oiii}
@@ -68,6 +75,7 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath
           <nebulaMaterial
             ref={matRefLayer2}
             uPerfTier={perfTierFloat}
+            uNebulaPath={nebulaPath2}
             uColorSII={nebula2Colors.sii}
             uColorHa={nebula2Colors.ha}
             uColorOIII={nebula2Colors.oiii}
