@@ -567,10 +567,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                     [1, 'Deep Ocean'],
                     [2, 'Orion Ribbon'],
                     [3, 'Plasma Threads'],
-                    [4, 'Polar Vortex'],
-                    [5, 'Emission Shell'],
+                    [4, 'Ion. Cavern'],
+                    [5, 'Tarantula Web'],
                     [6, 'Turb. Cascade'],
-                    [7, 'Bow Shock'],
+                    [7, 'Shock Front'],
                   ].map(([id, name]) => (
                     <button key={id} onClick={() => setFn(id)} style={{
                       padding: '3px 7px', borderRadius: 4, textAlign: 'left', cursor: 'pointer',
