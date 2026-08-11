@@ -22,10 +22,10 @@ export const NebulaMaterial = shaderMaterial(
     uTime: 0,
     uPerfTier: 0.0,     // 0.0=high (full quality), 0.5=med (skip r-warp), 1.0=low (1 FBM pass)
     // Hubble SHO palette: Sulfur-II → H-alpha → OIII
-    uColorSII:  new THREE.Color('#8800b3'), // Sulfur-II  — deep purple-violet
-    uColorHa:   new THREE.Color('#c40040'), // H-alpha    — rich deep crimson
-    uColorOIII: new THREE.Color('#330080'), // OIII       — deep indigo-ultramarine
-    uColorCore: new THREE.Color('#e6005c'), // Hot core   — rich deep magenta-ruby (intense deep glow)
+    uColorSII:  new THREE.Color('#ff4500'), // Sulfur-II  — warm orange-red (SII emission 673nm)
+    uColorHa:   new THREE.Color('#c0001a'), // H-alpha    — deep crimson  (Ha  emission 656nm)
+    uColorOIII: new THREE.Color('#00b4c8'), // OIII       — ionized teal  (OIII emission 501nm)
+    uColorCore: new THREE.Color('#ffe8c0'), // Hot core   — near-white yellow (ionization front)
     uScale: 3.5,
     uWarp: 2.5,
     uMaskRadius: 0.38,
