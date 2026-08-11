@@ -250,7 +250,7 @@ export const NebulaMaterial = shaderMaterial(
 
       // 2. Organic boundary mask
       float angle   = atan(centeredUv.y, centeredUv.x);
-      float edgeN   = fbm(vec2(angle * 2.5, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
+      float edgeN   = fbm(vec2(angle * 2.0, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
@@ -341,7 +341,7 @@ export const NebulaMaterial = shaderMaterial(
           float r4 = length(uv);
           float theta4 = atan(uv.y, uv.x) + uTime * 0.022;
           // Logarithmic spiral: convert back to Cartesian in spiral space
-          vec2 spiralUv = vec2(r4 * cos(theta4 * 1.4 + r4), r4 * sin(theta4 * 1.4 + r4));
+          vec2 spiralUv = vec2(r4 * cos(theta4 * 2.0 + r4), r4 * sin(theta4 * 2.0 + r4));
           vec2 q4;
           q4.x = fbm(spiralUv + vec2(0.0, uTime * 0.011));
           q4.y = fbm(spiralUv + vec2(4.1, uTime * 0.008));
