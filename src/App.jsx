@@ -186,6 +186,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
+  // Manual override lock — once user clicks a tier manually, NEVER auto-demote!
+  const [isTierManuallyLocked, setIsTierManuallyLocked] = useState(false);
 
   // Telemetry profiler overlay visibility (open via clicking FPS badge or pressing ~)
   const [isProfilerOpen, setIsProfilerOpen] = useState(() => {
@@ -199,12 +201,14 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   };
 
   const handleSetTier = (tier) => {
-    fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override' });
+    setIsTierManuallyLocked(true); // User manual choice — lock state permanently!
+    fpsLogger.logTierChange({ from: gpuTier, to: tier, reason: 'User HUD override (manual lock)' });
     setGpuTier(tier);
     setPerfTierFloat(tierToFloat(tier));
   };
 
   const handleAutoDemoteTier = () => {
+    if (isTierManuallyLocked) return; // User manually selected tier — NEVER auto-demote!
     if (gpuTier === 'high') {
       fpsLogger.logTierChange({ from: 'high', to: 'med', reason: 'Automatic performance demotion (live FPS < 25 FPS for 1.5s)' });
       setGpuTier('med');
