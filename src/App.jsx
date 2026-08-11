@@ -81,8 +81,10 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       stableTimer.current = 0;
     }
 
-    // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s, demote GPU tier automatically!
-    if (delta >= 0.040 && gpuTier !== 'low') {
+    // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s on active tab, demote GPU tier!
+    // Ignore when tab is hidden or when delta > 0.25s (tab switch / background throttle)
+    const isTabActive = typeof document !== 'undefined' && !document.hidden && document.visibilityState !== 'hidden';
+    if (isTabActive && delta >= 0.040 && delta < 0.250 && gpuTier !== 'low') {
       lowFpsTimer.current += delta;
       if (lowFpsTimer.current >= 1.5) {
         lowFpsTimer.current = 0;
