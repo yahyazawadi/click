@@ -30,7 +30,7 @@ export function DualNebulaBackground({
     sii:  new THREE.Color('#9900cc'),
     ha:   new THREE.Color('#c40045'),
     oiii: new THREE.Color('#5500bb'),
-    core: new THREE.Color('#c0f0ff'),
+    core: new THREE.Color('#ffd4e5'), // Luminous Whitish-Crimson core highlight (not stark white)
   }), []);
 
   const nebula2Colors = useMemo(() => ({
