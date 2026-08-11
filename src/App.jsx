@@ -180,9 +180,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
-  // DEV: independent path per nebula (1=Deep Ocean for red, 3=Plasma Filaments for teal)
-  const [nebulaPath1, setNebulaPath1] = useState(1);
-  const [nebulaPath2, setNebulaPath2] = useState(3);
+  // Exact locked paths: Path 2 (Orion Bow Wave) for Red, Path 5 (Cosmic Emission Shroud) for Teal
+  const [nebulaPath1, setNebulaPath1] = useState(2);
+  const [nebulaPath2, setNebulaPath2] = useState(5);
   // GPU tier — starts from benchmark result but can be overridden via profiler HUD
   const [gpuTier, setGpuTier] = useState(initialGpuTier);
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
