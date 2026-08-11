@@ -268,21 +268,21 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.30;
 
       } else if (path == 5) {
-        // PATH 5 — Emission Shell: Ring / Helix Nebula planetary shell
+        // PATH 5 — Emission Shell: Ring / Helix Nebula planetary shell (soft deep gas)
         vec2 q5;
         q5.x = fbm(uv + vec2(0.0, uTime * 0.015));
         q5.y = fbm(uv + vec2(6.3, uTime * 0.011));
         qLen = length(q5);
         float r5 = length(centeredUv + q5 * 0.08);
-        float shell5 = exp(-pow((r5 - 0.20) * 8.5, 2.0)) * 0.42;
-        float inner5 = exp(-r5 * r5 * 25.0) * 0.15;
-        float halo5  = exp(-pow((r5 - 0.32) * 5.0, 2.0)) * 0.12;
-        float detail5 = fbm(uv * 2.8 + q5 * 0.6 + vec2(uTime * 0.006)) * 0.18;
+        float shell5 = exp(-pow((r5 - 0.20) * 8.5, 2.0)) * 0.30;
+        float inner5 = exp(-r5 * r5 * 25.0) * 0.08;
+        float halo5  = exp(-pow((r5 - 0.32) * 5.0, 2.0)) * 0.08;
+        float detail5 = fbm(uv * 2.8 + q5 * 0.6 + vec2(uTime * 0.006)) * 0.12;
         float angle5 = atan(centeredUv.y, centeredUv.x);
         float ringClump = 0.75 + 0.25 * sin(angle5 * 3.0 + fbm(uv * 1.5) * 4.0);
-        density = (shell5 * ringClump + inner5 + halo5 + detail5 * shell5) * 0.52;
-        pathBrightness = 0.85;
-        pathScatter = 0.20;
+        density = (shell5 * ringClump + inner5 + halo5 + detail5 * shell5) * 0.36;
+        pathBrightness = 0.45;
+        pathScatter = 0.08;
 
       } else if (path == 6) {
         // PATH 6 — Kolmogorov Cascade: 3-scale turbulent fluid flow
