@@ -39,8 +39,8 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
     cloudBand:      new THREE.Color('#1a7aaa'),
     stormHighlight: new THREE.Color('#00d4f0'),
     atmosphere:     new THREE.Color('#00BAE3'),
-    continentColor: new THREE.Color('#2d5a6e'),
-    coastColor:     new THREE.Color('#1a8090'),
+    continentColor: new THREE.Color('#9E2A2B'), // Artistic Volcanic Crimson landmasses
+    coastColor:     new THREE.Color('#5C1924'), // Deep Crimson-Rose coastal shelf
   }), []);
 
   return (
@@ -69,37 +69,35 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
         />
       </mesh>
 
-      {/* 3. Concentric Core Orbit Ring 1 (Hidden on core focus to eliminate near-lens transparent overdraw) */}
-      {!isSelected && (
-        <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
-          <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-          {perfTierFloat >= 0.8 ? (
-            <meshBasicMaterial color={SYSTEM_CONFIG.colors.primaryCyan} />
-          ) : (
-            <meshStandardMaterial
-              color={SYSTEM_CONFIG.colors.primaryCyan}
-              emissive={SYSTEM_CONFIG.colors.primaryCyan}
-              emissiveIntensity={0.6}
-            />
-          )}
-        </mesh>
-      )}
+      {/* 3. Concentric Core Orbit Ring 1 (Bright Scarlet Red) */}
+      <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
+        <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+        {perfTierFloat >= 0.8 ? (
+          <meshBasicMaterial color="#FF0A2B" />
+        ) : (
+          <meshStandardMaterial
+            color="#FF0A2B"
+            emissive="#FF0A2B"
+            emissiveIntensity={0.8}
+          />
+        )}
+      </mesh>
 
-      {/* 4. Concentric Core Orbit Ring 2 (Hidden on core focus to eliminate near-lens transparent overdraw) */}
-      {!isSelected && (
-        <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
-          <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-          {perfTierFloat >= 0.8 ? (
-            <meshBasicMaterial color={SYSTEM_CONFIG.colors.secondaryBlue} transparent opacity={0.5} />
-          ) : (
-            <meshStandardMaterial
-              color={SYSTEM_CONFIG.colors.secondaryBlue}
-              transparent
-              opacity={0.5}
-            />
-          )}
-        </mesh>
-      )}
+      {/* 4. Concentric Core Orbit Ring 2 (Deep Ruby Crimson Red) */}
+      <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
+        <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+        {perfTierFloat >= 0.8 ? (
+          <meshBasicMaterial color="#B3002D" transparent opacity={0.7} />
+        ) : (
+          <meshStandardMaterial
+            color="#B3002D"
+            emissive="#B3002D"
+            emissiveIntensity={0.65}
+            transparent
+            opacity={0.7}
+          />
+        )}
+      </mesh>
     </group>
   );
 }

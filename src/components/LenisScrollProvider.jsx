@@ -6,8 +6,8 @@ export function LenisScrollProvider({ children, onIndexChange, totalIndices = 9 
 
   useEffect(() => {
     const handleWheel = (e) => {
-      // Direct mouse wheel delta detection
-      if (isCooldownRef.current) return;
+      // Ignore when Ctrl key is pressed (used for Desktop Ctrl + Wheel zoom)
+      if (e.ctrlKey || isCooldownRef.current) return;
       
       const delta = e.deltaY;
       if (Math.abs(delta) < 10) return; // Ignore micro-vibrations

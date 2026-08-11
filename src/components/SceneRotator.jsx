@@ -14,11 +14,11 @@ export function SceneRotator({ children, disabled = false }) {
   const { gl, size } = useThree();
   const groupRef = useRef();
 
-  // Target orientation quaternion & current display quaternion
-  const targetQuaternion = useRef(new THREE.Quaternion());
+  // Target orientation quaternion initialized with a sleek diagonal tilt
+  const targetQuaternion = useRef(new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.18, 0.32, 0.08)));
 
-  // Intro spinup animation state (540 degrees total = 1.5 * Math.PI * 2)
-  const isIntroSpinning = useRef(true);
+  // Intro spinup animation state disabled for stable initial load
+  const isIntroSpinning = useRef(false);
   const introProgress = useRef(0);
 
   // Drag velocity for smooth inertia
@@ -106,6 +106,9 @@ export function SceneRotator({ children, disabled = false }) {
       if (introProgress.current >= 1) {
         introProgress.current = 1;
         isIntroSpinning.current = false;
+        targetQuaternion.current.identity();
+        groupRef.current.quaternion.identity();
+        return;
       }
 
       // Calculate incremental rotation angle for this specific frame
@@ -115,7 +118,7 @@ export function SceneRotator({ children, disabled = false }) {
       const easePrev = 1 - Math.pow(1 - tPrev, 3);
       const easeCurr = 1 - Math.pow(1 - tCurr, 3);
 
-      const totalSpin = 0.75 * Math.PI * 2; // 270 degrees
+      const totalSpin = 1.0 * Math.PI * 2; // Full 360 degrees (lands perfectly at 0 deg identity)
       // Negative delta forces rotation to spin counter-clockwise
       const frameDelta = -(easeCurr - easePrev) * totalSpin;
 

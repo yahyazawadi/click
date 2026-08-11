@@ -50,12 +50,12 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       );
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget === 'core') {
-      // CORE FOCUS: Zoom out to frame central sphere nicely beside detail drawer
-      const coreZ = (isMobile ? 10.0 : 8.5) * zoomFactor;
-      const coreX = isMobile ? 0 : -2.2;
+      // CORE FOCUS: Offset camera to right so core sphere is beautifully framed in the open left area beside the drawer
+      const coreZ = (isMobile ? 10.0 : 6.8) * zoomFactor;
+      const coreX = isMobile ? 0 : 2.5;
       const coreY = isMobile ? -1.5 : 0;
       targetCamPos.current.set(coreX, coreY, coreZ);
-      targetLookAt.current.set(coreX, coreY, 0);
+      targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
       // PLANET FOCUS: Fly camera directly to front of selected planet
       const distOffset = (isMobile ? 5.2 : 3.2) * zoomFactor;

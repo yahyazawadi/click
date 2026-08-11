@@ -287,6 +287,24 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     zoomFactorRef.current = zoomFactor;
   }, [zoomFactor]);
 
+  // Desktop Ctrl + Mouse Wheel Zoom (Desktop Only)
+  useEffect(() => {
+    const handleWheelZoom = (e) => {
+      // Desktop only and Ctrl key must be pressed (or pinch gesture on desktop trackpad)
+      if (isMobile || !e.ctrlKey) return;
+      e.preventDefault();
+
+      const zoomDelta = e.deltaY * 0.0015;
+      setZoomFactor((prevZoom) => {
+        const nextZoom = Math.min(Math.max(prevZoom + zoomDelta, 0.4), 2.5);
+        return isFinite(nextZoom) ? nextZoom : prevZoom;
+      });
+    };
+
+    window.addEventListener('wheel', handleWheelZoom, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheelZoom);
+  }, [isMobile]);
+
   // 2-Finger Touch Pinch to Zoom (Touch devices only)
   useEffect(() => {
     let initialDist = null;
