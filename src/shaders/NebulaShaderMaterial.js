@@ -173,9 +173,8 @@ export const NebulaMaterial = shaderMaterial(
       float edgeDist = length(centeredUv);
       float planeEdgeFade = smoothstep(0.49, 0.08, edgeDist);
 
-      // 2. Organic boundary mask — widened transition zone for soft ethereal edges
-      float angle   = atan(centeredUv.y, centeredUv.x);
-      float edgeN   = fbm(vec2(angle * 2.0, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
+      // 2. Organic boundary mask — 2D Cartesian noise (zero polar fan singularities or radial spoke lines)
+      float edgeN   = fbm(centeredUv * 3.2 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius * 1.35, uMaskRadius * 0.05, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
@@ -309,12 +308,8 @@ export const NebulaMaterial = shaderMaterial(
       float absorption = pow(dustField, dustExponent) * uDustStrength * 0.65;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
-      // 5. Softened Pillar structures (no hard diagonal lines)
-      vec2 pillarUv = centeredUv * 3.0;
-      float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.22, 1.0);
-      float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.18, 0.85);
-      float pillars = (p1 + p2 * 0.60) * uPillarStrength * 0.35;
-      float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
+      // 5. Pure smooth gas density (zero hard column lines)
+      float finalDensity = clamp(gasAfterDust, 0.0, 1.0);
 
       // 6. Hubble SHO color science — relaxed strong white blowout
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
