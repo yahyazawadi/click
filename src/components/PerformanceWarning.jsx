@@ -1,126 +1,144 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // Returns true if we're on the /warning-performance preview route
 const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning-performance';
 
 export function PerformanceWarning({ currentFps = 60, isMobile = false, isDismissed = false, onDismiss = () => {} }) {
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
-  const [isBatteryKnown, setIsBatteryKnown] = useState(false);
+  const mountTimeRef = useRef(Date.now());
+  const onDismissRef = useRef(onDismiss);
 
   useEffect(() => {
-    // Determine if we confidently know the battery status. 
-    // Firefox blocks it entirely (getBattery is undefined or throws).
-    // Brave spoofs it (always returns charging: true, level: 1).
-    // It's hard to detect spoofing perfectly, but we know if it's completely missing.
-    if (!('getBattery' in navigator)) {
-      setIsBatteryKnown(false);
-    } else {
-      navigator.getBattery().then(b => {
-        setIsBatteryKnown(true);
-      }).catch(() => {
-        setIsBatteryKnown(false);
-      });
-    }
-  }, []);
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
 
+  // Auto-dismiss after 5 seconds when visible (stable timer - no parent re-render resets)
   useEffect(() => {
-    // If preview route or already dismissed, do nothing
-    if (isPreviewRoute() || isDismissed) return;
-    
-    // Only target Desktops/Laptops. 
-    if (isMobile) return;
+    if (!showWarning || isDismissed) return;
 
-    // Check FPS drops continuously for a few seconds
-    const checkFps = setInterval(() => {
-      // If FPS drops below 35 AND we either don't know the battery status 
-      // (or we assume we might be in a spoofed browser like Brave where the Battery API is useless)
-      if (currentFps < 35) {
-        setShowWarning(true);
+    const timer = setTimeout(() => {
+      setShowWarning(false);
+      if (typeof onDismissRef.current === 'function') {
+        onDismissRef.current();
       }
-    }, 5000);
+    }, 7000);
 
-    return () => clearInterval(checkFps);
-  }, [currentFps, isDismissed, isMobile, isBatteryKnown]);
+    return () => clearTimeout(timer);
+  }, [showWarning, isDismissed]);
 
-  if (!showWarning || isDismissed) return null;
+  useEffect(() => {
+    // If preview route or already dismissed or on mobile, skip logic
+    if (isPreviewRoute() || isDismissed || isMobile) return;
+
+    // Grace period: ignore initial 6 seconds of page startup (shader compile / asset loading spikes)
+    if (Date.now() - mountTimeRef.current < 6000) return;
+
+    // If FPS recovers to >= 50, automatically hide warning
+    if (currentFps >= 50 && showWarning) {
+      setShowWarning(false);
+      return;
+    }
+
+    // Only trigger if FPS falls below 35 after grace period
+    if (currentFps < 35 && !showWarning) {
+      setShowWarning(true);
+    }
+  }, [currentFps, isDismissed, isMobile, showWarning]);
+
+  // Desktop only & requires active warning state
+  if (isMobile || !showWarning || isDismissed) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, width: '100vw', height: '100vh',
-      backgroundColor: 'rgba(7, 17, 36, 0.95)',
-      zIndex: 9998,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontFamily: 'var(--font-mono)',
-      textAlign: 'center',
-      padding: '2rem'
-    }}>
+    <>
+      <style>{`
+        @keyframes toastProgressBar {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
+
       <div style={{
+        position: 'fixed',
+        top: '24px',
+        left: '24px',
+        width: '360px',
+        maxWidth: 'calc(100vw - 48px)',
+        zIndex: 9998,
+        fontFamily: 'var(--font-mono)',
+        pointerEvents: 'auto',
+        borderRadius: '10px',
+        overflow: 'hidden',
         border: '1px solid rgba(0, 186, 227, 0.5)',
-        padding: '2rem 2.5rem',
-        borderRadius: '12px',
-        background: 'rgba(0, 50, 104, 0.25)',
-        boxShadow: '0 0 40px rgba(0, 186, 227, 0.12)',
-        maxWidth: '480px',
+        background: 'rgba(7, 17, 36, 0.92)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 186, 227, 0.15)',
+        padding: '1.25rem 1.25rem 1.5rem 1.25rem',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        gap: '1rem'
+        gap: '0.6rem',
+        color: 'var(--text-pure)',
       }}>
-
-        <h2 style={{ 
-          fontFamily: 'var(--font-sans)', 
-          fontSize: '1.3rem', 
-          letterSpacing: '0.1em',
-          color: 'var(--text-pure)',
-        }}>
-          FPS DEGRADATION DETECTED
-        </h2>
-        
-        <p style={{ 
-          fontSize: '0.8rem', 
-          lineHeight: '1.7',
-          color: 'rgba(252, 252, 252, 0.75)',
-          letterSpacing: '0.03em'
-        }}>
-          Your system is struggling to render this simulation smoothly ({currentFps} FPS). <br/><br/>
-          If you are on a laptop, <strong>please plug in your charger</strong>. 
-          Some browsers (like Brave) block battery detection, but hardware often severely throttles 3D graphics on battery power.
-        </p>
-        
-        <button 
-          onClick={onDismiss}
-          style={{
-            marginTop: '0.25rem',
-            background: 'transparent',
-            border: '1px solid var(--primary-cyan)',
+        {/* Header with Title and Close Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.85rem',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
             color: 'var(--primary-cyan)',
-            padding: '0.55rem 1.75rem',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            letterSpacing: '0.15em',
-            borderRadius: '999px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            outline: 'none'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.background = 'var(--primary-cyan)';
-            e.target.style.color = '#000';
-            e.target.style.boxShadow = '0 0 20px var(--primary-cyan)';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--primary-cyan)';
-            e.target.style.boxShadow = 'none';
-          }}
-        >
-          [ CONTINUE ANYWAY ]
-        </button>
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem'
+          }}>
+            <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ff4d4d' }}></span>
+            FPS DEGRADATION DETECTED
+          </span>
+
+          <button
+            onClick={() => { setShowWarning(false); onDismiss(); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(252, 252, 252, 0.5)',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              padding: '0 0.2rem',
+              lineHeight: 1,
+            }}
+            onMouseOver={(e) => e.target.style.color = '#fff'}
+            onMouseOut={(e) => e.target.style.color = 'rgba(252, 252, 252, 0.5)'}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Description Text */}
+        <p style={{
+          margin: 0,
+          fontSize: '0.75rem',
+          lineHeight: '1.5',
+          color: 'rgba(252, 252, 252, 0.8)',
+          letterSpacing: '0.02em'
+        }}>
+          Frame rate is currently low ({currentFps} FPS). If on a laptop, plug in your charger for full 3D performance.
+        </p>
+
+        {/* 5-Second Shrinking Progress Bar at Bottom of Card */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          height: '3px',
+          backgroundColor: 'rgba(0, 186, 227, 0.2)',
+        }}>
+          <div style={{
+            height: '100%',
+            backgroundColor: 'var(--primary-cyan)',
+            boxShadow: '0 0 8px var(--primary-cyan)',
+            animation: 'toastProgressBar 7s linear forwards',
+          }} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

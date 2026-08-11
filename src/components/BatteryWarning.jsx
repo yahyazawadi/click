@@ -1,26 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // Returns true if we're on the /warning preview route
 const isPreviewRoute = () => window.location.pathname.replace(/\/$/, '') === '/warning';
 
-export function BatteryWarning({ isDismissed = false, onDismiss = () => {} }) {
-  // Initialize directly from pathname — no async race, always correct on frame 1
+export function BatteryWarning({ isMobile = false, isDismissed = false, onDismiss = () => {} }) {
   const [showWarning, setShowWarning] = useState(() => isPreviewRoute());
+  const onDismissRef = useRef(onDismiss);
 
   useEffect(() => {
-    // If we're on the /warning preview route, always show — skip battery API
-    if (isPreviewRoute() || isDismissed) return;
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
+
+  // Auto-dismiss after 5 seconds when visible (stable timer - no parent re-render resets)
+  useEffect(() => {
+    if (!showWarning || isDismissed) return;
+
+    const timer = setTimeout(() => {
+      setShowWarning(false);
+      if (typeof onDismissRef.current === 'function') {
+        onDismissRef.current();
+      }
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  }, [showWarning, isDismissed]);
+
+  useEffect(() => {
+    // If preview route, already dismissed, or on mobile, skip battery listener
+    if (isPreviewRoute() || isDismissed || isMobile) return;
 
     let batteryInstance = null;
     let handleBatteryChange = null;
 
-    // Check actual battery status on real devices supporting Battery Status API (Chrome, Edge, Opera)
     if ('getBattery' in navigator) {
       navigator.getBattery().then((battery) => {
         batteryInstance = battery;
 
         handleBatteryChange = () => {
-          // Show warning if device is not charging OR if battery is 25% or lower
           if (!battery.charging || battery.level <= 0.25) {
             setShowWarning(true);
           } else {
@@ -28,14 +44,11 @@ export function BatteryWarning({ isDismissed = false, onDismiss = () => {} }) {
           }
         };
 
-        handleBatteryChange(); // Initial check
+        handleBatteryChange();
 
-        // Reactively update when charger is plugged/unplugged or level changes
         battery.addEventListener('chargingchange', handleBatteryChange);
         battery.addEventListener('levelchange', handleBatteryChange);
-      }).catch(() => {
-        // Battery API blocked or unavailable
-      });
+      }).catch(() => {});
     }
 
     return () => {
@@ -44,86 +57,102 @@ export function BatteryWarning({ isDismissed = false, onDismiss = () => {} }) {
         batteryInstance.removeEventListener('levelchange', handleBatteryChange);
       }
     };
-  }, [isDismissed]);
+  }, [isDismissed, isMobile]);
 
-  if (!showWarning || isDismissed) return null;
+  // Desktop only & requires active warning state
+  if (isMobile || !showWarning || isDismissed) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, width: '100vw', height: '100vh',
-      backgroundColor: 'rgba(7, 17, 36, 0.95)',
-      zIndex: 9999,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontFamily: 'var(--font-mono)',
-      textAlign: 'center',
-      padding: '2rem'
-    }}>
+    <>
+      <style>{`
+        @keyframes toastProgressBar {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
+
       <div style={{
+        position: 'fixed',
+        top: '24px',
+        left: '24px',
+        width: '360px',
+        maxWidth: 'calc(100vw - 48px)',
+        zIndex: 9999,
+        fontFamily: 'var(--font-mono)',
+        pointerEvents: 'auto',
+        borderRadius: '10px',
+        overflow: 'hidden',
         border: '1px solid rgba(0, 186, 227, 0.5)',
-        padding: '2rem 2.5rem',
-        borderRadius: '12px',
-        background: 'rgba(0, 50, 104, 0.25)',
-        boxShadow: '0 0 40px rgba(0, 186, 227, 0.12)',
-        maxWidth: '480px',
+        background: 'rgba(7, 17, 36, 0.92)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 186, 227, 0.15)',
+        padding: '1.25rem 1.25rem 1.5rem 1.25rem',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        gap: '1rem'
+        gap: '0.6rem',
+        color: 'var(--text-pure)',
       }}>
-
-        <h2 style={{ 
-          fontFamily: 'var(--font-sans)', 
-          fontSize: '1.3rem', 
-          letterSpacing: '0.1em',
-          color: 'var(--text-pure)',
-        }}>
-          SYSTEM POWER LIMITED
-        </h2>
-        
-        <p style={{ 
-          fontSize: '0.8rem', 
-          lineHeight: '1.7',
-          color: 'rgba(252, 252, 252, 0.75)',
-          letterSpacing: '0.03em'
-        }}>
-          Your device is running on battery power. Browsers restrict GPU performance to save power — 
-          plug in your charger to experience this simulation at 60+ FPS.
-        </p>
-        
-        <button 
-          onClick={onDismiss}
-          style={{
-            marginTop: '0.25rem',
-            background: 'transparent',
-            border: '1px solid var(--primary-cyan)',
+        {/* Header with Title and Close Button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.85rem',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
             color: 'var(--primary-cyan)',
-            padding: '0.55rem 1.75rem',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            letterSpacing: '0.15em',
-            borderRadius: '999px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            outline: 'none'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.background = 'var(--primary-cyan)';
-            e.target.style.color = '#000';
-            e.target.style.boxShadow = '0 0 20px var(--primary-cyan)';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--primary-cyan)';
-            e.target.style.boxShadow = 'none';
-          }}
-        >
-          [ CONTINUE ANYWAY ]
-        </button>
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem'
+          }}>
+            <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffae00' }}></span>
+            SYSTEM POWER LIMITED
+          </span>
+
+          <button
+            onClick={() => { setShowWarning(false); onDismiss(); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(252, 252, 252, 0.5)',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              padding: '0 0.2rem',
+              lineHeight: 1,
+            }}
+            onMouseOver={(e) => e.target.style.color = '#fff'}
+            onMouseOut={(e) => e.target.style.color = 'rgba(252, 252, 252, 0.5)'}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Description Text */}
+        <p style={{
+          margin: 0,
+          fontSize: '0.75rem',
+          lineHeight: '1.5',
+          color: 'rgba(252, 252, 252, 0.8)',
+          letterSpacing: '0.02em'
+        }}>
+          Device running on battery power. Plug in your charger for peak 60+ FPS performance.
+        </p>
+
+        {/* 5-Second Shrinking Progress Bar at Bottom of Card */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          height: '3px',
+          backgroundColor: 'rgba(0, 186, 227, 0.2)',
+        }}>
+          <div style={{
+            height: '100%',
+            backgroundColor: 'var(--primary-cyan)',
+            boxShadow: '0 0 8px var(--primary-cyan)',
+            animation: 'toastProgressBar 7s linear forwards',
+          }} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

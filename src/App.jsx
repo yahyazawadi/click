@@ -434,7 +434,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         <div className="canvas-container">
           <Canvas
             dpr={gpuTier === 'low' ? [0.75, 0.85] : [1, 1.25]}
-            camera={{ position: [0, 25, 55], fov: 45 }}
+            camera={{ position: [0, 120, 300], fov: 45 }}
             gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance' }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
@@ -538,7 +538,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         />
 
         {/* Battery / Low Power Warning UI */}
-        <BatteryWarning isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
+        <BatteryWarning isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
         <PerformanceWarning currentFps={currentFps} isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
 
 
