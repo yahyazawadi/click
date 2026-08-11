@@ -253,9 +253,9 @@ export const NEBULA_CONFIG = {
     alpha: 0.92,
   },
 
-  // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration (Dynamic Bow Shock!)
+  // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration
   nebula2: {
-    path: NEBULA_PRESETS.BOW_SHOCK_ARCS,  // Path 7 (Supersonic Bow Shock Arcs - Gold Standard!)
+    path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 4.5,
     warp: 3.8,
     brightness: 2.8,
