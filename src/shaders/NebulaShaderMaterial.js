@@ -307,7 +307,7 @@ export const NebulaMaterial = shaderMaterial(
           float base2 = fbm(uv + uWarp * q2);
           density = base2 * (0.7 + 0.3 * ribbonMask);
 
-        } else {
+        } else if (uNebulaPath == 3) {
           // PATH 3 — Organic Plasma Filaments v2
           // Replaces the mathematical sin() crosshatch with FBM-ridge filaments
           // warped by the gas flow itself. Two crossing ridge families at different
