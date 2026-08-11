@@ -19,7 +19,6 @@ import { fpsLogger } from './utils/fpsLogger';
 import { tierToFloat } from './utils/detectGpuTier.js';
 
 import { useFrame } from '@react-three/fiber';
-
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
 function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier, onAutoDemoteTier }) {
   const stableTimer = useRef(0);

@@ -243,14 +243,14 @@ export const NEBULA_CONFIG = {
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 3.2,
-    warp: 2.6,
-    brightness: 2.4,
-    dustStrength: 0.55,
+    warp: 3.2,
+    brightness: 2.7,
+    dustStrength: 0.78,
     pillarStrength: 0.65,
     maskRadius: 0.38,
     edgeWarp: 0.30,
     coreRadius: 0.16,
-    alpha: 0.92,
+    alpha: 0.95,
   },
 
   // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration
