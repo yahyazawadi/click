@@ -62,31 +62,29 @@ export function DualNebulaBackground({ isMobile, perfTierFloat = 0.0, nebulaPath
       </mesh>
 
       {/* NEBULA 2 (RIGHT): Hidden on LOW tier to save draw call + fragment cost */}
-      {perfTierFloat < 1.0 && (
-        <mesh position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
-          <planeGeometry args={[190, 140]} />
-          <nebulaMaterial
-            ref={matRefLayer2}
-            uPerfTier={perfTierFloat}
-            uColorSII={nebula2Colors.sii}
-            uColorHa={nebula2Colors.ha}
-            uColorOIII={nebula2Colors.oiii}
-            uColorCore={nebula2Colors.core}
-            uScale={4.5}
-            uWarp={3.8}
-            uMaskRadius={0.35}
-            uEdgeWarp={0.4}
-            uAlpha={0.88}
-            uBrightness={2.8}
-            uDustStrength={0.35}
-            uPillarStrength={0.5}
-            uCoreRadius={0.20}
-            transparent
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
-      )}
+      <mesh visible={perfTierFloat < 1.0} position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
+        <planeGeometry args={[190, 140]} />
+        <nebulaMaterial
+          ref={matRefLayer2}
+          uPerfTier={perfTierFloat}
+          uColorSII={nebula2Colors.sii}
+          uColorHa={nebula2Colors.ha}
+          uColorOIII={nebula2Colors.oiii}
+          uColorCore={nebula2Colors.core}
+          uScale={4.5}
+          uWarp={3.8}
+          uMaskRadius={0.35}
+          uEdgeWarp={0.4}
+          uAlpha={0.88}
+          uBrightness={2.8}
+          uDustStrength={0.35}
+          uPillarStrength={0.5}
+          uCoreRadius={0.20}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
     </group>
   );
 }

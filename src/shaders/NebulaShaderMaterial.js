@@ -1,91 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  HIGH-TIER NEBULA ITERATION PATHS
-//  Change NEBULA_PATH (0–3) to switch between visual experiments.
-//  Save the file — Vite hot-reloads instantly. No deploy needed.
+//  HIGH-TIER NEBULA RUNTIME PATHS (0–7)
+//  Selected dynamically at runtime via the `uNebulaPath` uniform.
+//  Each path is 100% isolated within its own GLSL branch in the fragment shader.
 //
-//  0  SILKY WISPS       — current natural look: single warp + micro-filaments
-//  1  DEEP OCEAN PILLARS — second-pass warp blended softly, like cumulonimbus
-//  2  ORION RIBBON       — asymmetric curl + radial stretch, like emission bow
-//  3  BIOLUMINESCENT VEINS — tight sinusoidal filament lattice inside the gas
+//  0  SILKY WISPS         — Single domain-warp + micro-filaments
+//  1  DEEP OCEAN PILLARS  — Two soft domain-warp passes (LOCKED BASELINE)
+//  2  ORION RIBBON        — Rotating bow-shock arc with directional mask
+//  3  PLASMA THREADS      — Organic FBM-ridge filaments flowing with gas
+//  4  POLAR VORTEX        — Rotating spiral polar coordinates
+//  5  EMISSION SHELL      — Hollow ring like the Ring Nebula
+//  6  KOLMOGOROV CASCADE  — 3-scale turbulent fluid flow
+//  7  BOW SHOCK ARCS      — Compressed gas sheets from stellar wind
 // ─────────────────────────────────────────────────────────────────────────────
-const NEBULA_PATH = 0;
-
-// ─── HIGH-TIER GLSL SNIPPETS — one is injected at runtime based on NEBULA_PATH ───
-// All paths take: uv, uWarp, uTime, fbm()  →  write float density, float qLen
-
-const HIGH_PATH_SNIPPETS = [
-
-  /* ── PATH 0 : SILKY WISPS ──────────────────────────────────────────────────
-     Natural baseline: smooth single domain-warp + delicate micro-filaments
-     blended only where gas is dense. Very clean organic look.               */
-  `
-    // PATH 0 — Silky Wisps
-    vec2 q0;
-    q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
-    q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
-    qLen = length(q0);
-    float base0     = fbm(uv + uWarp * q0);
-    float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
-    density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
-  `,
-
-  /* ── PATH 1 : DEEP OCEAN PILLARS ───────────────────────────────────────────
-     Two soft domain-warp passes at very different speeds. Second pass is
-     blended gently (not full strength) so you get depth without chaos.
-     Feels like cumulonimbus or undersea thermal vents.                       */
-  `
-    // PATH 1 — Deep Ocean Pillars
-    vec2 q1;
-    q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
-    q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
-    qLen = length(q1);
-    vec2 r1;
-    r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
-    r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
-    float base1 = fbm(uv + uWarp * q1);
-    float deep1 = fbm(uv + uWarp * r1 * 0.5);
-    density = mix(base1, deep1, 0.32);  // soft blend — no muddy double-warp
-  `,
-
-  /* ── PATH 2 : ORION RIBBON ─────────────────────────────────────────────────
-     Asymmetric angular curl + a radial bow-stretch modulator. The warp
-     vector is rotated by a slow angle offset, creating an elongated ribbon
-     arc like an emission bow-shock or an Orion Nebula shard.                 */
-  `
-    // PATH 2 — Orion Ribbon
-    float bowAngle = uTime * 0.006;
-    mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
-    vec2 q2;
-    q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
-    q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
-    qLen = length(q2);
-    // Radial bow stretch: density falls off perpendicular to ribbon axis
-    float ribbonMask = 1.0 - smoothstep(0.0, 0.55, abs(uv.y * 0.7 - uv.x * 0.3));
-    float base2 = fbm(uv + uWarp * q2);
-    density = base2 * (0.7 + 0.3 * ribbonMask);
-  `,
-
-  /* ── PATH 3 : BIOLUMINESCENT VEINS ─────────────────────────────────────────
-     Sinusoidal lattice carved through the warp density field. Creates a
-     glowing vein network inside the gas cloud — like deep ocean creatures
-     or branching plasma threads. Stays natural because veins only glow
-     where gas already exists (masked by baseDensity).                        */
-  `
-    // PATH 3 — Bioluminescent Veins
-    vec2 q3;
-    q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
-    q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
-    qLen = length(q3);
-    float base3 = fbm(uv + uWarp * q3);
-    // Vein lattice: sinusoidal crosshatch in warped space
-    vec2 veinUv = uv * 4.5 + q3 * 1.2;
-    float veinX  = abs(sin(veinUv.x * 3.14159));
-    float veinY  = abs(sin(veinUv.y * 3.14159 + 1.1));
-    float veins  = pow(max(veinX, veinY), 6.0) * 0.22;
-    // Only glow where gas is present (mask veins to dense regions)
-    density = base3 + veins * smoothstep(0.2, 0.75, base3);
-  `,
-];
 
 import * as THREE from 'three';
 import { shaderMaterial } from '@react-three/drei';
@@ -250,7 +176,7 @@ export const NebulaMaterial = shaderMaterial(
 
       // 2. Organic boundary mask
       float angle   = atan(centeredUv.y, centeredUv.x);
-      float edgeN   = fbm(vec2(angle * 2.5, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
+      float edgeN   = fbm(vec2(angle * 2.0, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
