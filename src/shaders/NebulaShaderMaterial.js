@@ -169,14 +169,14 @@ export const NebulaMaterial = shaderMaterial(
     void main() {
       vec2 centeredUv = vUv - vec2(0.5);
 
-      // 1. Radial plane edge kill
+      // 1. Radial plane edge kill — smooth gradual falloff
       float edgeDist = length(centeredUv);
-      float planeEdgeFade = smoothstep(0.45, 0.15, edgeDist);
+      float planeEdgeFade = smoothstep(0.49, 0.08, edgeDist);
 
-      // 2. Organic boundary mask
+      // 2. Organic boundary mask — widened transition zone for soft ethereal edges
       float angle   = atan(centeredUv.y, centeredUv.x);
       float edgeN   = fbm(vec2(angle * 2.0, uTime * 0.012) + centeredUv * 2.0) * uEdgeWarp;
-      float organicMask = smoothstep(uMaskRadius, uMaskRadius * 0.1, edgeDist + edgeN);
+      float organicMask = smoothstep(uMaskRadius * 1.35, uMaskRadius * 0.05, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
       vec2 uv = centeredUv * uScale + uParallaxOffset;
@@ -188,15 +188,14 @@ export const NebulaMaterial = shaderMaterial(
       int path = uNebulaPath;
 
       if (path == 0) {
-        // PATH 0 — Silky Wisps: single warp + spready micro-filaments
+        // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
         vec2 q0;
         q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
         q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
         qLen = length(q0);
         float base0 = fbm(uv + uWarp * q0);
         float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
-        float spreadyAura0 = fbm(uv * 0.9 + q0 * 0.3 + vec2(uTime * 0.005)) * 0.22;
-        density = base0 * 0.80 + (filament0 + spreadyAura0) * smoothstep(0.08, 0.65, base0 + 0.15);
+        density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
         pathBrightness = 1.0;
         pathScatter = 0.35;
 
@@ -216,7 +215,7 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.35;
 
       } else if (path == 2) {
-        // PATH 2 — Orion Bow Wave: massive connected cloud with sweeping bow front
+        // PATH 2 — Orion Bow Wave: massive connected cloud with relaxed bow front
         float bowAngle = uTime * 0.006;
         mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
         vec2 q2;
@@ -225,10 +224,10 @@ export const NebulaMaterial = shaderMaterial(
         qLen = length(q2);
         float base2 = fbm(uv + uWarp * q2);
         vec2 rUv = bowRot * uv;
-        float bowFront2 = exp(-pow((rUv.y * 0.35 - rUv.x * 0.25), 2.0)) * 0.35;
-        density = (base2 * 0.75 + bowFront2 * smoothstep(0.05, 0.45, base2 + 0.20)) * 0.88;
-        pathBrightness = 0.98;
-        pathScatter = 0.32;
+        float bowFront2 = exp(-pow((rUv.y * 0.35 - rUv.x * 0.25), 2.0)) * 0.28;
+        density = (base2 * 0.75 + bowFront2 * smoothstep(0.05, 0.45, base2 + 0.20)) * 0.78;
+        pathBrightness = 0.82;
+        pathScatter = 0.28;
 
       } else if (path == 3) {
         // PATH 3 — Plasma Canopy: massive connected gas flow with sweeping energy streams
@@ -240,9 +239,9 @@ export const NebulaMaterial = shaderMaterial(
         vec2 fUv = uv * 2.2 + q3 * 1.4 + vec2(uTime * 0.0035, uTime * 0.0028);
         float ridgeA = fbm(fUv);
         float threadA = pow(1.0 - abs(ridgeA - 0.48) * 2.2, 3.0) * 0.28;
-        density = (base3 * 0.80 + threadA * smoothstep(0.08, 0.55, base3 + 0.15)) * 0.90;
-        pathBrightness = 0.96;
-        pathScatter = 0.32;
+        density = (base3 * 0.80 + threadA * smoothstep(0.08, 0.55, base3 + 0.15)) * 0.82;
+        pathBrightness = 0.85;
+        pathScatter = 0.28;
 
       } else if (path == 4) {
         // PATH 4 — Polar Spiral Galaxy: massive continuous rotating spiral cloud
@@ -255,9 +254,9 @@ export const NebulaMaterial = shaderMaterial(
         qLen = length(q4);
         float base4 = fbm(spiralUv + uWarp * q4 * 0.75);
         float continuousSpiral = fbm(uv * 1.2 + q4 * 0.5) * 0.35;
-        density = (base4 * 0.70 + continuousSpiral) * 0.88;
-        pathBrightness = 0.96;
-        pathScatter = 0.32;
+        density = (base4 * 0.70 + continuousSpiral) * 0.80;
+        pathBrightness = 0.85;
+        pathScatter = 0.28;
 
       } else if (path == 5) {
         // PATH 5 — Cosmic Emission Shroud: broad connected interstellar cloud shroud
@@ -267,10 +266,10 @@ export const NebulaMaterial = shaderMaterial(
         qLen = length(q5);
         float base5 = fbm(uv + uWarp * q5 * 0.85);
         float r5 = length(centeredUv + q5 * 0.10);
-        float shroud5 = exp(-pow(r5 * 2.8, 2.0)) * 0.35;
-        density = (base5 * 0.75 + shroud5 * smoothstep(0.05, 0.45, base5 + 0.15)) * 0.85;
-        pathBrightness = 0.92;
-        pathScatter = 0.28;
+        float shroud5 = exp(-pow(r5 * 2.8, 2.0)) * 0.28;
+        density = (base5 * 0.75 + shroud5 * smoothstep(0.05, 0.45, base5 + 0.15)) * 0.76;
+        pathBrightness = 0.80;
+        pathScatter = 0.25;
 
       } else if (path == 6) {
         // PATH 6 — Kolmogorov Fluid Cascade: massive connected turbulent fluid streams
@@ -280,9 +279,9 @@ export const NebulaMaterial = shaderMaterial(
         qLen = length(q6);
         float large6  = fbm(uv * 0.85 + uWarp * q6 * 0.85);
         float medium6 = fbm(uv * 1.6 + uWarp * q6 * 0.50 + vec2(3.7, 1.2)) * 0.45;
-        density = (large6 * 0.65 + medium6 * smoothstep(0.10, 0.45, large6)) * 0.90;
-        pathBrightness = 0.95;
-        pathScatter = 0.30;
+        density = (large6 * 0.65 + medium6 * smoothstep(0.10, 0.45, large6)) * 0.80;
+        pathBrightness = 0.85;
+        pathScatter = 0.26;
 
       } else {
         // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD)
@@ -303,27 +302,27 @@ export const NebulaMaterial = shaderMaterial(
 
       float gasDensity = smoothstep(0.0, 0.5, density);
 
-      // 4. Dark dust absorption lanes
+      // 4. Dark dust absorption lanes — soft gas shadows
       vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
       float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
-      float dustExponent = uPerfTier < 0.3 ? 2.8 : 2.5;
-      float absorption = pow(dustField, dustExponent) * uDustStrength;
+      float dustExponent = 2.0;
+      float absorption = pow(dustField, dustExponent) * uDustStrength * 0.65;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
-      // 5. Pillar structures
+      // 5. Softened Pillar structures (no hard diagonal lines)
       vec2 pillarUv = centeredUv * 3.0;
-      float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.14, 1.0);
-      float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.11, 0.85);
-      float pillars = (p1 + p2 * 0.75) * uPillarStrength;
+      float p1 = pillar(pillarUv + vec2(0.3, -0.2), normalize(vec2(0.3, 1.0)), 0.22, 1.0);
+      float p2 = pillar(pillarUv + vec2(-0.4, 0.1), normalize(vec2(-0.2, 1.0)), 0.18, 0.85);
+      float pillars = (p1 + p2 * 0.60) * uPillarStrength * 0.35;
       float finalDensity = clamp(gasAfterDust + pillars * organicMask, 0.0, 1.0);
 
-      // 6. Hubble SHO color science
+      // 6. Hubble SHO color science — relaxed strong white blowout
       float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
 
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
+      col = mix(col, uColorHa,   smoothstep(0.08, 0.55, finalDensity));
+      col = mix(col, uColorSII,  smoothstep(0.45, 0.80, finalDensity));
+      col = mix(col, uColorCore, smoothstep(0.88, 1.0, finalDensity) * 0.35 + coreGlow * 0.12);
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
 
       // 7. Volumetric scatter halo (soft inner glow)
