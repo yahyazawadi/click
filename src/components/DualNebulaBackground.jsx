@@ -46,8 +46,8 @@ export function DualNebulaBackground({
   return (
     <group position={[0, 0, -50]}>
       {/* NEBULA 1 (LEFT): Deep Violet / Crimson Gas Cloud */}
-      <mesh position={[-35, 20, -40]} rotation={[0.15, 0.3, -0.1]}>
-        <planeGeometry args={[220, 160]} />
+      <mesh position={[-22, 12, -45]} rotation={[0.15, 0.3, -0.1]}>
+        <planeGeometry args={[480, 320]} />
         <nebulaMaterial
           ref={matRefLayer1}
           uPerfTier={perfTierFloat}
@@ -71,8 +71,8 @@ export function DualNebulaBackground({
       </mesh>
 
       {/* NEBULA 2 (RIGHT): Teal / Blue Gas Cloud (Hidden on LOW tier to save draw calls) */}
-      <mesh visible={perfTierFloat < 1.0} position={[45, -15, -30]} rotation={[-0.1, -0.4, 0.15]}>
-        <planeGeometry args={[190, 140]} />
+      <mesh visible={perfTierFloat < 1.0} position={[32, -10, -35]} rotation={[-0.1, -0.4, 0.15]}>
+        <planeGeometry args={[420, 280]} />
         <nebulaMaterial
           ref={matRefLayer2}
           uPerfTier={perfTierFloat}
