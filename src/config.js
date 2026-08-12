@@ -80,21 +80,21 @@ export const NEBULA_CONFIG = {
   // 🔴 NEBULA 1 (RED / CRIMSON) — Independent Configuration
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
-    scale: 4.2,
-    warp: 3.6,
-    brightness: 2.7,
-    dustStrength: 0.45,
-    pillarStrength: 0.55,
-    maskRadius: 0.44,
-    edgeWarp: 0.38,
-    coreRadius: 0.22,
+    scale: 4.6,
+    warp: 4.8,
+    brightness: 3.2,
+    dustStrength: 0.52,
+    pillarStrength: 0.72,
+    maskRadius: 0.46,
+    edgeWarp: 0.55,
+    coreRadius: 0.26,
     alpha: 0.95,
-    // 🎨 Original Crimson Color Palette (Restored)
+    // 🎨 Color Palette (High-Brightness Pure Scarlet — Zero Pink Drift)
     colors: {
-      sii:  '#ff0a2b', // Vibrant bright crimson-scarlet
-      ha:   '#800000', // Deep blood red mid-tone
-      oiii: '#140103', // Pitch dark maroon-void shadow
-      core: '#ff3856', // Intense burning ruby core glow
+      sii:  '#ff0022', // Fiery scarlet outer wisps
+      ha:   '#700010', // Rich crimson-burgundy mid-body
+      oiii: '#120004', // Dark velvet void base
+      core: '#ff1530', // Burning hot ruby core (brilliant red, zero pink)
     },
   },
 
