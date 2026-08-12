@@ -85,9 +85,9 @@ export const NEBULA_CONFIG = {
     brightness: 2.7,
     dustStrength: 0.78,
     pillarStrength: 0.65,
-    maskRadius: 0.38,
+    maskRadius: 0.44,
     edgeWarp: 0.30,
-    coreRadius: 0.16,
+    coreRadius: 0.22,
     alpha: 0.95,
   },
 
@@ -99,9 +99,9 @@ export const NEBULA_CONFIG = {
     brightness: 2.8,
     dustStrength: 0.35,
     pillarStrength: 0.50,
-    maskRadius: 0.35,
+    maskRadius: 0.42,
     edgeWarp: 0.40,
-    coreRadius: 0.20,
+    coreRadius: 0.25,
     alpha: 0.88,
   },
 
