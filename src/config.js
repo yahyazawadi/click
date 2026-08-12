@@ -80,14 +80,14 @@ export const NEBULA_CONFIG = {
   // 🔴 NEBULA 1 (RED / CRIMSON) — Independent Configuration
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
-    scale: 4.4,
-    warp: 4.0,
-    brightness: 2.9,
-    dustStrength: 0.42,
-    pillarStrength: 0.60,
-    maskRadius: 0.45,
-    edgeWarp: 0.42,
-    coreRadius: 0.24,
+    scale: 4.2,
+    warp: 3.4,
+    brightness: 2.7,
+    dustStrength: 0.38,
+    pillarStrength: 0.52,
+    maskRadius: 0.44,
+    edgeWarp: 0.34,
+    coreRadius: 0.22,
     alpha: 0.95,
     // 🎨 Color Palette (High-Brightness Pure Scarlet — Zero Pink Drift)
     colors: {
