@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Stars } from '@react-three/drei';
+import { EnhancedStarfield } from './EnhancedStarfield';
 import { DualNebulaBackground } from './DualNebulaBackground';
 import { SYSTEM_CONFIG } from '../config';
 
@@ -20,14 +20,11 @@ export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0
     <>
       {enabled && <DualNebulaBackground isMobile={isMobile} perfTierFloat={perfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />}
       <group ref={starsRef}>
-        <Stars
+        <EnhancedStarfield
           radius={100}
           depth={50}
           count={starCount}
           factor={4}
-          saturation={0}
-          fade
-          speed={1}
         />
       </group>
     </>
