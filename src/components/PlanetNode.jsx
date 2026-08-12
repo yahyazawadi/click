@@ -4,50 +4,14 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
 import {
-  SaturnPlanet,
-  MobiusPlanet,
-  CrystalPlanet,
-  GyroscopePlanet,
-  PlasmaTorusPlanet,
-  VortexShellPlanet,
-  HyperCubePlanet,
-  BinaryMoonPlanet,
   ScissorPlanet,
   ScissorMoonPlanet,
-  NodePlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex to dedicated component files
 function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile, perfTierFloat }) {
-  const nodeType = typeof type === 'number' ? Math.abs(type) % 11 : 0;
-
-  switch (nodeType) {
-    case 0:
-      return <PlasmaTorusPlanet color={color} size={size} isMobile={isMobile} />;
-    case 1:
-      return <SaturnPlanet color={color} size={size} isMobile={isMobile} />;
-    case 2:
-      // MobiusPlanet disabled for performance — fallback to GyroscopePlanet
-      return <GyroscopePlanet color={color} size={size} isMobile={isMobile} />;
-    case 3:
-      return <CrystalPlanet color={color} size={size} isMobile={isMobile} />;
-    case 4:
-      return <GyroscopePlanet color={color} size={size} isMobile={isMobile} />;
-    case 5:
-      return <PlasmaTorusPlanet color={color} size={size} isMobile={isMobile} />;
-    case 6:
-      return <VortexShellPlanet color={color} size={size} isMobile={isMobile} />;
-    case 7:
-      return <HyperCubePlanet color={color} size={size} isMobile={isMobile} />;
-    case 8:
-      return <BinaryMoonPlanet color={color} size={size} isMobile={isMobile} />;
-    case 9:
-      return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
-    case 10:
-      return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
-    default:
-      return <NodePlanet color={color} size={size} isFocused={isSelected} isMobile={isMobile} />;
-  }
+  // Always return ScissorMoonPlanet as per user request
+  return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
 
 export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true, perfTierFloat = 0.0 }) {
