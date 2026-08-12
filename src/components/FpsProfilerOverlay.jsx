@@ -62,6 +62,36 @@ export function FpsProfilerOverlay({
 
   const [frameHistory, setFrameHistory] = useState([]);
   const canvasRef = useRef(null);
+  const overlayRef = useRef(null);
+
+  // Prevent wheel scroll event from propagating to Lenis smooth scroll or background page
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el || !visible) return;
+
+    const preventPageScroll = (e) => {
+      e.stopPropagation();
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const isScrollable = scrollHeight > clientHeight;
+      if (isScrollable) {
+        const isAtTop = scrollTop <= 0 && e.deltaY < 0;
+        const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) <= 2 && e.deltaY > 0;
+        if (isAtTop || isAtBottom) {
+          e.preventDefault();
+        }
+      } else {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener('wheel', preventPageScroll, { passive: false });
+    el.addEventListener('touchmove', preventPageScroll, { passive: false });
+
+    return () => {
+      el.removeEventListener('wheel', preventPageScroll);
+      el.removeEventListener('touchmove', preventPageScroll);
+    };
+  }, [visible]);
 
   // Update mini frame time graph
   useEffect(() => {
@@ -143,6 +173,7 @@ export function FpsProfilerOverlay({
 
   return (
     <div 
+      ref={overlayRef}
       className="telemetry-profiler-container"
       style={{
         position: 'fixed',
