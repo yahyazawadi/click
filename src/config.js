@@ -68,16 +68,16 @@ export const SYSTEM_CONFIG = {
 export const NEBULA_PRESETS = {
   SILKY_WISPS: 0,
   DEEP_OCEAN: 1,
-  ORION_BOW_WAVE: 2,     // 🔴 Red Nebula Master Shape (Locked)
+  ORION_BOW_WAVE: 2,     // Red Nebula Master Shape (Locked)
   PLASMA_CANOPY: 3,
   POLAR_VORTEX: 4,
-  EMISSION_SHROUD: 5,   // 🔵 Teal Nebula Master Shape (Locked)
+  EMISSION_SHROUD: 5,   // Teal Nebula Master Shape (Locked)
   KOLMOGOROV_CASCADE: 6,
   BOW_SHOCK_ARCS: 7,
 };
 
 export const NEBULA_CONFIG = {
-  // 🔴 NEBULA 1 (RED / CRIMSON) — Independent Configuration
+  // NEBULA 1 (RED / CRIMSON) - Independent Configuration
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 4.2,
@@ -89,16 +89,16 @@ export const NEBULA_CONFIG = {
     edgeWarp: 0.34,
     coreRadius: 0.22,
     alpha: 0.95,
-    // 🎨 Color Palette (High-Brightness Pure Scarlet — Zero Pink Drift)
+    // Color Palette
     colors: {
-      sii:  '#ff0022', // Fiery scarlet outer wisps
-      ha:   '#700010', // Rich crimson-burgundy mid-body
-      oiii: '#120004', // Dark velvet void base
-      core: '#ff1530', // Burning hot ruby core (brilliant red, zero pink)
+      sii: '#ff0022', // Outer gas wisps - fiery scarlet
+      ha: '#700010', // Mid-gas body - rich crimson-burgundy
+      oiii: '#120004', // Void shadow base - dark velvet void
+      core: '#ff1530', // Burning hot ruby core
     },
   },
 
-  // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration
+  // NEBULA 2 (TEAL / BLUE) - Independent Configuration
   nebula2: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 4.5,
@@ -110,10 +110,10 @@ export const NEBULA_CONFIG = {
     edgeWarp: 0.40,
     coreRadius: 0.25,
     alpha: 0.88,
-    // 🎨 Color Palette (experiment freely!)
+    // Color Palette
     colors: {
-      sii:  '#00a8e6', // Rich deep cyan-turquoise
-      ha:   '#081640', // Deep cosmic navy-cobalt
+      sii: '#00a8e6', // Rich deep cyan-turquoise
+      ha: '#081640', // Deep cosmic navy-cobalt
       oiii: '#3b008f', // Deep royal violet gas depth
       core: '#00b8e6', // Rich deep electric cyan core
     },

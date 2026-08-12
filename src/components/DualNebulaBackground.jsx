@@ -16,12 +16,40 @@ export function DualNebulaBackground({
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     if (matRefLayer1.current) {
+      const n1 = NEBULA_CONFIG.nebula1;
       matRefLayer1.current.uTime = time * 0.35;
       matRefLayer1.current.uNebulaPath = nebulaPath1;
+      matRefLayer1.current.uScale = n1.scale;
+      matRefLayer1.current.uWarp = n1.warp;
+      matRefLayer1.current.uBrightness = n1.brightness;
+      matRefLayer1.current.uDustStrength = n1.dustStrength;
+      matRefLayer1.current.uPillarStrength = n1.pillarStrength;
+      matRefLayer1.current.uMaskRadius = n1.maskRadius;
+      matRefLayer1.current.uEdgeWarp = n1.edgeWarp;
+      matRefLayer1.current.uCoreRadius = n1.coreRadius;
+      matRefLayer1.current.uAlpha = n1.alpha;
+      matRefLayer1.current.uColorSII.set(n1.colors.sii);
+      matRefLayer1.current.uColorHa.set(n1.colors.ha);
+      matRefLayer1.current.uColorOIII.set(n1.colors.oiii);
+      matRefLayer1.current.uColorCore.set(n1.colors.core);
     }
     if (matRefLayer2.current) {
+      const n2 = NEBULA_CONFIG.nebula2;
       matRefLayer2.current.uTime = time * 0.55;
       matRefLayer2.current.uNebulaPath = nebulaPath2;
+      matRefLayer2.current.uScale = n2.scale;
+      matRefLayer2.current.uWarp = n2.warp;
+      matRefLayer2.current.uBrightness = n2.brightness;
+      matRefLayer2.current.uDustStrength = n2.dustStrength;
+      matRefLayer2.current.uPillarStrength = n2.pillarStrength;
+      matRefLayer2.current.uMaskRadius = n2.maskRadius;
+      matRefLayer2.current.uEdgeWarp = n2.edgeWarp;
+      matRefLayer2.current.uCoreRadius = n2.coreRadius;
+      matRefLayer2.current.uAlpha = n2.alpha;
+      matRefLayer2.current.uColorSII.set(n2.colors.sii);
+      matRefLayer2.current.uColorHa.set(n2.colors.ha);
+      matRefLayer2.current.uColorOIII.set(n2.colors.oiii);
+      matRefLayer2.current.uColorCore.set(n2.colors.core);
     }
   });
 
