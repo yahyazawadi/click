@@ -345,3 +345,32 @@ html, body, #root {
     font-size: 0.7rem;
   }
 }
+
+/* Telemetry Profiler Modal & Custom Scrollbar */
+.telemetry-profiler-container {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 186, 227, 0.4) rgba(7, 17, 36, 0.6);
+}
+
+.telemetry-profiler-container::-webkit-scrollbar {
+  width: 4px;
+  height: 0px;
+}
+
+.telemetry-profiler-container::-webkit-scrollbar-track {
+  background: rgba(7, 17, 36, 0.6);
+  border-radius: 4px;
+}
+
+.telemetry-profiler-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 186, 227, 0.45);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.telemetry-profiler-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-cyan);
+  box-shadow: 0 0 8px var(--primary-cyan);
+}

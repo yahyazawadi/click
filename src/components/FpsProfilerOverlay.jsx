@@ -142,26 +142,30 @@ export function FpsProfilerOverlay({
   const currentNebula = NEBULA_CONFIG[activeNebulaTab];
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: '12px',
-      right: '12px',
-      width: '350px',
-      maxHeight: '92vh',
-      zIndex: 9999,
-      background: 'rgba(7, 17, 36, 0.96)',
-      border: '1px solid var(--primary-cyan)',
-      boxShadow: '0 0 25px rgba(0, 186, 227, 0.3)',
-      borderRadius: '10px',
-      padding: '1rem',
-      fontFamily: 'var(--font-mono)',
-      color: 'var(--text-pure)',
-      fontSize: '0.72rem',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.65rem',
-      overflowY: 'auto'
-    }}>
+    <div 
+      className="telemetry-profiler-container"
+      style={{
+        position: 'fixed',
+        top: '12px',
+        right: '12px',
+        width: '340px',
+        maxHeight: '92vh',
+        zIndex: 9999,
+        background: 'rgba(7, 17, 36, 0.96)',
+        border: '1px solid var(--primary-cyan)',
+        boxShadow: '0 0 25px rgba(0, 186, 227, 0.3)',
+        borderRadius: '10px',
+        padding: '0.85rem',
+        fontFamily: 'var(--font-mono)',
+        color: 'var(--text-pure)',
+        fontSize: '0.72rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.65rem',
+        overflowX: 'hidden',
+        overflowY: 'auto'
+      }}
+    >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem' }}>
         <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.05em' }}>
@@ -191,7 +195,7 @@ export function FpsProfilerOverlay({
         <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)', marginBottom: '2px' }}>
           FRAME TIME GRAPH (ms) - 16.6ms target
         </div>
-        <canvas ref={canvasRef} width={318} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)' }} />
+        <canvas ref={canvasRef} width={300} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
       </div>
 
       {/* GPU Tier Switcher */}
