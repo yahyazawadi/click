@@ -40,6 +40,7 @@ export function FpsProfilerOverlay({
 
   // Copy notification state
   const [copiedStatus, setCopiedStatus] = useState(false);
+  const [pastedStatus, setPastedStatus] = useState(false);
 
   const toggleVisibility = () => {
     if (onToggle) {
@@ -167,6 +168,27 @@ export function FpsProfilerOverlay({
     navigator.clipboard.writeText(configStr);
     setCopiedStatus(true);
     setTimeout(() => setCopiedStatus(false), 2000);
+  };
+
+  const pasteConfigJson = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+      const parsed = JSON.parse(text);
+      if (parsed.nebula1 || parsed.nebula2) {
+        if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
+        if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
+      } else if (parsed.scale !== undefined || parsed.brightness !== undefined) {
+        Object.assign(NEBULA_CONFIG[activeNebulaTab], parsed);
+      } else {
+        return;
+      }
+      setPastedStatus(true);
+      setRerender((v) => v + 1);
+      setTimeout(() => setPastedStatus(false), 2000);
+    } catch (err) {
+      console.warn("Clipboard paste error or invalid JSON", err);
+    }
   };
 
   const currentNebula = NEBULA_CONFIG[activeNebulaTab];
@@ -316,22 +338,41 @@ export function FpsProfilerOverlay({
           <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
             NEBULA SHAPE TUNER
           </span>
-          <button
-            onClick={copyConfigJson}
-            style={{
-              background: copiedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
-              color: copiedStatus ? '#000' : 'var(--primary-cyan)',
-              border: '1px solid var(--primary-cyan)',
-              padding: '0.2rem 0.4rem',
-              fontSize: '0.58rem',
-              fontFamily: 'var(--font-mono)',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
-          >
-            {copiedStatus ? 'COPIED!' : 'COPY CONFIG'}
-          </button>
+          <div style={{ display: 'flex', gap: '0.3rem' }}>
+            <button
+              onClick={copyConfigJson}
+              style={{
+                background: copiedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
+                color: copiedStatus ? '#000' : 'var(--primary-cyan)',
+                border: '1px solid var(--primary-cyan)',
+                padding: '0.2rem 0.35rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              {copiedStatus ? 'COPIED!' : 'COPY'}
+            </button>
+
+            <button
+              onClick={pasteConfigJson}
+              style={{
+                background: pastedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
+                color: pastedStatus ? '#000' : 'var(--primary-cyan)',
+                border: '1px solid var(--primary-cyan)',
+                padding: '0.2rem 0.35rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              {pastedStatus ? 'PASTED!' : 'PASTE'}
+            </button>
+          </div>
         </div>
 
         {/* Tab Selection */}
