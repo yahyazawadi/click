@@ -80,21 +80,21 @@ export const NEBULA_CONFIG = {
   // NEBULA 1 (RED / CRIMSON) - Independent Configuration
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
-    scale: 4.2,
-    warp: 3.4,
-    brightness: 2.7,
-    dustStrength: 0.38,
+    scale: 5,
+    warp: 4.6,
+    brightness: 2.8,
+    dustStrength: 0.76,
     pillarStrength: 0.52,
-    maskRadius: 0.44,
-    edgeWarp: 0.34,
-    coreRadius: 0.22,
-    alpha: 0.95,
+    maskRadius: 0.24,
+    edgeWarp: 0.64,
+    coreRadius: 0.16,
+    alpha: 0.92,
     // Color Palette
     colors: {
-      sii: '#ff0022', // Outer gas wisps - fiery scarlet
-      ha: '#700010', // Mid-gas body - rich crimson-burgundy
-      oiii: '#120004', // Void shadow base - dark velvet void
-      core: '#ff1530', // Burning hot ruby core
+      sii:  '#b1631b', // Golden Amber Outer Wisps
+      ha:   '#e61924', // Vivid Crimson Mid-Body
+      oiii: '#570047', // Deep Violet Void Shadow
+      core: '#ff2465', // Hot Ruby Rose Core
     },
   },
 
@@ -105,15 +105,15 @@ export const NEBULA_CONFIG = {
     warp: 3.8,
     brightness: 2.8,
     dustStrength: 0.35,
-    pillarStrength: 0.50,
+    pillarStrength: 0.5,
     maskRadius: 0.42,
-    edgeWarp: 0.40,
+    edgeWarp: 0.4,
     coreRadius: 0.25,
     alpha: 0.88,
     // Color Palette
     colors: {
-      sii: '#00a8e6', // Rich deep cyan-turquoise
-      ha: '#081640', // Deep cosmic navy-cobalt
+      sii:  '#00a8e6', // Rich deep cyan-turquoise
+      ha:   '#081640', // Deep cosmic navy-cobalt
       oiii: '#3b008f', // Deep royal violet gas depth
       core: '#00b8e6', // Rich deep electric cyan core
     },
