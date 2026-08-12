@@ -82,7 +82,7 @@ export const NEBULA_CONFIG = {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 3.2,
     warp: 3.2,
-    brightness: 2.3,
+    brightness: 2.7,
     dustStrength: 0.88,
     pillarStrength: 0.80,
     maskRadius: 0.44,
@@ -91,10 +91,10 @@ export const NEBULA_CONFIG = {
     alpha: 0.95,
     // 🎨 Color Palette (experiment freely!)
     colors: {
-      sii:  '#ff3520', // Outer gas wisps — warm orange-red
-      ha:   '#5c0020', // Mid-gas body — deep maroon-plum
-      oiii: '#0a0004', // Void shadow base — near-black red-brown
-      core: '#ff1a55', // Hot inner core — hot magenta-crimson
+      sii:  '#ff0033', // Outer gas wisps — ultra-vibrant laser crimson
+      ha:   '#660015', // Mid-gas body — rich deep blood red
+      oiii: '#0d0004', // Void shadow base — dark void shadow
+      core: '#ff1f44', // Hot inner core — fiery hot ruby core
     },
   },
 
