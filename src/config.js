@@ -91,10 +91,10 @@ export const NEBULA_CONFIG = {
     alpha: 0.95,
     // 🎨 Color Palette (experiment freely!)
     colors: {
-      sii:  '#ff2244', // Outer gas wisps — vivid scorching scarlet
-      ha:   '#6b0018', // Mid-gas body — deep blood burgundy
-      oiii: '#08000d', // Void shadow base — near-black red-void
-      core: '#ff5060', // Hot inner core — hot rose-red (plasma-hot)
+      sii:  '#ff3520', // Outer gas wisps — warm orange-red
+      ha:   '#5c0020', // Mid-gas body — deep maroon-plum
+      oiii: '#0a0004', // Void shadow base — near-black red-brown
+      core: '#ff1a55', // Hot inner core — hot magenta-crimson
     },
   },
 
