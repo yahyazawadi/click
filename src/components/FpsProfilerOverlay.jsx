@@ -38,9 +38,49 @@ export function FpsProfilerOverlay({
   const [activeNebulaTab, setActiveNebulaTab] = useState('nebula1');
   const [, setRerender] = useState(0);
 
-  // Copy notification state
-  const [copiedStatus, setCopiedStatus] = useState(false);
-  const [pastedStatus, setPastedStatus] = useState(false);
+  // Undo / Redo history stacks
+  const [historyStack, setHistoryStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const initialConfigRef = useRef(JSON.parse(JSON.stringify(NEBULA_CONFIG)));
+
+  const pushHistorySnapshot = () => {
+    const currentSnapshot = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+    setHistoryStack((prev) => [...prev.slice(-40), currentSnapshot]);
+    setRedoStack([]);
+  };
+
+  const handleUndo = () => {
+    if (historyStack.length === 0) return;
+    const previousState = historyStack[historyStack.length - 1];
+    const currentState = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+
+    setRedoStack((prev) => [...prev, currentState]);
+    setHistoryStack((prev) => prev.slice(0, -1));
+
+    Object.assign(NEBULA_CONFIG.nebula1, previousState.nebula1);
+    Object.assign(NEBULA_CONFIG.nebula2, previousState.nebula2);
+    setRerender((v) => v + 1);
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length === 0) return;
+    const nextState = redoStack[redoStack.length - 1];
+    const currentState = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+
+    setHistoryStack((prev) => [...prev, currentState]);
+    setRedoStack((prev) => prev.slice(0, -1));
+
+    Object.assign(NEBULA_CONFIG.nebula1, nextState.nebula1);
+    Object.assign(NEBULA_CONFIG.nebula2, nextState.nebula2);
+    setRerender((v) => v + 1);
+  };
+
+  const handleResetToInitial = () => {
+    pushHistorySnapshot();
+    Object.assign(NEBULA_CONFIG.nebula1, JSON.parse(JSON.stringify(initialConfigRef.current.nebula1)));
+    Object.assign(NEBULA_CONFIG.nebula2, JSON.parse(JSON.stringify(initialConfigRef.current.nebula2)));
+    setRerender((v) => v + 1);
+  };
 
   const toggleVisibility = () => {
     if (onToggle) {
@@ -50,16 +90,24 @@ export function FpsProfilerOverlay({
     }
   };
 
-  // Keyboard shortcut listener (~ Tilde or Shift+D)
+  // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '`' || e.key === '~') {
         toggleVisibility();
       }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        handleRedo();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onToggle]);
+  }, [onToggle, historyStack, redoStack]);
 
   const [frameHistory, setFrameHistory] = useState([]);
   const canvasRef = useRef(null);
@@ -175,6 +223,7 @@ export function FpsProfilerOverlay({
       const text = await navigator.clipboard.readText();
       if (!text) return;
       const parsed = JSON.parse(text);
+      pushHistorySnapshot();
       if (parsed.nebula1 || parsed.nebula2) {
         if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
         if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
@@ -338,14 +387,70 @@ export function FpsProfilerOverlay({
           <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
             NEBULA SHAPE TUNER
           </span>
-          <div style={{ display: 'flex', gap: '0.3rem' }}>
+          <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <button
+              onClick={handleUndo}
+              disabled={historyStack.length === 0}
+              title="Undo (Ctrl+Z)"
+              style={{
+                background: historyStack.length > 0 ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                color: historyStack.length > 0 ? 'var(--primary-cyan)' : '#555',
+                border: '1px solid ' + (historyStack.length > 0 ? 'var(--primary-cyan)' : '#444'),
+                padding: '0.2rem 0.3rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                borderRadius: '4px',
+                cursor: historyStack.length > 0 ? 'pointer' : 'default',
+                fontWeight: 'bold',
+              }}
+            >
+              UNDO
+            </button>
+
+            <button
+              onClick={handleRedo}
+              disabled={redoStack.length === 0}
+              title="Redo (Ctrl+Y)"
+              style={{
+                background: redoStack.length > 0 ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                color: redoStack.length > 0 ? 'var(--primary-cyan)' : '#555',
+                border: '1px solid ' + (redoStack.length > 0 ? 'var(--primary-cyan)' : '#444'),
+                padding: '0.2rem 0.3rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                borderRadius: '4px',
+                cursor: redoStack.length > 0 ? 'pointer' : 'default',
+                fontWeight: 'bold',
+              }}
+            >
+              REDO
+            </button>
+
+            <button
+              onClick={handleResetToInitial}
+              title="Reset to Initial Config"
+              style={{
+                background: 'rgba(0, 186, 227, 0.15)',
+                color: 'var(--secondary-blue)',
+                border: '1px solid rgba(93, 186, 225, 0.4)',
+                padding: '0.2rem 0.3rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              RESET
+            </button>
+
             <button
               onClick={copyConfigJson}
               style={{
                 background: copiedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: copiedStatus ? '#000' : 'var(--primary-cyan)',
                 border: '1px solid var(--primary-cyan)',
-                padding: '0.2rem 0.35rem',
+                padding: '0.2rem 0.3rem',
                 fontSize: '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
@@ -362,7 +467,7 @@ export function FpsProfilerOverlay({
                 background: pastedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: pastedStatus ? '#000' : 'var(--primary-cyan)',
                 border: '1px solid var(--primary-cyan)',
-                padding: '0.2rem 0.35rem',
+                padding: '0.2rem 0.3rem',
                 fontSize: '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
@@ -448,6 +553,8 @@ export function FpsProfilerOverlay({
                   max={max}
                   step={step}
                   value={val}
+                  onMouseDown={pushHistorySnapshot}
+                  onTouchStart={pushHistorySnapshot}
                   onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
                   style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
                 />
@@ -476,12 +583,14 @@ export function FpsProfilerOverlay({
                       <input
                         type="color"
                         value={hexVal}
+                        onMouseDown={pushHistorySnapshot}
                         onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
                         style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
                       />
                       <input
                         type="text"
                         value={hexVal}
+                        onFocus={pushHistorySnapshot}
                         onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
                         style={{
                           width: '100%',
