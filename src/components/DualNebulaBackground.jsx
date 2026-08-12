@@ -25,19 +25,19 @@ export function DualNebulaBackground({
     }
   });
 
-  // Memoize colors ONCE to prevent allocation on React re-renders
+  // Memoize colors ONCE — sourced from config.js for easy experimentation!
   const nebula1Colors = useMemo(() => ({
-    sii:  new THREE.Color('#ff0a2b'), // Vibrant bright crimson-scarlet
-    ha:   new THREE.Color('#800000'), // Deep blood red mid-tone
-    oiii: new THREE.Color('#140103'), // Pitch dark maroon-void shadow (high contrast base)
-    core: new THREE.Color('#ff3856'), // Intense burning ruby core glow
+    sii:  new THREE.Color(NEBULA_CONFIG.nebula1.colors.sii),
+    ha:   new THREE.Color(NEBULA_CONFIG.nebula1.colors.ha),
+    oiii: new THREE.Color(NEBULA_CONFIG.nebula1.colors.oiii),
+    core: new THREE.Color(NEBULA_CONFIG.nebula1.colors.core),
   }), []);
 
   const nebula2Colors = useMemo(() => ({
-    sii:  new THREE.Color('#00a8e6'), // Rich deep cyan-turquoise
-    ha:   new THREE.Color('#081640'), // Deep cosmic navy-cobalt
-    oiii: new THREE.Color('#3b008f'), // Deep royal violet gas depth
-    core: new THREE.Color('#00b8e6'), // Rich deep electric cyan core (saturated & deep, zero pale white)
+    sii:  new THREE.Color(NEBULA_CONFIG.nebula2.colors.sii),
+    ha:   new THREE.Color(NEBULA_CONFIG.nebula2.colors.ha),
+    oiii: new THREE.Color(NEBULA_CONFIG.nebula2.colors.oiii),
+    core: new THREE.Color(NEBULA_CONFIG.nebula2.colors.core),
   }), []);
 
   const n1 = NEBULA_CONFIG.nebula1;

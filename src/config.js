@@ -82,13 +82,20 @@ export const NEBULA_CONFIG = {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
     scale: 3.2,
     warp: 3.2,
-    brightness: 2.7,
-    dustStrength: 0.78,
-    pillarStrength: 0.65,
-    maskRadius: 0.38,
+    brightness: 2.3,
+    dustStrength: 0.88,
+    pillarStrength: 0.80,
+    maskRadius: 0.44,
     edgeWarp: 0.30,
-    coreRadius: 0.16,
+    coreRadius: 0.22,
     alpha: 0.95,
+    // 🎨 Color Palette (experiment freely!)
+    colors: {
+      sii:  '#ff2244', // Outer gas wisps — vivid scorching scarlet
+      ha:   '#6b0018', // Mid-gas body — deep blood burgundy
+      oiii: '#08000d', // Void shadow base — near-black red-void
+      core: '#ff5060', // Hot inner core — hot rose-red (plasma-hot)
+    },
   },
 
   // 🔵 NEBULA 2 (TEAL / BLUE) — Independent Configuration
@@ -99,10 +106,17 @@ export const NEBULA_CONFIG = {
     brightness: 2.8,
     dustStrength: 0.35,
     pillarStrength: 0.50,
-    maskRadius: 0.35,
+    maskRadius: 0.42,
     edgeWarp: 0.40,
-    coreRadius: 0.20,
+    coreRadius: 0.25,
     alpha: 0.88,
+    // 🎨 Color Palette (experiment freely!)
+    colors: {
+      sii:  '#00a8e6', // Rich deep cyan-turquoise
+      ha:   '#081640', // Deep cosmic navy-cobalt
+      oiii: '#3b008f', // Deep royal violet gas depth
+      core: '#00b8e6', // Rich deep electric cyan core
+    },
   },
 
   // Locked Baseline Guard
