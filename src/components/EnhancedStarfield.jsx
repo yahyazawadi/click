@@ -15,6 +15,7 @@ const StarfieldShaderMaterial = {
     attribute vec3 aColor;
     attribute float aPhase;
     attribute float aSpeed;
+    attribute float aFlickerDepth;
 
     varying vec3 vColor;
     varying float vTwinkle;
@@ -29,15 +30,17 @@ const StarfieldShaderMaterial = {
       float wave2 = cos(uTime * aSpeed * 0.731 + aPhase * 1.618);
       float wave3 = sin(uTime * aSpeed * 1.370 + aPhase * 0.420);
 
-      // Smooth flickering range between 0.35 and 1.0
-      float twinkle = 0.5 + 0.3 * wave1 + 0.15 * wave2 + 0.05 * wave3;
-      vTwinkle = clamp(twinkle, 0.35, 1.0);
+      // Base wave between 0.25 and 1.0
+      float rawWave = 0.5 + 0.32 * wave1 + 0.13 * wave2 + 0.05 * wave3;
+
+      // Apply per-tier flickering depth (medium stars flicker noticeably, hero stars stay stable)
+      vTwinkle = clamp(1.0 - aFlickerDepth * (1.0 - rawWave), 0.25, 1.0);
 
       vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
       gl_Position = projectionMatrix * mvPosition;
 
-      // Significantly smaller star sizes with camera distance attenuation
-      float dynamicSize = aSize * uSizeFactor * (0.85 + 0.25 * vTwinkle);
+      // Star size attenuation with subtle size pulse tied to twinkle
+      float dynamicSize = aSize * uSizeFactor * (0.88 + 0.22 * vTwinkle);
       gl_PointSize = dynamicSize * (220.0 / -mvPosition.z);
     }
   `,
@@ -82,12 +85,13 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
   const materialRef = useRef();
 
   // Generate Geometry Attributes once per count/radius/depth configuration
-  const { positions, sizes, colors, phases, speeds } = useMemo(() => {
+  const { positions, sizes, colors, phases, speeds, flickerDepths } = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
     const colors = new Float32Array(count * 3);
     const phases = new Float32Array(count);
     const speeds = new Float32Array(count);
+    const flickerDepths = new Float32Array(count);
 
     // Stellar classification color palettes
     const cyan = new THREE.Color('#00f0ff');
@@ -107,17 +111,20 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
 
-      // 2. Significantly Smaller Multi-Tier Sizes
+      // 2. Multi-Tier Sizes and Specific Flicker Depths
       const sizeRand = Math.random();
       if (sizeRand < 0.72) {
-        // Micro background dust (0.8px - 1.8px)
+        // Micro background dust (0.8px - 1.8px) -> Moderate subtle flicker
         sizes[i] = (0.8 + Math.random() * 1.0) * (factor / 4);
+        flickerDepths[i] = 0.55;
       } else if (sizeRand < 0.94) {
-        // Medium stars (2.0px - 3.8px)
+        // Medium stars (2.0px - 3.8px) -> Noticeable, lively flicker for laptop visibility
         sizes[i] = (2.0 + Math.random() * 1.8) * (factor / 4);
+        flickerDepths[i] = 0.85;
       } else {
-        // Subtle hero stars with 4-point flare (4.5px - 6.5px)
+        // Hero stars with 4-point flare (4.5px - 6.5px) -> Majestic, stable (minimal flicker)
         sizes[i] = (4.5 + Math.random() * 2.0) * (factor / 4);
+        flickerDepths[i] = 0.25;
       }
 
       // 3. Stellar Classification Color Distribution
@@ -142,7 +149,7 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
       speeds[i] = 0.8 + Math.random() * 2.2;
     }
 
-    return { positions, sizes, colors, phases, speeds };
+    return { positions, sizes, colors, phases, speeds, flickerDepths };
   }, [count, radius, depth, factor]);
 
   // Zero-CPU overhead: Update GPU time uniform in frame loop
@@ -160,6 +167,7 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
         <bufferAttribute attach="attributes-aColor" count={count} array={colors} itemSize={3} />
         <bufferAttribute attach="attributes-aPhase" count={count} array={phases} itemSize={1} />
         <bufferAttribute attach="attributes-aSpeed" count={count} array={speeds} itemSize={1} />
+        <bufferAttribute attach="attributes-aFlickerDepth" count={count} array={flickerDepths} itemSize={1} />
       </bufferGeometry>
       <shaderMaterial
         ref={materialRef}
