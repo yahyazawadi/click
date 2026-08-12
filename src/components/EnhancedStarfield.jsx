@@ -30,17 +30,17 @@ const StarfieldShaderMaterial = {
       float wave2 = cos(uTime * aSpeed * 0.731 + aPhase * 1.618);
       float wave3 = sin(uTime * aSpeed * 1.370 + aPhase * 0.420);
 
-      // Base wave between 0.25 and 1.0
-      float rawWave = 0.5 + 0.32 * wave1 + 0.13 * wave2 + 0.05 * wave3;
+      // Base wave between 0.15 and 1.0
+      float rawWave = 0.5 + 0.35 * wave1 + 0.15 * wave2 + 0.05 * wave3;
 
-      // Apply per-tier flickering depth (medium stars flicker noticeably, hero stars stay stable)
-      vTwinkle = clamp(1.0 - aFlickerDepth * (1.0 - rawWave), 0.25, 1.0);
+      // Apply per-tier flickering depth
+      vTwinkle = clamp(1.0 - aFlickerDepth * (1.0 - rawWave), 0.15, 1.0);
 
       vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
       gl_Position = projectionMatrix * mvPosition;
 
-      // Star size attenuation with subtle size pulse tied to twinkle
-      float dynamicSize = aSize * uSizeFactor * (0.88 + 0.22 * vTwinkle);
+      // Star size attenuation with pronounced size pulse tied to twinkle
+      float dynamicSize = aSize * uSizeFactor * (0.80 + 0.35 * vTwinkle);
       gl_PointSize = dynamicSize * (220.0 / -mvPosition.z);
     }
   `,
@@ -74,7 +74,7 @@ const StarfieldShaderMaterial = {
       float shimmer = (vTwinkle - 0.35) * 0.25;
       vec3 starColor = mix(vColor, hotWhite, clamp(coreMask * 0.85 + shimmer + fourPointCross * 0.3, 0.0, 1.0));
 
-      float finalAlpha = starShape * (0.35 + 0.65 * vTwinkle);
+      float finalAlpha = starShape * (0.25 + 0.75 * vTwinkle);
 
       gl_FragColor = vec4(starColor, finalAlpha);
     }
@@ -111,20 +111,23 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
 
-      // 2. Multi-Tier Sizes and Specific Flicker Depths
+      // 2. Multi-Tier Sizes and Specific Flicker Depths & Speeds
       const sizeRand = Math.random();
       if (sizeRand < 0.72) {
         // Micro background dust (0.8px - 1.8px) -> Moderate subtle flicker
         sizes[i] = (0.8 + Math.random() * 1.0) * (factor / 4);
         flickerDepths[i] = 0.55;
+        speeds[i] = 0.8 + Math.random() * 1.8;
       } else if (sizeRand < 0.94) {
-        // Medium stars (2.0px - 3.8px) -> Noticeable, lively flicker for laptop visibility
+        // Medium stars (2.0px - 3.8px) -> Vibrant, pronounced twinkle for desktop visibility!
         sizes[i] = (2.0 + Math.random() * 1.8) * (factor / 4);
-        flickerDepths[i] = 0.85;
+        flickerDepths[i] = 1.0; // Max twinkling range
+        speeds[i] = 1.6 + Math.random() * 2.8; // Faster, livelier speed
       } else {
         // Hero stars with 4-point flare (4.5px - 6.5px) -> Majestic, stable (minimal flicker)
         sizes[i] = (4.5 + Math.random() * 2.0) * (factor / 4);
         flickerDepths[i] = 0.25;
+        speeds[i] = 0.5 + Math.random() * 1.0;
       }
 
       // 3. Stellar Classification Color Distribution
@@ -146,7 +149,6 @@ export function EnhancedStarfield({ count = 1200, radius = 100, depth = 50, fact
 
       // 4. Asynchronous Flickering Seeds
       phases[i] = Math.random() * 100.0;
-      speeds[i] = 0.8 + Math.random() * 2.2;
     }
 
     return { positions, sizes, colors, phases, speeds, flickerDepths };
