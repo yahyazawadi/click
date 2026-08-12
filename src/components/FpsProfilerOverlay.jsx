@@ -38,6 +38,10 @@ export function FpsProfilerOverlay({
   const [activeNebulaTab, setActiveNebulaTab] = useState('nebula1');
   const [, setRerender] = useState(0);
 
+  // Copy / Paste notification states
+  const [copiedStatus, setCopiedStatus] = useState(false);
+  const [pastedStatus, setPastedStatus] = useState(false);
+
   // Undo / Redo history stacks
   const [historyStack, setHistoryStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
