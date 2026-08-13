@@ -7,27 +7,25 @@ export function SculptedHeartPlanet({ color, size, isMobile, perfTierFloat = 0.0
   const meshRef = useRef();
   const shaderMatRef = useRef();
 
-  // Create perfectly symmetric, upright 3D heart shape
+  // Create smooth extruded 3D heart shape
   const heartGeometry = useMemo(() => {
     const shape = new THREE.Shape();
     
-    // Pristine upright 2D heart contour centered at origin
-    shape.moveTo(0, -0.6);
-    // Left cheek / lobe
-    shape.bezierCurveTo(-0.65, -0.25, -0.7, 0.45, -0.36, 0.58);
-    shape.bezierCurveTo(-0.16, 0.66, 0, 0.42, 0, 0.22);
-    // Right cheek / lobe
-    shape.bezierCurveTo(0, 0.42, 0.16, 0.66, 0.36, 0.58);
-    shape.bezierCurveTo(0.7, 0.45, 0.65, -0.25, 0, -0.6);
+    // Perfect symmetrical 2D heart shape definition
+    shape.moveTo(0, 0.25);
+    shape.bezierCurveTo(0, 0.45, -0.6, 0.75, -0.6, 0.25);
+    shape.bezierCurveTo(-0.6, -0.15, -0.2, -0.45, 0, -0.75);
+    shape.bezierCurveTo(0.2, -0.45, 0.6, -0.15, 0.6, 0.25);
+    shape.bezierCurveTo(0.6, 0.75, 0, 0.45, 0, 0.25);
 
     const extrudeSettings = {
-      steps: 3,
-      depth: 0.35,
+      steps: 2,
+      depth: 0.3,
       bevelEnabled: true,
       bevelThickness: 0.12,
-      bevelSize: 0.09,
+      bevelSize: 0.1,
       bevelOffset: 0,
-      bevelSegments: isMobile ? 4 : 10,
+      bevelSegments: isMobile ? 4 : 8,
     };
 
     const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -44,13 +42,13 @@ export function SculptedHeartPlanet({ color, size, isMobile, perfTierFloat = 0.0
     }
 
     if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.35;
-      meshRef.current.position.y = Math.sin(t * 1.5) * 0.06;
+      meshRef.current.rotation.y += delta * 0.4;
+      meshRef.current.position.y = Math.sin(t * 1.5) * 0.08;
     }
   });
 
   return (
-    <group scale={size * 1.6}>
+    <group scale={size * 1.2}>
       <mesh ref={meshRef} geometry={heartGeometry}>
         <heartPlanetShaderMaterial ref={shaderMatRef} transparent depthWrite={true} />
       </mesh>

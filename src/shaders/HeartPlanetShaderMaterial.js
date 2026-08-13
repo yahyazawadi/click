@@ -91,46 +91,41 @@ export const HeartPlanetShaderMaterial = shaderMaterial(
     }
 
     void main() {
-      vec3 pos = vPosition;
-      vec3 normPos = normalize(vPosition);
+      vec3 pos = normalize(vPosition);
       float t = uTime * 0.15;
 
       // Domain warping for organic river flow
-      vec3 q = vec3(fbm(pos * 2.5 + vec3(0.0, t, 0.0)),
-                    fbm(pos * 2.5 + vec3(5.2, 1.3, t * 0.8)),
-                    fbm(pos * 2.5 + vec3(1.7, 9.2, 0.4)));
+      vec3 q = vec3(fbm(pos * 3.0 + vec3(0.0, t, 0.0)),
+                    fbm(pos * 3.0 + vec3(5.2, 1.3, t * 0.8)),
+                    fbm(pos * 3.0 + vec3(1.7, 9.2, 0.4)));
 
-      vec3 r = vec3(fbm(pos * 4.0 + 4.0 * q + vec3(1.7, 9.2, t * 1.2)),
-                    fbm(pos * 4.0 + 4.0 * q + vec3(8.3, 2.8, 0.0)),
-                    fbm(pos * 4.0 + 4.0 * q + vec3(3.1, 0.4, t * 0.5)));
+      vec3 r = vec3(fbm(pos * 5.0 + 4.0 * q + vec3(1.7, 9.2, t * 1.2)),
+                    fbm(pos * 5.0 + 4.0 * q + vec3(8.3, 2.8, 0.0)),
+                    fbm(pos * 5.0 + 4.0 * q + vec3(3.1, 0.4, t * 0.5)));
 
-      float riverValue = fbm(pos * 3.5 + 3.0 * r);
+      float riverValue = fbm(pos * 4.0 + 3.0 * r);
       
       // Carve out narrow glowing river channels
       float rivers = smoothstep(0.12, 0.01, abs(riverValue - 0.1));
 
-      // Front hemisphere Heart Basin check (for sphere)
-      vec2 uvHeart = vec2(atan(normPos.x, normPos.z) / 3.14159, normPos.y);
-      uvHeart.y *= 1.25;
-      uvHeart.y += 0.05;
-      float dHeart = heartSDF(uvHeart * 2.2);
-      float heartMask = smoothstep(0.08, -0.15, dHeart);
-
-      // Base terrain mix
+      // Base terrain mix with organic 3D FBM noise
       vec3 col = mix(uDeepVoid, uTerrain, fbm(pos * 2.5 + q) * 0.5 + 0.5);
 
-      // Add violet & pink glowing rivers
+      // Add bioluminescent violet (#9F477E) & rose coral (#CD6973) glowing rivers
       float riverPulse = sin(uTime * 2.0 + riverValue * 10.0) * 0.25 + 0.75;
       vec3 riverColor = mix(uRiverViolet, uRiverPink, sin(riverValue * 12.0 + uTime) * 0.5 + 0.5);
       
-      // Inject river energy
-      col = mix(col, riverColor * 1.8 * riverPulse, rivers);
-      col = mix(col, uCorePink * 2.2, heartMask * 0.65 * (0.8 + 0.2 * sin(uTime * 3.0)));
+      // Inject glowing river energy across surface
+      col = mix(col, riverColor * 2.0 * riverPulse, rivers);
 
-      // Fresnel Atmospheric Glow
+      // Add subtle warm core glow from within
+      float centerGlow = pow(max(0.0, 1.0 - length(pos.xy * 0.7)), 2.0);
+      col += uCorePink * centerGlow * 0.4 * (0.8 + 0.2 * sin(uTime * 2.5));
+
+      // Fresnel Atmospheric Corona Glow
       vec3 viewDir = normalize(cameraPosition - vWorldPosition);
       float fresnel = pow(1.0 - max(0.0, dot(vWorldNormal, viewDir)), 3.0);
-      col += uAtmosphere * fresnel * 1.6;
+      col += uAtmosphere * fresnel * 1.8;
 
       gl_FragColor = vec4(col, 1.0);
     }
