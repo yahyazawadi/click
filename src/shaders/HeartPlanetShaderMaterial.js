@@ -91,25 +91,26 @@ export const HeartPlanetShaderMaterial = shaderMaterial(
     }
 
     void main() {
-      vec3 pos = normalize(vPosition);
+      vec3 pos = vPosition;
+      vec3 normPos = normalize(vPosition);
       float t = uTime * 0.15;
 
       // Domain warping for organic river flow
-      vec3 q = vec3(fbm(pos * 3.0 + vec3(0.0, t, 0.0)),
-                    fbm(pos * 3.0 + vec3(5.2, 1.3, t * 0.8)),
-                    fbm(pos * 3.0 + vec3(1.7, 9.2, 0.4)));
+      vec3 q = vec3(fbm(pos * 2.5 + vec3(0.0, t, 0.0)),
+                    fbm(pos * 2.5 + vec3(5.2, 1.3, t * 0.8)),
+                    fbm(pos * 2.5 + vec3(1.7, 9.2, 0.4)));
 
-      vec3 r = vec3(fbm(pos * 5.0 + 4.0 * q + vec3(1.7, 9.2, t * 1.2)),
-                    fbm(pos * 5.0 + 4.0 * q + vec3(8.3, 2.8, 0.0)),
-                    fbm(pos * 5.0 + 4.0 * q + vec3(3.1, 0.4, t * 0.5)));
+      vec3 r = vec3(fbm(pos * 4.0 + 4.0 * q + vec3(1.7, 9.2, t * 1.2)),
+                    fbm(pos * 4.0 + 4.0 * q + vec3(8.3, 2.8, 0.0)),
+                    fbm(pos * 4.0 + 4.0 * q + vec3(3.1, 0.4, t * 0.5)));
 
-      float riverValue = fbm(pos * 4.0 + 3.0 * r);
+      float riverValue = fbm(pos * 3.5 + 3.0 * r);
       
       // Carve out narrow glowing river channels
       float rivers = smoothstep(0.12, 0.01, abs(riverValue - 0.1));
 
-      // Front hemisphere Heart Basin check
-      vec2 uvHeart = vec2(atan(pos.x, pos.z) / 3.14159, pos.y);
+      // Front hemisphere Heart Basin check (for sphere)
+      vec2 uvHeart = vec2(atan(normPos.x, normPos.z) / 3.14159, normPos.y);
       uvHeart.y *= 1.25;
       uvHeart.y += 0.05;
       float dHeart = heartSDF(uvHeart * 2.2);
