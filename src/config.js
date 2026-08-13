@@ -65,7 +65,7 @@ export const SECRET_LOVE_PROJECTS = [
     id: 'proj-heart-1',
     title: 'FOR MY FAVORITE PERSON',
     ringIndex: 0,
-    shapeIndex: 'heart-rivers',
+    shapeIndex: 'flower',
     startAngle: 1.2,
     size: 0.65,
     color: '#CD6973',
