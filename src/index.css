@@ -415,6 +415,13 @@ html, body, #root {
   letter-spacing: 0.01em;
 }
 
+.detail-drawer.secret-love-theme .drawer-desc b,
+.detail-drawer.secret-love-theme .drawer-desc strong {
+  font-weight: 700;
+  color: #CD6973;
+  text-shadow: 0 0 10px rgba(205, 105, 115, 0.4);
+}
+
 .detail-drawer.secret-love-theme .specs-box {
   background: rgba(159, 71, 126, 0.15);
   border: 1px solid rgba(205, 105, 115, 0.35);

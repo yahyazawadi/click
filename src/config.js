@@ -89,7 +89,7 @@ export const SECRET_LOVE_PROJECTS = [
     color: '#9F477E',
     category: 'SECRET WORLD // JUST FOR YOU',
     shortDesc: 'A glowing 3D heart floating in orbit, dedicated to the prettiest girl in the world.',
-    fullDesc: 'You have the softest, most caring heart and a smile that lights up any space. Thank you for being you, for caring so deeply, and for making my life so incredibly complete. You are loved beyond measure.',
+    fullDesc: 'You have the softest, most caring heart and a smile that lights up <b>my space</b>. Thank you for being you, for caring so deeply, and for making my life so incredibly complete. You are loved beyond measure.',
     tags: ['ALWAYS & FOREVER', 'SO PRETTY', 'WARM & CARING', 'SPECIAL EASTER EGG'],
     specs: [
       'Smile: Brightest Light in My Universe',

@@ -76,7 +76,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
           <>
             <span className="drawer-tag">{selectedProject.category || '[ PROJECT TRANSMISSION ]'}</span>
             <h2 className="drawer-title">{selectedProject.title}</h2>
-            <p className="drawer-desc">{selectedProject.fullDesc || selectedProject.shortDesc}</p>
+            <p className="drawer-desc" dangerouslySetInnerHTML={{ __html: selectedProject.fullDesc || selectedProject.shortDesc }} />
 
             <div className="specs-box">
               <span className="specs-header">// SPECIFICATIONS & ARCHITECTURE</span>
