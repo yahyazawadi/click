@@ -76,24 +76,24 @@ export function FlowerPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
           <heartPlanetShaderMaterial ref={shaderMatRef} transparent depthWrite={true} />
         </mesh>
 
-        {/* Soft Rose Coral Central Flower Core (#CD6973) */}
+        {/* Balanced Golden Yellow Central Flower Receptacle Button */}
         <mesh position={[0, 0, 0.07]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[planetRadius * 0.35, planetRadius * 0.35, 0.52, 32]} />
           <meshStandardMaterial
-            color="#CD6973"
-            emissive="#9F477E"
-            emissiveIntensity={0.5}
-            roughness={0.25}
-            metalness={0.4}
+            color="#FFC837"
+            emissive="#FF8000"
+            emissiveIntensity={0.55}
+            roughness={0.35}
+            metalness={0.2}
           />
         </mesh>
       </group>
 
-      {/* Floating Stardust Ring (#D2ADAC) */}
+      {/* Floating Stardust Ring */}
       <mesh ref={ringRef} rotation={[Math.PI / 3, 0, 0]}>
         <ringGeometry args={[planetRadius * 1.3, planetRadius * 1.65, 64]} />
         <meshBasicMaterial
-          color="#D2ADAC"
+          color="#CD6973"
           side={THREE.DoubleSide}
           transparent
           opacity={0.4}

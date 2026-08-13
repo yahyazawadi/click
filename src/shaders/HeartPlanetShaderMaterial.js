@@ -9,9 +9,9 @@ export const HeartPlanetShaderMaterial = shaderMaterial(
     uDeepVoid:    new THREE.Color('#16061a'), // Dark Cosmic Mauve Shadow
     uTerrain:     new THREE.Color('#38122c'), // Deep Berry Continent Base
     uRiverViolet: new THREE.Color('#9F477E'), // Rich Berry Mauve River (#9F477E)
-    uRiverPink:   new THREE.Color('#D2ADAC'), // Soft Dusty Rose Glow (#D2ADAC)
+    uRiverPink:   new THREE.Color('#CD6973'), // Soft Rose Coral Glow (#CD6973)
     uCorePink:    new THREE.Color('#e88a94'), // Glowing Heart Core Highlight
-    uAtmosphere:  new THREE.Color('#D2ADAC'), // Soft Dusty Rose Outer Rim (#D2ADAC)
+    uAtmosphere:  new THREE.Color('#CD6973'), // Rose Fresnel Rim Glow
   },
 
   // ── Vertex Shader ──────────────────────────────────────────────────────────

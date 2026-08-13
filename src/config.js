@@ -68,7 +68,7 @@ export const SECRET_LOVE_PROJECTS = [
     shapeIndex: 'flower',
     startAngle: 1.2,
     size: 0.65,
-    color: '#D2ADAC',
+    color: '#CD6973',
     category: 'SECRET WORLD // JUST FOR YOU',
     shortDesc: 'A world created for the most caring, gentle, and remarkably beautiful person in the universe.',
     fullDesc: 'No matter what challenges or storms come our way, we will pass every single struggle together, side-by-side. You bring so much strength, warmth, and comfort into my life. Hand in hand, there is nothing in this universe we cannot overcome together. I love you more than words can express.',
