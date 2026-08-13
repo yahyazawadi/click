@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { SYSTEM_CONFIG, NEBULA_CONFIG } from './config';
+import { SYSTEM_CONFIG, NEBULA_CONFIG, SECRET_LOVE_PROJECTS } from './config';
 import { CosmicBackground } from './components/CosmicBackground';
 import { SystemCore } from './components/SystemCore';
 import { OrbitalPath } from './components/OrbitalPath';
@@ -188,6 +188,21 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   // Manual override lock — once user clicks a tier manually, NEVER auto-demote!
   const [isTierManuallyLocked, setIsTierManuallyLocked] = useState(false);
 
+  // Secret URL trigger detection (?love or #love or /love)
+  const [isLoveMode, setIsLoveMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const s = (window.location.search || '').toLowerCase();
+    const h = (window.location.hash || '').toLowerCase();
+    const p = (window.location.pathname || '').toLowerCase();
+    return s.includes('love') || h.includes('love') || p.includes('love');
+  });
+
+  const activeProjects = React.useMemo(() => {
+    return isLoveMode
+      ? [...SYSTEM_CONFIG.projects, ...SECRET_LOVE_PROJECTS]
+      : SYSTEM_CONFIG.projects;
+  }, [isLoveMode]);
+
   // Telemetry profiler overlay visibility (open via clicking FPS badge or pressing ~)
   const [isProfilerOpen, setIsProfilerOpen] = useState(() => {
     return typeof window !== 'undefined' && 
@@ -231,8 +246,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
 
   const handleUnlockNext = () => {
     setUnlockedCount((prev) => {
-      const nextCount = Math.min(SYSTEM_CONFIG.projects.length, prev + 1);
-      const unlockedProject = SYSTEM_CONFIG.projects[nextCount - 1];
+      const nextCount = Math.min(activeProjects.length, prev + 1);
+      const unlockedProject = activeProjects[nextCount - 1];
       if (unlockedProject) {
         fpsLogger.logUnlock({ planetId: unlockedProject.id, unlockedCount: nextCount });
       }
@@ -250,8 +265,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Total indices = 1 (Overview) + 1 (Core) + 8 Projects = 10 total positions
-  const totalIndices = 2 + SYSTEM_CONFIG.projects.length;
+  // Total indices = 1 (Overview) + 1 (Core) + Projects = Total positions
+  const totalIndices = 2 + activeProjects.length;
 
   // Sync scroll index change from Lenis / Wheel
   // Index 0: Overview Orbit
@@ -264,7 +279,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     } else if (index === 1) {
       setSelectedTarget('core');
     } else {
-      const proj = SYSTEM_CONFIG.projects[index - 2];
+      const proj = activeProjects[index - 2];
       if (proj) {
         setSelectedTarget(proj.id);
       }
@@ -362,14 +377,14 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   // Randomly select 1 or 2 planet titles to display every few seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      const allIds = SYSTEM_CONFIG.projects.map(p => p.id);
+      const allIds = activeProjects.map(p => p.id);
       const numTitles = Math.floor(Math.random() * 2) + 1;
       const shuffled = allIds.sort(() => 0.5 - Math.random());
       setActiveTitles(shuffled.slice(0, numTitles));
     }, 4500);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [activeProjects]);
 
   // Detect manual dragging to break focus ON RELEASE
   useEffect(() => {
@@ -430,7 +445,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     } else {
       fpsLogger.logInteraction({ type: 'SELECT_PLANET', target: id, details: {} });
       setSelectedTarget(id);
-      const index = SYSTEM_CONFIG.projects.findIndex((p) => p.id === id);
+      const index = activeProjects.findIndex((p) => p.id === id);
       if (index !== -1) {
         scrollToPlanetIndex(index + 2); // Index 0 = Overview, Index 1 = Core, Projects start at Index 2
       }
@@ -443,7 +458,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     scrollToPlanetIndex(0);
   };
 
-  const selectedProject = SYSTEM_CONFIG.projects.find((p) => p.id === selectedTarget);
+  const selectedProject = activeProjects.find((p) => p.id === selectedTarget);
 
   return (
     <LenisScrollProvider onIndexChange={handleScrollIndexChange} totalIndices={totalIndices}>
@@ -494,10 +509,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 ))}
 
                 {/* Orbiting Project Planets — Progressively Unlocked as FPS Stabilizes */}
-                {SYSTEM_CONFIG.projects.map((proj, idx) => {
+                {activeProjects.map((proj, idx) => {
                   const ring = SYSTEM_CONFIG.rings[proj.ringIndex];
                   // Priority 1: Initial planets start unlocked immediately from frame 1
-                  const isPriorityPlanet = idx < 2;
+                  const isPriorityPlanet = idx < 2 || proj.id.includes('heart');
                   const isUnlocked = isPriorityPlanet || idx < unlockedCount;
 
                   return (

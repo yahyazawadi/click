@@ -60,6 +60,45 @@ export const SYSTEM_CONFIG = {
   ]
 };
 
+export const SECRET_LOVE_PROJECTS = [
+  {
+    id: 'proj-heart-1',
+    title: 'PLANET ROSA // PINK RIVERS',
+    ringIndex: 0,
+    shapeIndex: 'heart-rivers',
+    startAngle: 1.2,
+    size: 0.65,
+    color: '#FF2A85',
+    category: 'SECRET WORLD // FOR HER',
+    shortDesc: 'A celestial world wrapped in glowing bioluminescent pink and violet rivers of light.',
+    fullDesc: 'Created specifically as a special easter egg. Glowing energy channels flow across deep cosmic purple landmasses, converging into a luminescent heart basin.',
+    tags: ['FOR YOU', 'GLSL SHADER', 'PINK RIVERS', 'SECRET WORLD'],
+    specs: [
+      'Surface: Bioluminescent Pink & Violet Rivers',
+      'Basin: Luminescent Heart Sea',
+      'Aura: Violet Fresnel Corona'
+    ]
+  },
+  {
+    id: 'proj-heart-2',
+    title: 'PLANET VALENTINA // 3D HEART',
+    ringIndex: 2,
+    shapeIndex: 'heart-sculpted',
+    startAngle: 3.5,
+    size: 0.65,
+    color: '#E056FD',
+    category: 'SECRET WORLD // FOR HER',
+    shortDesc: 'A sculpted 3D heart planet floating in cosmic orbit with a soft stardust aura.',
+    fullDesc: 'Extruded smooth 3D heart shape with soft bevels, glowing magenta atmosphere, and floating cosmic stardust.',
+    tags: ['FOR YOU', '3D HEART', 'CELESTIAL', 'SECRET WORLD'],
+    specs: [
+      'Core: 3D Beveled Heart',
+      'Atmosphere: Magenta/Violet Glow',
+      'Orbit: Gyroscopic Trajectory'
+    ]
+  }
+];
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  CENTRAL NEBULA CONFIGURATION & PRESETS
 //  Single source of truth for all nebula path selections & state locks.
