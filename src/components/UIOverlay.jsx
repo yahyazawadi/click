@@ -5,6 +5,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
   const isCore = selectedTarget === 'core';
   const isProject = Boolean(selectedProject);
   const isOpen = isCore || isProject;
+  const isSecretLove = Boolean(selectedProject?.id?.includes('heart'));
 
   const targetFps = isMobile ? 30 : 45;
   const isFpsStable = currentFps >= targetFps;
@@ -50,7 +51,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
       )}
 
       {/* Slide-over Detail Drawer */}
-      <div className={`detail-drawer ${isOpen ? 'open' : ''}`}>
+      <div className={`detail-drawer ${isOpen ? 'open' : ''} ${isSecretLove ? 'secret-love-theme' : ''}`}>
         {isCore && (
           <>
             <span className="drawer-tag">[ SYSTEM CORE // ABOUT ]</span>

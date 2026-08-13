@@ -63,38 +63,38 @@ export const SYSTEM_CONFIG = {
 export const SECRET_LOVE_PROJECTS = [
   {
     id: 'proj-heart-1',
-    title: 'PLANET ROSA // PINK RIVERS',
+    title: 'FOR MY FAVORITE PERSON',
     ringIndex: 0,
     shapeIndex: 'heart-rivers',
     startAngle: 1.2,
     size: 0.65,
     color: '#CD6973',
-    category: 'SECRET WORLD // FOR HER',
-    shortDesc: 'A celestial world wrapped in glowing bioluminescent pink and violet rivers of light.',
-    fullDesc: 'Created specifically as a special easter egg. Glowing energy channels flow across deep cosmic purple landmasses, converging into a luminescent heart basin.',
-    tags: ['FOR YOU', 'GLSL SHADER', 'PINK RIVERS', 'SECRET WORLD'],
+    category: 'SECRET WORLD // JUST FOR YOU',
+    shortDesc: 'A world created for the most caring, gentle, and remarkably beautiful person in the universe.',
+    fullDesc: 'Across every galaxy and infinite orbit, you bring so much warmth, comfort, and happiness into my world. Your caring soul, sweet laugh, and effortless beauty make every single day brighter. I love you more than words can express.',
+    tags: ['I LOVE YOU', 'SO CARING & KIND', 'PRETTIEST EVER', 'MY EVERYTHING'],
     specs: [
-      'Palette 1: Soft Rose Coral (#CD6973)',
-      'Palette 2: Rich Berry Mauve (#9F477E)',
-      'Surface: Bioluminescent Flowing Rivers'
+      'Heart: Caring, Gentle & Kind',
+      'Beauty: Truly Unmatched',
+      'Status: Forever My Favorite Person'
     ]
   },
   {
     id: 'proj-heart-2',
-    title: 'PLANET VALENTINA // 3D HEART',
+    title: 'YOU MEAN THE WORLD TO ME',
     ringIndex: 2,
     shapeIndex: 'heart-sculpted',
     startAngle: 3.5,
     size: 0.65,
     color: '#9F477E',
-    category: 'SECRET WORLD // FOR HER',
-    shortDesc: 'A sculpted 3D heart planet floating in cosmic orbit with a soft stardust aura.',
-    fullDesc: 'Extruded smooth 3D heart shape with soft bevels, glowing magenta atmosphere, and floating cosmic stardust.',
-    tags: ['FOR YOU', '3D HEART', 'CELESTIAL', 'SECRET WORLD'],
+    category: 'SECRET WORLD // JUST FOR YOU',
+    shortDesc: 'A glowing 3D heart floating in orbit, dedicated to the prettiest girl in the world.',
+    fullDesc: 'You have the softest, most caring heart and a smile that lights up any space. Thank you for being you, for caring so deeply, and for making my life so incredibly complete. You are loved beyond measure.',
+    tags: ['ALWAYS & FOREVER', 'SO PRETTY', 'WARM & CARING', 'SPECIAL EASTER EGG'],
     specs: [
-      'Palette 1: Rich Berry Mauve (#9F477E)',
-      'Palette 2: Soft Rose Coral (#CD6973)',
-      'Core: 3D Beveled Heart'
+      'Smile: Brightest Light in My Universe',
+      'Soul: Pure Joy & Warmth',
+      'My Promise: Loving You Always'
     ]
   }
 ];
