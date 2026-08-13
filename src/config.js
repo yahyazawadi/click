@@ -71,11 +71,11 @@ export const SECRET_LOVE_PROJECTS = [
     color: '#CD6973',
     category: 'SECRET WORLD // JUST FOR YOU',
     shortDesc: 'A world created for the most caring, gentle, and remarkably beautiful person in the universe.',
-    fullDesc: 'Across every galaxy and infinite orbit, you bring so much warmth, comfort, and happiness into my world. Your caring soul, sweet laugh, and effortless beauty make every single day brighter. I love you more than words can express.',
-    tags: ['I LOVE YOU', 'SO CARING & KIND', 'PRETTIEST EVER', 'MY EVERYTHING'],
+    fullDesc: 'No matter what challenges or storms come our way, we will pass every single struggle together, side-by-side. You bring so much strength, warmth, and comfort into my life. Hand in hand, there is nothing in this universe we cannot overcome together. I love you more than words can express.',
+    tags: ['TOGETHER FOREVER', 'HAND IN HAND', 'SO CARING & KIND', 'MY EVERYTHING'],
     specs: [
+      'Promise: Passing Every Struggle Together',
       'Heart: Caring, Gentle & Kind',
-      'Beauty: Truly Unmatched',
       'Status: Forever My Favorite Flower'
     ]
   },
@@ -89,12 +89,12 @@ export const SECRET_LOVE_PROJECTS = [
     color: '#9F477E',
     category: 'SECRET WORLD // JUST FOR YOU',
     shortDesc: 'A glowing 3D heart floating in orbit, dedicated to the prettiest girl in the world.',
-    fullDesc: 'You have the softest, most caring heart and a smile that lights up <b>my space</b>. Thank you for being you, for caring so deeply, and for making my life so incredibly complete. You are loved beyond measure.',
-    tags: ['ALWAYS & FOREVER', 'SO PRETTY', 'WARM & CARING', 'SPECIAL EASTER EGG'],
+    fullDesc: 'You have the softest, most caring heart and a smile that lights up <b>my space</b>. Together, we will rise above every hardship and pass every struggle as one. Thank you for caring so deeply and making my life complete. You are loved endlessly, always & forever.',
+    tags: ['ALWAYS & FOREVER', 'STRONG TOGETHER', 'WARM & CARING', 'SPECIAL EASTER EGG'],
     specs: [
       'Smile: Brightest Light in My Universe',
-      'Soul: Pure Joy & Warmth',
-      'My Promise: Loving You Always'
+      'Promise: Standing Strong Side-by-Side',
+      'My Heart: Yours Forever'
     ]
   }
 ];
