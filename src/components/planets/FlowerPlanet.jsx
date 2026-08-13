@@ -76,9 +76,9 @@ export function FlowerPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
           <heartPlanetShaderMaterial ref={shaderMatRef} transparent depthWrite={true} />
         </mesh>
 
-        {/* Slightly Longer Golden Yellow Central Flower Receptacle Button */}
-        <mesh position={[0, 0, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[planetRadius * 0.35, planetRadius * 0.35, 0.62, 32]} />
+        {/* Balanced Golden Yellow Central Flower Receptacle Button */}
+        <mesh position={[0, 0, 0.07]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[planetRadius * 0.35, planetRadius * 0.35, 0.52, 32]} />
           <meshStandardMaterial
             color="#FFC837"
             emissive="#FF8000"
