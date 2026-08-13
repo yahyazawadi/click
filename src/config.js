@@ -63,7 +63,7 @@ export const SYSTEM_CONFIG = {
 export const SECRET_LOVE_PROJECTS = [
   {
     id: 'proj-heart-1',
-    title: 'FOR MY FAVORITE PERSON',
+    title: 'FOR MY FAVORITE FLOWER',
     ringIndex: 0,
     shapeIndex: 'flower',
     startAngle: 1.2,
@@ -76,7 +76,7 @@ export const SECRET_LOVE_PROJECTS = [
     specs: [
       'Heart: Caring, Gentle & Kind',
       'Beauty: Truly Unmatched',
-      'Status: Forever My Favorite Person'
+      'Status: Forever My Favorite Flower'
     ]
   },
   {
