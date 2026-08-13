@@ -197,6 +197,25 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     return s.includes('love') || h.includes('love') || p.includes('love');
   });
 
+  useEffect(() => {
+    const checkLovePath = () => {
+      if (typeof window === 'undefined') return;
+      const s = (window.location.search || '').toLowerCase();
+      const h = (window.location.hash || '').toLowerCase();
+      const p = (window.location.pathname || '').toLowerCase();
+      if (s.includes('love') || h.includes('love') || p.includes('love')) {
+        setIsLoveMode(true);
+      }
+    };
+    checkLovePath();
+    window.addEventListener('popstate', checkLovePath);
+    window.addEventListener('hashchange', checkLovePath);
+    return () => {
+      window.removeEventListener('popstate', checkLovePath);
+      window.removeEventListener('hashchange', checkLovePath);
+    };
+  }, []);
+
   const activeProjects = React.useMemo(() => {
     return isLoveMode
       ? [...SYSTEM_CONFIG.projects, ...SECRET_LOVE_PROJECTS]
