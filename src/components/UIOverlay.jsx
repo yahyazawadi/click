@@ -20,9 +20,6 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
           </div>
 
           <div className="top-right-hud">
-            <div className="header-status">
-              SYSTEM // {selectedTarget ? 'TARGET_ENGAGED' : 'MACRO_ORBIT'}
-            </div>
 
             <div 
               className="fps-hud-counter"
