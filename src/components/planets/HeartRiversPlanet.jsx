@@ -40,10 +40,10 @@ export function HeartRiversPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
       <mesh ref={ringRef} rotation={[Math.PI / 3, 0, 0]}>
         <ringGeometry args={[planetRadius * 1.3, planetRadius * 1.65, 64]} />
         <meshBasicMaterial
-          color="#ff44aa"
+          color="#CD6973"
           side={THREE.DoubleSide}
           transparent
-          opacity={0.35}
+          opacity={0.4}
           blending={THREE.AdditiveBlending}
         />
       </mesh>

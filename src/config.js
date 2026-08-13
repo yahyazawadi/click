@@ -68,15 +68,15 @@ export const SECRET_LOVE_PROJECTS = [
     shapeIndex: 'heart-rivers',
     startAngle: 1.2,
     size: 0.65,
-    color: '#FF2A85',
+    color: '#CD6973',
     category: 'SECRET WORLD // FOR HER',
     shortDesc: 'A celestial world wrapped in glowing bioluminescent pink and violet rivers of light.',
     fullDesc: 'Created specifically as a special easter egg. Glowing energy channels flow across deep cosmic purple landmasses, converging into a luminescent heart basin.',
     tags: ['FOR YOU', 'GLSL SHADER', 'PINK RIVERS', 'SECRET WORLD'],
     specs: [
-      'Surface: Bioluminescent Pink & Violet Rivers',
-      'Basin: Luminescent Heart Sea',
-      'Aura: Violet Fresnel Corona'
+      'Palette 1: Soft Rose Coral (#CD6973)',
+      'Palette 2: Rich Berry Mauve (#9F477E)',
+      'Surface: Bioluminescent Flowing Rivers'
     ]
   },
   {
@@ -86,15 +86,15 @@ export const SECRET_LOVE_PROJECTS = [
     shapeIndex: 'heart-sculpted',
     startAngle: 3.5,
     size: 0.65,
-    color: '#E056FD',
+    color: '#9F477E',
     category: 'SECRET WORLD // FOR HER',
     shortDesc: 'A sculpted 3D heart planet floating in cosmic orbit with a soft stardust aura.',
     fullDesc: 'Extruded smooth 3D heart shape with soft bevels, glowing magenta atmosphere, and floating cosmic stardust.',
     tags: ['FOR YOU', '3D HEART', 'CELESTIAL', 'SECRET WORLD'],
     specs: [
-      'Core: 3D Beveled Heart',
-      'Atmosphere: Magenta/Violet Glow',
-      'Orbit: Gyroscopic Trajectory'
+      'Palette 1: Rich Berry Mauve (#9F477E)',
+      'Palette 2: Soft Rose Coral (#CD6973)',
+      'Core: 3D Beveled Heart'
     ]
   }
 ];

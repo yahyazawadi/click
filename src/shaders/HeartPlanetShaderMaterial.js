@@ -6,12 +6,12 @@ export const HeartPlanetShaderMaterial = shaderMaterial(
   {
     uTime:        0,
     uPerfTier:    0.0,  // 0.0=high, 0.5=med, 1.0=low
-    uDeepVoid:    new THREE.Color('#100520'), // Dark Cosmic Indigo Terrain
-    uTerrain:     new THREE.Color('#250a3d'), // Deep Violet Continent Base
-    uRiverViolet: new THREE.Color('#8a2be2'), // Rich Electric Violet River
-    uRiverPink:   new THREE.Color('#ff2a85'), // Hot Magenta-Pink Bioluminescent Glow
-    uCorePink:    new THREE.Color('#ff85c0'), // Bright Rose Core Highlight
-    uAtmosphere:  new THREE.Color('#e056fd'), // Violet Fresnel Rim Glow
+    uDeepVoid:    new THREE.Color('#16061a'), // Dark Cosmic Mauve Shadow
+    uTerrain:     new THREE.Color('#38122c'), // Deep Berry Continent Base
+    uRiverViolet: new THREE.Color('#9F477E'), // Rich Berry Mauve River (#9F477E)
+    uRiverPink:   new THREE.Color('#CD6973'), // Soft Rose Coral Glow (#CD6973)
+    uCorePink:    new THREE.Color('#e88a94'), // Glowing Heart Core Highlight
+    uAtmosphere:  new THREE.Color('#CD6973'), // Rose Fresnel Rim Glow
   },
 
   // ── Vertex Shader ──────────────────────────────────────────────────────────
