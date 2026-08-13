@@ -118,10 +118,6 @@ export const HeartPlanetShaderMaterial = shaderMaterial(
       // Inject glowing river energy across surface
       col = mix(col, riverColor * 2.0 * riverPulse, rivers);
 
-      // Add subtle warm core glow from within
-      float centerGlow = pow(max(0.0, 1.0 - length(pos.xy * 0.7)), 2.0);
-      col += uCorePink * centerGlow * 0.4 * (0.8 + 0.2 * sin(uTime * 2.5));
-
       // Fresnel Atmospheric Corona Glow
       vec3 viewDir = normalize(cameraPosition - vWorldPosition);
       float fresnel = pow(1.0 - max(0.0, dot(vWorldNormal, viewDir)), 3.0);
