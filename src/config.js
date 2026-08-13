@@ -26,6 +26,11 @@ export const SYSTEM_CONFIG = {
       { label: 'STATUS', val: 'ONLINE // ACTIVE' },
       { label: 'DOMAIN', val: 'YAHYA.CLICK' },
       { label: 'FOCUS', val: 'FULLSTACK & SPATIAL' },
+    ],
+    meetLinks: [
+      { label: 'GITHUB', url: 'https://github.com/yahyazawadi' },
+      { label: 'LINKEDIN', url: 'https://linkedin.com/in/yahyazawadi' },
+      { label: 'EMAIL', url: 'mailto:hello@yahya.click' }
     ]
   },
 

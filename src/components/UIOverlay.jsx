@@ -15,7 +15,7 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
       <div className="ui-overlay">
         <header className="top-header">
           <div className="brand-box" onClick={onReturn}>
-            <div className="brand-dot"></div>
+            <img src="/favicon.svg" alt="Yahya Logo" style={{ width: '22px', height: '22px', marginRight: '10px' }} />
             <h1 className="brand-title">YAHYA.CLICK</h1>
           </div>
 
@@ -65,6 +65,44 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
                     <span style={{ color: 'var(--secondary-blue)' }}>{stat.label}</span>
                     <span style={{ color: 'var(--primary-cyan)', fontWeight: 600 }}>{stat.val}</span>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="specs-box" style={{ marginTop: '1rem' }}>
+              <span className="specs-header">// SECURE COMMS // MEET</span>
+              <div className="specs-list" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {SYSTEM_CONFIG.core.meetLinks?.map((link, idx) => (
+                  <a 
+                    key={idx} 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{
+                      flex: 1,
+                      textAlign: 'center',
+                      padding: '0.4rem',
+                      background: 'rgba(0, 186, 227, 0.1)',
+                      border: '1px solid rgba(0, 186, 227, 0.3)',
+                      color: 'var(--primary-cyan)',
+                      textDecoration: 'none',
+                      fontSize: '0.65rem',
+                      fontWeight: 'bold',
+                      borderRadius: '4px',
+                      transition: 'all 0.2s ease',
+                      minWidth: '30%'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = 'rgba(0, 186, 227, 0.3)';
+                      e.target.style.boxShadow = '0 0 10px rgba(0, 186, 227, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'rgba(0, 186, 227, 0.1)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  >
+                    [{link.label}]
+                  </a>
                 ))}
               </div>
             </div>
