@@ -76,21 +76,15 @@ export function FlowerPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
           <heartPlanetShaderMaterial ref={shaderMatRef} transparent depthWrite={true} />
         </mesh>
 
-        {/* Prominent Central Cylindrical Core (Protrudes clearly out from front & back) */}
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[planetRadius * 0.38, planetRadius * 0.38, 0.95, 32]} />
-          <heartPlanetShaderMaterial ref={shaderMatRef} transparent depthWrite={true} />
-        </mesh>
-
-        {/* Front Raised Cylindrical Cap / Button */}
-        <mesh position={[0, 0, 0.28]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[planetRadius * 0.42, planetRadius * 0.42, 0.18, 32]} />
+        {/* Short & Golden Yellow Central Flower Receptacle Button */}
+        <mesh position={[0, 0, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[planetRadius * 0.35, planetRadius * 0.35, 0.42, 32]} />
           <meshStandardMaterial
-            color="#CD6973"
-            emissive="#9F477E"
-            emissiveIntensity={0.6}
-            roughness={0.2}
-            metalness={0.8}
+            color="#FFC837"
+            emissive="#FF8000"
+            emissiveIntensity={0.55}
+            roughness={0.35}
+            metalness={0.2}
           />
         </mesh>
       </group>
