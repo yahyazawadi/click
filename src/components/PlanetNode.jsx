@@ -7,10 +7,14 @@ import {
   ScissorMoonPlanet,
   SculptedHeartPlanet,
   FlowerPlanet,
+  ClimamedixPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
-function ProceduralPlanetMesh({ type, color, size, isSelected, isMobile, perfTierFloat }) {
+function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMobile, perfTierFloat }) {
+  if (type === 'climamedix') {
+    return <ClimamedixPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
   if (type === 'flower' || type === 'heart-rivers' || type === 99) {
     return <FlowerPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }

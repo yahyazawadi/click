@@ -37,8 +37,27 @@ export const SYSTEM_CONFIG = {
     { id: 2, radius: 8.5, tiltX: 0.3, tiltY: -1.2, tiltZ: 0.9, speed: 0.05, color: '#003268' },
   ],
 
-  // 5. Planetary Projects Data (Expanded with 8 Orbital Nodes!)
+  // 5. Planetary Projects Data
   projects: [
+    {
+      id: 'proj-climamedix',
+      title: 'CLIMAMEDIX',
+      ringIndex: 0,
+      shapeIndex: 'climamedix',
+      startAngle: 2.1,
+      size: 0.62,
+      color: '#2D7A48',
+      category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
+      shortDesc: 'Geospatial epidemiological intelligence platform tracking climate change impacts on disease vectors.',
+      fullDesc: 'An epidemiological intelligence platform mapping climate change impacts on disease vectors, respiratory risks, and regional health dynamics. Built with Supabase PostgreSQL, geospatial data visualizers, and predictive telemetry.',
+      tags: ['FULL-STACK', 'POSTGRESQL', 'SUPABASE', 'GEOSPATIAL', 'EPIDEMIOLOGY', '3D WEBGL'],
+      specs: [
+        'Core: Geospatial Contagion & Vector Tracking',
+        'Database: Supabase PostgreSQL & Spatial Schemas',
+        'Telemetry: Real-Time Environmental Health Indices',
+        'Interface: Multi-Language Disease Intelligence'
+      ]
+    },
     {
       id: 'proj-10',
       title: 'SCISSOR WORLD',

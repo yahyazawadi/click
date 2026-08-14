@@ -3,6 +3,7 @@ import { ScissorMoonPlanet } from './ScissorMoonPlanet';
 import { HeartRiversPlanet } from './HeartRiversPlanet';
 import { SculptedHeartPlanet } from './SculptedHeartPlanet';
 import { FlowerPlanet } from './FlowerPlanet';
+import { ClimamedixPlanet } from './ClimamedixPlanet';
 
 export {
   ScissorPlanet,
@@ -10,4 +11,6 @@ export {
   HeartRiversPlanet,
   SculptedHeartPlanet,
   FlowerPlanet,
+  ClimamedixPlanet,
 };
+

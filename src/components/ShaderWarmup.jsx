@@ -22,17 +22,18 @@
 
 import { useEffect, useState } from 'react';
 import '../shaders/ScissorMoonShaderMaterial';
+import '../shaders/ClimamedixEarthShaderMaterial';
 
 export function ShaderWarmup({ perfTierFloat = 0.0 }) {
-  // step 0 = not started, 1 = ScissorMoon visible, 99 = done (removed)
+  // step 0 = not started, 1 = shaders visible, 99 = done (removed)
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     const timers = [
-      // 300ms: scene is rendered and stable → compile ScissorMoonShaderMaterial
+      // 300ms: scene is rendered and stable → compile shaders
       setTimeout(() => setStep(1), 300),
 
-      // 600ms: 2-3 frames have passed → shader is compiled → remove warmup mesh
+      // 600ms: 2-3 frames have passed → shaders are compiled → remove warmup mesh
       setTimeout(() => setStep(99), 600),
     ];
 
@@ -44,16 +45,22 @@ export function ShaderWarmup({ perfTierFloat = 0.0 }) {
 
   return (
     <group>
-      {/* ScissorMoonShaderMaterial warmup mesh — invisible but forces GLSL compilation */}
+      {/* Invisible warmup meshes to force background GLSL driver compilation */}
       {step >= 1 && (
-        <mesh
-          scale={[0, 0, 0]}
-          frustumCulled={false} // must not be culled or it won't draw
-        >
-          {/* Minimal geometry — 4×4 sphere is enough to trigger compilation */}
-          <sphereGeometry args={[1, 4, 4]} />
-          <scissorMoonShaderMaterial uPerfTier={perfTierFloat} />
-        </mesh>
+        <group scale={[0, 0, 0]}>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <scissorMoonShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <climamedixEarthShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <climamedixCloudShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+        </group>
       )}
     </group>
   );
