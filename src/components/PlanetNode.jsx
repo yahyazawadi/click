@@ -4,9 +4,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { SYSTEM_CONFIG } from '../config';
 import {
-  ScissorPlanet,
   ScissorMoonPlanet,
-  HeartRiversPlanet,
   SculptedHeartPlanet,
   FlowerPlanet,
 } from './planets';
