@@ -59,6 +59,25 @@ export const SYSTEM_CONFIG = {
       ]
     },
     {
+      id: 'proj-earth-real',
+      title: 'CLIMAMEDIX // TERRA',
+      ringIndex: 2,
+      shapeIndex: 'real-earth',
+      startAngle: 0.8,
+      size: 0.70,
+      color: '#0284C7',
+      category: 'AUTHENTIC NASA CONTINENTS',
+      shortDesc: 'Photorealistic continental Earth with real-world landmasses, oceans, and parallax clouds.',
+      fullDesc: 'An authentic high-definition 3D Earth incorporating real NASA Blue Marble continental mapping, specular ocean reflections, and dynamic atmospheric cloud formations drifting in true 3D parallax.',
+      tags: ['NASA MAPS', 'REAL CONTINENTS', 'PARALLAX CLOUDS', '120 FPS', 'THREE.JS'],
+      specs: [
+        'Mapping: Authentic NASA Continental Geography',
+        'Atmosphere: Real-Time Parallax Cloud Drift',
+        'Oceans: High-Definition Specular Glint Mapping',
+        'Performance: Hardware-Accelerated 120 FPS'
+      ]
+    },
+    {
       id: 'proj-10',
       title: 'SCISSOR WORLD',
       ringIndex: 1,
