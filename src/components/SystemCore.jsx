@@ -36,34 +36,36 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = time;
 
-      // Sync color uniforms from CORE_CONFIG
-      colors.deepOcean.set(CORE_CONFIG.colors.deepOcean);
-      colors.midOcean.set(CORE_CONFIG.colors.midOcean);
-      colors.cloudBand.set(CORE_CONFIG.colors.cloudBand);
-      colors.stormHighlight.set(CORE_CONFIG.colors.stormHighlight);
-      colors.atmosphere.set(CORE_CONFIG.colors.atmosphere);
-      colors.continentColor.set(CORE_CONFIG.colors.continentColor);
-      colors.coastColor.set(CORE_CONFIG.colors.coastColor);
+      // Direct GPU Uniform Synchronization in-place every frame
+      const u = shaderMatRef.current.uniforms;
+      if (u) {
+        if (u.uDeepOcean?.value?.set) u.uDeepOcean.value.set(CORE_CONFIG.colors.deepOcean);
+        if (u.uMidOcean?.value?.set) u.uMidOcean.value.set(CORE_CONFIG.colors.midOcean);
+        if (u.uCloudBand?.value?.set) u.uCloudBand.value.set(CORE_CONFIG.colors.cloudBand);
+        if (u.uStormHighlight?.value?.set) u.uStormHighlight.value.set(CORE_CONFIG.colors.stormHighlight);
+        if (u.uAtmosphere?.value?.set) u.uAtmosphere.value.set(CORE_CONFIG.colors.atmosphere);
+        if (u.uContinentColor?.value?.set) u.uContinentColor.value.set(CORE_CONFIG.colors.continentColor);
+        if (u.uCoastColor?.value?.set) u.uCoastColor.value.set(CORE_CONFIG.colors.coastColor);
 
-      // Sync procedural dynamics uniforms
-      shaderMatRef.current.uCloudDriftSpeed = CORE_CONFIG.clouds.driftSpeed;
-      shaderMatRef.current.uCloudScale = CORE_CONFIG.clouds.scale;
-      shaderMatRef.current.uBandFrequency = CORE_CONFIG.clouds.bandFrequency;
-      shaderMatRef.current.uBandWarp = CORE_CONFIG.clouds.bandWarp;
-      shaderMatRef.current.uStormIntensity = CORE_CONFIG.clouds.stormIntensity;
+        if (u.uCloudDriftSpeed) u.uCloudDriftSpeed.value = CORE_CONFIG.clouds.driftSpeed;
+        if (u.uCloudScale) u.uCloudScale.value = CORE_CONFIG.clouds.scale;
+        if (u.uBandFrequency) u.uBandFrequency.value = CORE_CONFIG.clouds.bandFrequency;
+        if (u.uBandWarp) u.uBandWarp.value = CORE_CONFIG.clouds.bandWarp;
+        if (u.uStormIntensity) u.uStormIntensity.value = CORE_CONFIG.clouds.stormIntensity;
 
-      shaderMatRef.current.uContinentDriftSpeed = CORE_CONFIG.continents.driftSpeed;
-      shaderMatRef.current.uContinentScale = CORE_CONFIG.continents.scale;
-      shaderMatRef.current.uSeaLevel = CORE_CONFIG.continents.seaLevel;
+        if (u.uContinentDriftSpeed) u.uContinentDriftSpeed.value = CORE_CONFIG.continents.driftSpeed;
+        if (u.uContinentScale) u.uContinentScale.value = CORE_CONFIG.continents.scale;
+        if (u.uSeaLevel) u.uSeaLevel.value = CORE_CONFIG.continents.seaLevel;
 
-      shaderMatRef.current.uAtmosphereFresnelPower = CORE_CONFIG.atmosphere.fresnelPower;
-      shaderMatRef.current.uAtmosphereFresnelIntensity = CORE_CONFIG.atmosphere.fresnelIntensity;
+        if (u.uAtmosphereFresnelPower) u.uAtmosphereFresnelPower.value = CORE_CONFIG.atmosphere.fresnelPower;
+        if (u.uAtmosphereFresnelIntensity) u.uAtmosphereFresnelIntensity.value = CORE_CONFIG.atmosphere.fresnelIntensity;
 
-      shaderMatRef.current.uSpecularIntensity = CORE_CONFIG.lighting.specularIntensity;
-      shaderMatRef.current.uSpecularShininess = CORE_CONFIG.lighting.specularShininess;
-      shaderMatRef.current.uAmbientLight = CORE_CONFIG.lighting.ambientLight;
-      shaderMatRef.current.uDiffuseLight = CORE_CONFIG.lighting.diffuseLight;
-      shaderMatRef.current.uPolarFade = CORE_CONFIG.lighting.polarFade;
+        if (u.uSpecularIntensity) u.uSpecularIntensity.value = CORE_CONFIG.lighting.specularIntensity;
+        if (u.uSpecularShininess) u.uSpecularShininess.value = CORE_CONFIG.lighting.specularShininess;
+        if (u.uAmbientLight) u.uAmbientLight.value = CORE_CONFIG.lighting.ambientLight;
+        if (u.uDiffuseLight) u.uDiffuseLight.value = CORE_CONFIG.lighting.diffuseLight;
+        if (u.uPolarFade) u.uPolarFade.value = CORE_CONFIG.lighting.polarFade;
+      }
     }
 
     const rotSpeed = CORE_CONFIG.rotationSpeed !== undefined ? CORE_CONFIG.rotationSpeed : 0.15;
