@@ -1,88 +1,152 @@
-import React, { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef, useMemo, useEffect } from 'react';
+import { useFrame, extend } from '@react-three/fiber';
+import { useTexture, shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
-export function SimpleEarthPlanet({ size = 0.65, color = '#00BAE3', isMobile = false }) {
-  const planetRef = useRef();
+const StylizedEarthMaterial = shaderMaterial(
+  {
+    uSpecularMap: null,
+    uOceanColor: new THREE.Color('#031528'),
+    uOceanEmissive: new THREE.Color('#062444'),
+    uLandColor: new THREE.Color('#00B4D8'),
+    uLandEmissive: new THREE.Color('#0284C7'),
+    uAtmosphereColor: new THREE.Color('#38BDF8'),
+  },
+  // Vertex Shader
+  /* glsl */ `
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vViewPosition;
+
+    void main() {
+      vUv = uv;
+      vNormal = normalize(normalMatrix * normal);
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      vViewPosition = -mvPosition.xyz;
+      gl_Position = projectionMatrix * mvPosition;
+    }
+  `,
+  // Fragment Shader
+  /* glsl */ `
+    uniform sampler2D uSpecularMap;
+    uniform vec3 uOceanColor;
+    uniform vec3 uOceanEmissive;
+    uniform vec3 uLandColor;
+    uniform vec3 uLandEmissive;
+    uniform vec3 uAtmosphereColor;
+
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vViewPosition;
+
+    void main() {
+      // Sample specular map: 1.0 is ocean, 0.0 is land
+      float spec = texture2D(uSpecularMap, vUv).r;
+      float isLand = smoothstep(0.45, 0.15, spec);
+
+      // Stylized clean base & emissive colors (zero photographic noise)
+      vec3 baseCol = mix(uOceanColor, uLandColor, isLand);
+      vec3 emissiveCol = mix(uOceanEmissive, uLandEmissive, isLand);
+
+      // Soft lighting and atmospheric rim fresnel
+      vec3 normal = normalize(vNormal);
+      vec3 viewDir = normalize(vViewPosition);
+      float fresnel = pow(1.0 - max(0.0, dot(normal, viewDir)), 2.8);
+
+      vec3 finalCol = baseCol * 0.6 + emissiveCol * 0.85 + uAtmosphereColor * fresnel * 0.5;
+
+      gl_FragColor = vec4(finalCol, 1.0);
+    }
+  `
+);
+
+extend({ StylizedEarthMaterial });
+
+export function SimpleEarthPlanet({ size = 0.65, isMobile = false }) {
+  const earthRef  = useRef();
   const cloudsRef = useRef();
-  const ringRef   = useRef();
+  const earthMatRef = useRef();
 
   const planetRadius = size * 0.88;
-  const segments = isMobile ? 24 : 36;
+  const cloudRadius  = planetRadius * 1.022; // Parallax cloud altitude
+  const segments     = isMobile ? 24 : 38;
 
-  // Pre-allocate simple geometries for clean memory management
-  const planetGeo = useMemo(() => new THREE.SphereGeometry(planetRadius, segments, segments), [planetRadius, segments]);
-  const cloudGeo  = useMemo(() => new THREE.SphereGeometry(planetRadius * 1.025, 24, 24), [planetRadius]);
-  const ringGeo   = useMemo(() => new THREE.RingGeometry(planetRadius * 1.25, planetRadius * 1.45, 48), [planetRadius]);
+  // Load NASA cloud layer and specular continent mask
+  const [cloudsMap, specularMap] = useTexture([
+    '/textures/earth_clouds.jpg',
+    '/textures/earth_specular.jpg',
+  ]);
 
-  React.useEffect(() => {
+  // Optimize texture filtering
+  useEffect(() => {
+    if (cloudsMap) {
+      cloudsMap.generateMipmaps = true;
+      cloudsMap.minFilter = THREE.LinearMipmapLinearFilter;
+    }
+    if (specularMap) {
+      specularMap.generateMipmaps = true;
+      specularMap.minFilter = THREE.LinearMipmapLinearFilter;
+    }
+  }, [cloudsMap, specularMap]);
+
+  // Pre-allocate geometries for clean memory lifecycle
+  const earthGeo = useMemo(() => new THREE.SphereGeometry(planetRadius, segments, segments), [planetRadius, segments]);
+  const cloudGeo = useMemo(() => new THREE.SphereGeometry(cloudRadius, segments, segments), [cloudRadius, segments]);
+  const hazeGeo  = useMemo(() => new THREE.SphereGeometry(planetRadius * 1.065, 24, 24), [planetRadius]);
+
+  useEffect(() => {
     return () => {
-      planetGeo.dispose();
+      earthGeo.dispose();
       cloudGeo.dispose();
-      ringGeo.dispose();
+      hazeGeo.dispose();
     };
-  }, [planetGeo, cloudGeo, ringGeo]);
+  }, [earthGeo, cloudGeo, hazeGeo]);
 
   useFrame((_state, delta) => {
-    if (planetRef.current) {
-      planetRef.current.rotation.y += delta * 0.10;
+    // Stylized Earth surface rotation
+    if (earthRef.current) {
+      earthRef.current.rotation.y += delta * 0.09;
     }
+
+    // Clouds rotate faster for continuous 3D parallax over stylized continents
     if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += delta * 0.14;
-      cloudsRef.current.rotation.z += delta * 0.02;
-    }
-    if (ringRef.current) {
-      ringRef.current.rotation.z += delta * 0.05;
+      cloudsRef.current.rotation.y += delta * 0.13;
     }
   });
 
   return (
-    <group rotation={[0.3, 0, 0.1]}>
-      {/* ── 1. Smooth Clean Planet Body (Always softly glowing & bright) ── */}
-      <mesh ref={planetRef} geometry={planetGeo}>
-        <meshStandardMaterial
-          color="#06203D"
-          emissive="#0A3A68"
-          emissiveIntensity={0.65}
-          roughness={0.4}
-          metalness={0.2}
+    <group rotation={[0.38, 0, 0.12]}>
+      {/* ── 1. Simplified Stylized Continents (Clean Vector-like Geography) ── */}
+      <mesh ref={earthRef} geometry={earthGeo}>
+        <stylizedEarthMaterial
+          ref={earthMatRef}
+          uSpecularMap={specularMap}
         />
       </mesh>
 
-      {/* ── 2. Simplistic Stylized Landmass Wire/Geo Shell ── */}
-      <mesh geometry={planetGeo} scale={1.002}>
-        <meshStandardMaterial
-          color="#00E5FF"
-          emissive="#10B981"
-          emissiveIntensity={0.8}
-          wireframe={true}
-          transparent
-          opacity={0.35}
-        />
-      </mesh>
-
-      {/* ── 3. Soft Floating Simplistic Cloud Shell ── */}
+      {/* ── 2. NASA Parallax Cloud Layer ── */}
       <mesh ref={cloudsRef} geometry={cloudGeo}>
         <meshStandardMaterial
-          color="#E6F7FF"
-          emissive="#00BAE3"
-          emissiveIntensity={0.3}
+          map={cloudsMap}
           transparent
-          opacity={0.28}
-          wireframe={true}
+          opacity={0.82}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
         />
       </mesh>
 
-      {/* ── 4. Elegant Minimalist Orbital Ring ── */}
-      <mesh ref={ringRef} geometry={ringGeo} rotation={[Math.PI / 2.5, 0, 0]}>
-        <meshBasicMaterial
-          color={color || '#00BAE3'}
-          side={THREE.DoubleSide}
+      {/* ── 3. Atmospheric Blue Limb Glow ── */}
+      <mesh geometry={hazeGeo}>
+        <meshStandardMaterial
+          color="#38bdf8"
           transparent
-          opacity={0.3}
-          blending={THREE.AdditiveBlending}
+          opacity={0.09}
+          side={THREE.BackSide}
+          emissive="#38bdf8"
+          emissiveIntensity={0.45}
         />
       </mesh>
     </group>
   );
 }
+
