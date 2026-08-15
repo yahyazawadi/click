@@ -327,9 +327,10 @@ export const NebulaMaterial = shaderMaterial(
       float absorption = pow(dustField, dustExponent) * uDustStrength;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
-      // 5. Dynamic Density Falloff with Gradient Softness Gamma Curve
+      // 5. Dynamic Density Falloff with Gradient Softness Gamma Curve & Min/Max Envelope
       float soft = clamp(uGradientSoftness, 0.1, 3.0);
-      float finalDensity = pow(clamp(gasAfterDust, 0.0, 1.0), 1.0 / soft);
+      float baseDensity = pow(clamp(gasAfterDust, 0.0, 1.0), 1.0 / soft);
+      float finalDensity = baseDensity * organicMask;
 
       // 6. Hubble SHO color science — bright core highlights & continuous color melting
       float singleCore = smoothstep(uCoreRadius, 0.0, edgeDist);
@@ -346,19 +347,19 @@ export const NebulaMaterial = shaderMaterial(
       float voidField = pow(clamp(fbm(cellUv * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
       float densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
 
-      // Color layer blending driven by Gradient Softness
+      // Color layer blending driven by Gradient Softness & bounded density
       float tHa   = smoothstep(0.05, mix(0.5, 0.9, soft * 0.5), densityMod);
       float tSII  = smoothstep(0.25, mix(0.7, 1.0, soft * 0.5), densityMod);
-      float tCore = pow(densityMod, max(1.0, 3.0 / soft)) + coreGlow * (0.5 + 0.5 * uMultiCoreStrength);
+      float tCore = pow(densityMod, max(1.0, 3.0 / soft)) + coreGlow * (0.5 + 0.5 * uMultiCoreStrength) * organicMask;
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   tHa);
       col = mix(col, uColorSII,  tSII);
       col = mix(col, uColorCore, clamp(tCore, 0.0, 1.0));
-      col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
+      col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter * organicMask;
 
-      // 7. Volumetric scatter halo (soft inner glow)
-      float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius);
+      // 7. Volumetric scatter halo (strictly bounded within organic envelope)
+      float glow = volumetricGlow(centeredUv, finalDensity, uGlowRadius) * organicMask;
       col += uColorOIII * glow * 0.6 + uColorHa * glow * 0.4;
 
       col *= (uBrightness * pathBrightness);
@@ -373,7 +374,7 @@ export const NebulaMaterial = shaderMaterial(
       col = mix(col, col + starColor * 1.8, stars * starMask);
 
       // 9. Final alpha
-      float alpha = clamp(finalDensity * organicMask * planeEdgeFade * uAlpha, 0.0, 1.0);
+      float alpha = clamp(finalDensity * planeEdgeFade * uAlpha, 0.0, 1.0);
       // Stars need their own alpha boost so they punch through
       alpha = clamp(alpha + stars * starMask * 0.95, 0.0, 1.0);
 
