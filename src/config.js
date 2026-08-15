@@ -46,7 +46,7 @@ export const SYSTEM_CONFIG = {
       shapeIndex: 'simple-earth',
       startAngle: 2.1,
       size: 0.65,
-      color: '#00BAE3',
+      color: '#10B981',
       category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
       shortDesc: 'Geospatial epidemiological intelligence platform tracking climate change impacts on disease vectors.',
       fullDesc: 'An epidemiological intelligence platform mapping climate change impacts on disease vectors, respiratory risks, and regional health dynamics. Built with Supabase PostgreSQL, geospatial data visualizers, and predictive telemetry.',

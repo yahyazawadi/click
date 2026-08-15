@@ -6,12 +6,12 @@ import * as THREE from 'three';
 const StylizedEarthMaterial = shaderMaterial(
   {
     uSpecularMap: null,
-    uOceanColor: new THREE.Color('#051E3D'),
-    uOceanDeep: new THREE.Color('#020D1C'),
-    uLandColor: new THREE.Color('#1B8A72'),     // Soothing emerald-teal landmasses
-    uLandCoast: new THREE.Color('#2DD4BF'),     // Gentle luminous coastal shelf
-    uPolarColor: new THREE.Color('#E0F2FE'),    // Soft polar ice cap hue
-    uAtmosphereColor: new THREE.Color('#38BDF8'),
+    uOceanColor: new THREE.Color('#031224'),
+    uOceanDeep: new THREE.Color('#010712'),
+    uLandColor: new THREE.Color('#16A34A'),     // Pure vibrant lush green continents
+    uLandCoast: new THREE.Color('#4ADE80'),     // Bright fresh green coastal glow
+    uPolarColor: new THREE.Color('#E2FBE8'),    // Soft pale mint-white polar frost
+    uAtmosphereColor: new THREE.Color('#22C55E'),// Pure emerald green atmospheric glow
   },
   // Vertex Shader
   /* glsl */ `
@@ -62,26 +62,26 @@ const StylizedEarthMaterial = shaderMaterial(
       float ambient = 0.28;
       float light = ambient + diffuse * 0.82;
 
-      // Ocean color with subtle depth
+      // Ocean color with deep cosmic navy contrast
       vec3 oceanCol = mix(uOceanDeep, uOceanColor, max(0.0, NdotL * 0.7 + 0.3));
 
-      // Land color with gentle coastal shelf
-      vec3 landCol = mix(uLandColor, uLandCoast, isCoast * 0.6);
-      landCol = mix(landCol, uPolarColor, isPolar * 0.85);
+      // Pure Green Landmasses with gentle coastal shelf
+      vec3 landCol = mix(uLandColor, uLandCoast, isCoast * 0.65);
+      landCol = mix(landCol, uPolarColor, isPolar * 0.80);
 
       // Combine base surface
       vec3 surfaceCol = mix(oceanCol, landCol, isLand);
       surfaceCol *= light;
 
-      // Soft Ocean Specular Glint
+      // Soft Specular Glint on Oceans
       vec3 viewDir = normalize(vViewPosition);
       vec3 halfVector = normalize(lightDir + viewDir);
       float specHighlight = pow(max(0.0, dot(normal, halfVector)), 32.0);
-      surfaceCol += uAtmosphereColor * (specHighlight * (1.0 - isLand) * 0.35);
+      surfaceCol += uAtmosphereColor * (specHighlight * (1.0 - isLand) * 0.25);
 
-      // Atmospheric Rim Fresnel
+      // Atmospheric Green Rim Fresnel
       float fresnel = pow(1.0 - max(0.0, dot(normal, viewDir)), 2.5);
-      surfaceCol += uAtmosphereColor * fresnel * 0.35;
+      surfaceCol += uAtmosphereColor * fresnel * 0.40;
 
       gl_FragColor = vec4(surfaceCol, 1.0);
     }
@@ -144,7 +144,7 @@ export function SimpleEarthPlanet({ size = 0.65, isMobile = false }) {
 
   return (
     <group rotation={[0.38, 0, 0.12]}>
-      {/* ── 1. Simplified Stylized Continents (Clean Vector-like Geography) ── */}
+      {/* ── 1. Simplified Stylized Green Continents (Clean Vector Geography) ── */}
       <mesh ref={earthRef} geometry={earthGeo}>
         <stylizedEarthMaterial
           ref={earthMatRef}
@@ -163,14 +163,14 @@ export function SimpleEarthPlanet({ size = 0.65, isMobile = false }) {
         />
       </mesh>
 
-      {/* ── 3. Atmospheric Blue Limb Glow ── */}
+      {/* ── 3. Atmospheric Green Limb Glow ── */}
       <mesh geometry={hazeGeo}>
         <meshStandardMaterial
-          color="#38bdf8"
+          color="#22c55e"
           transparent
           opacity={0.09}
           side={THREE.BackSide}
-          emissive="#38bdf8"
+          emissive="#22c55e"
           emissiveIntensity={0.45}
         />
       </mesh>
