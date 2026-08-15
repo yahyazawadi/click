@@ -291,3 +291,33 @@ export const NEBULA_CONFIG = {
   // Locked Baseline Guard
   isLocked: true,
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  LOCALSTORAGE PERSISTENCE INITIALIZER
+// ─────────────────────────────────────────────────────────────────────────────
+if (typeof window !== 'undefined') {
+  try {
+    const savedCore = localStorage.getItem('yahya_core_config');
+    if (savedCore) Object.assign(CORE_CONFIG, JSON.parse(savedCore));
+
+    const savedRings = localStorage.getItem('yahya_rings_config');
+    if (savedRings) {
+      const parsed = JSON.parse(savedRings);
+      if (parsed.rings) {
+        parsed.rings.forEach((r, i) => {
+          if (RINGS_CONFIG.rings[i]) Object.assign(RINGS_CONFIG.rings[i], r);
+        });
+      }
+      if (parsed.global) Object.assign(RINGS_CONFIG.global, parsed.global);
+    }
+
+    const savedNebula = localStorage.getItem('yahya_nebula_config');
+    if (savedNebula) {
+      const parsed = JSON.parse(savedNebula);
+      if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
+      if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
+    }
+  } catch (e) {
+    console.warn('LocalStorage config load error:', e);
+  }
+}

@@ -233,6 +233,17 @@ export function FpsProfilerOverlay({
 
   // --- PARAMETER UPDATE HELPERS ---
 
+  const saveToStorage = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('yahya_core_config', JSON.stringify(CORE_CONFIG));
+      localStorage.setItem('yahya_rings_config', JSON.stringify(RINGS_CONFIG));
+      localStorage.setItem('yahya_nebula_config', JSON.stringify(NEBULA_CONFIG));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
+  };
+
   const updateCoreParam = (section, key, value, isNumeric = true) => {
     if (section === 'root') {
       CORE_CONFIG[key] = isNumeric ? parseFloat(value) : value;
@@ -241,6 +252,7 @@ export function FpsProfilerOverlay({
     } else {
       CORE_CONFIG[section][key] = isNumeric ? parseFloat(value) : value;
     }
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -253,6 +265,7 @@ export function FpsProfilerOverlay({
     } else {
       CORE_CONFIG.innerRings[ringKey][key] = isNumeric ? parseFloat(value) : value;
     }
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -266,6 +279,7 @@ export function FpsProfilerOverlay({
     } else {
       ring[key] = isNumeric ? parseFloat(value) : value;
     }
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -275,6 +289,7 @@ export function FpsProfilerOverlay({
     } else {
       RINGS_CONFIG.global[key] = isNumeric ? parseFloat(value) : value;
     }
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -285,6 +300,7 @@ export function FpsProfilerOverlay({
     } else {
       NEBULA_CONFIG[nebulaKey][paramKey] = parseFloat(value);
     }
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -329,6 +345,7 @@ export function FpsProfilerOverlay({
         if (nebData.nebula2) Object.assign(NEBULA_CONFIG.nebula2, nebData.nebula2);
       }
 
+      saveToStorage();
       setPastedStatus(true);
       setRerender((v) => v + 1);
       setTimeout(() => setPastedStatus(false), 2000);
@@ -349,7 +366,7 @@ export function FpsProfilerOverlay({
         position: 'fixed',
         top: '12px',
         right: '12px',
-        width: '350px',
+        width: '360px',
         maxHeight: '92vh',
         zIndex: 9999,
         background: 'rgba(7, 17, 36, 0.97)',
@@ -369,9 +386,14 @@ export function FpsProfilerOverlay({
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem' }}>
-        <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.05em' }}>
-          TELEMETRY PROFILER & TUNER
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.05em' }}>
+            TELEMETRY & LIVE TUNER
+          </span>
+          <span style={{ fontSize: '0.52rem', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '1px 4px', borderRadius: '3px', border: '1px solid rgba(0, 255, 170, 0.3)' }}>
+            AUTO-SAVED
+          </span>
+        </div>
         <button 
           onClick={toggleVisibility}
           style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem' }}
@@ -396,7 +418,7 @@ export function FpsProfilerOverlay({
         <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)', marginBottom: '2px' }}>
           FRAME TIME GRAPH (ms) - 16.6ms target
         </div>
-        <canvas ref={canvasRef} width={310} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
+        <canvas ref={canvasRef} width={320} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
       </div>
 
       {/* GPU Tier Switcher */}
@@ -487,7 +509,7 @@ export function FpsProfilerOverlay({
         {/* Main Category Header & History Actions */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
-            SYSTEM LIVE TUNER
+            LIVE TUNER CONTROLS
           </span>
           <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <button
@@ -548,6 +570,7 @@ export function FpsProfilerOverlay({
 
             <button
               onClick={copyConfigJson}
+              title="Copy active configuration JSON to clipboard"
               style={{
                 background: copiedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: copiedStatus ? '#000' : 'var(--primary-cyan)',
@@ -565,6 +588,7 @@ export function FpsProfilerOverlay({
 
             <button
               onClick={pasteConfigJson}
+              title="Paste configuration JSON from clipboard"
               style={{
                 background: pastedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: pastedStatus ? '#000' : 'var(--primary-cyan)',
@@ -619,13 +643,13 @@ export function FpsProfilerOverlay({
         ═══════════════════════════════════════════════════════════ */}
         {activeMainTab === 'core' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            {/* Core Sub-Tabs */}
-            <div style={{ display: 'flex', gap: '0.25rem', overflowX: 'auto' }}>
+            {/* Core Sub-Tabs in a clean 2x2 Grid so NEAR RINGS is instantly visible! */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem' }}>
               {[
-                { key: 'surface', label: 'SURFACE & COLORS' },
-                { key: 'dynamics', label: 'DYNAMICS & LAND' },
-                { key: 'lighting', label: 'ATMOSPHERE & LIGHT' },
-                { key: 'innerRings', label: 'INNER RINGS' },
+                { key: 'surface', label: '🎨 SURFACE & COLORS' },
+                { key: 'innerRings', label: '💫 NEAR / INNER RINGS' },
+                { key: 'dynamics', label: '🌪️ DYNAMICS & LAND' },
+                { key: 'lighting', label: '✨ ATMOSPHERE & LIGHT' },
               ].map(({ key, label }) => {
                 const isActive = activeCoreSubTab === key;
                 return (
@@ -633,17 +657,16 @@ export function FpsProfilerOverlay({
                     key={key}
                     onClick={() => setActiveCoreSubTab(key)}
                     style={{
-                      flex: 1,
-                      whiteSpace: 'nowrap',
-                      padding: '0.3rem 0.25rem',
-                      fontSize: '0.56rem',
+                      padding: '0.35rem 0.25rem',
+                      fontSize: '0.58rem',
                       fontFamily: 'var(--font-mono)',
                       border: '1px solid ' + (isActive ? 'var(--primary-cyan)' : '#333'),
-                      background: isActive ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                      background: isActive ? 'rgba(0, 186, 227, 0.25)' : 'rgba(0, 0, 0, 0.3)',
                       color: isActive ? 'var(--primary-cyan)' : '#888',
-                      borderRadius: '3px',
+                      borderRadius: '4px',
                       cursor: 'pointer',
-                      fontWeight: isActive ? 'bold' : 'normal'
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      boxShadow: isActive ? '0 0 8px rgba(0, 186, 227, 0.3)' : 'none',
                     }}
                   >
                     {label}
