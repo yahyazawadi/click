@@ -1625,7 +1625,7 @@ export function FpsProfilerOverlay({
                 { label: 'MOVEMENT SPEED', key: 'speed', min: 0.0, max: 0.50, step: 0.005 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
               ].map(({ label, key, min, max, step }) => {
-                const val = currentNebula[key] ?? (key === 'gradientSoftness' ? 1.0 : (key === 'speed' ? (activeNebulaTab === 'nebula1' ? 0.10 : 0.12) : undefined));
+                const val = currentNebula[key] ?? (key === 'gradientSoftness' ? 1.0 : (key === 'speed' ? 0.0 : undefined));
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>

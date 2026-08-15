@@ -291,7 +291,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     coreRadius: 0.17,
     alpha: 0.72,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
-    speed: 0.10, // Organic cosmic drift speed (0.0 = static freeze, 0.10 = calm majestic drift)
+    speed: 0.0, // Static freeze baseline
     seedX: generateTimeBasedSeed(1),
     seedY: generateTimeBasedSeed(2),
     // Multi-Core & Cellular Convection Parameters
@@ -320,7 +320,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     coreRadius: 0.02,
     alpha: 1,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
-    speed: 0.12, // Organic cosmic drift speed (0.0 = static freeze, 0.12 = calm majestic drift)
+    speed: 0.0, // Static freeze baseline
     seedX: generateTimeBasedSeed(3),
     seedY: generateTimeBasedSeed(4),
     // Multi-Core & Cellular Convection Parameters
