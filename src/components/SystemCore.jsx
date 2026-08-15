@@ -41,6 +41,8 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
 
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = time;
+      shaderMatRef.current.uCloudPhase = cloudPhase.current;
+      shaderMatRef.current.uContinentPhase = continentPhase.current;
 
       // Direct GPU Uniform Synchronization in-place every frame
       const u = shaderMatRef.current.uniforms;

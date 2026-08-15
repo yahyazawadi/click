@@ -790,11 +790,11 @@ export function FpsProfilerOverlay({
                   ATMOSPHERIC CLOUD & BELT DYNAMICS:
                 </div>
                 {[
-                  { label: 'CLOUD DRIFT SPEED', section: 'clouds', key: 'driftSpeed', min: 0.0, max: 0.1, step: 0.002 },
-                  { label: 'CLOUD SCALE', section: 'clouds', key: 'scale', min: 0.5, max: 6.0, step: 0.1 },
-                  { label: 'BAND FREQUENCY', section: 'clouds', key: 'bandFrequency', min: 2.0, max: 30.0, step: 0.5 },
-                  { label: 'BAND WARP', section: 'clouds', key: 'bandWarp', min: 0.0, max: 0.5, step: 0.01 },
-                  { label: 'STORM INTENSITY', section: 'clouds', key: 'stormIntensity', min: 0.0, max: 2.0, step: 0.05 },
+                  { label: 'CLOUD DRIFT SPEED', section: 'clouds', key: 'driftSpeed', min: -1.0, max: 1.0, step: 0.01 },
+                  { label: 'CLOUD SCALE', section: 'clouds', key: 'scale', min: 0.5, max: 8.0, step: 0.1 },
+                  { label: 'BAND FREQUENCY', section: 'clouds', key: 'bandFrequency', min: 2.0, max: 40.0, step: 0.5 },
+                  { label: 'BAND WARP', section: 'clouds', key: 'bandWarp', min: 0.0, max: 0.8, step: 0.01 },
+                  { label: 'STORM INTENSITY', section: 'clouds', key: 'stormIntensity', min: 0.0, max: 3.0, step: 0.05 },
                 ].map(({ label, section, key, min, max, step }) => {
                   const val = CORE_CONFIG[section][key];
                   return (
@@ -822,9 +822,9 @@ export function FpsProfilerOverlay({
                   CONTINENTAL TECTONICS:
                 </div>
                 {[
-                  { label: 'CONTINENT DRIFT', section: 'continents', key: 'driftSpeed', min: 0.0, max: 0.05, step: 0.001 },
-                  { label: 'CONTINENT SCALE', section: 'continents', key: 'scale', min: 0.2, max: 3.0, step: 0.05 },
-                  { label: 'SEA LEVEL ELEVATION', section: 'continents', key: 'seaLevel', min: -0.60, max: 0.60, step: 0.02 },
+                  { label: 'CONTINENT DRIFT', section: 'continents', key: 'driftSpeed', min: -0.5, max: 0.5, step: 0.005 },
+                  { label: 'CONTINENT SCALE', section: 'continents', key: 'scale', min: 0.2, max: 4.0, step: 0.05 },
+                  { label: 'SEA LEVEL ELEVATION', section: 'continents', key: 'seaLevel', min: -0.80, max: 0.80, step: 0.02 },
                 ].map(({ label, section, key, min, max, step }) => {
                   const val = CORE_CONFIG[section][key];
                   return (
