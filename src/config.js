@@ -3,39 +3,39 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const DEFAULT_CORE_CONFIG = {
-  radius: 1.8,
+  radius: 1.6,
   rotationSpeed: 0.15,
   colors: {
-    deepOcean:      '#041830',
-    midOcean:       '#0a4070',
-    cloudBand:      '#1a7aaa',
-    stormHighlight: '#00d4f0',
+    deepOcean:      '#ffffff',
+    midOcean:       '#0088ff',
+    cloudBand:      '#00aaff',
+    stormHighlight: '#00e1ff',
     atmosphere:     '#00BAE3',
-    continentColor: '#2d5a6e',
-    coastColor:     '#1a8090',
+    continentColor: '#00b3ff',
+    coastColor:     '#00ddff'
   },
   clouds: {
     driftSpeed:     0.025,
-    scale:          2.5,
-    bandFrequency:  14.0,
-    bandWarp:       0.12,
-    stormIntensity: 0.70,
+    scale:          2,
+    bandFrequency:  14,
+    bandWarp:       0.65,
+    stormIntensity: 0.7
   },
   continents: {
     driftSpeed:     0.004,
     scale:          0.95,
-    seaLevel:       -0.10,
+    seaLevel:       -0.1
   },
   atmosphere: {
-    fresnelPower:     3.0,
-    fresnelIntensity: 0.80,
+    fresnelPower:     1.3,
+    fresnelIntensity: 1.25
   },
   lighting: {
     specularIntensity: 0.35,
-    specularShininess: 32.0,
+    specularShininess: 32,
     ambientLight:      0.25,
     diffuseLight:      0.85,
-    polarFade:         0.45,
+    polarFade:         1
   },
   innerRings: {
     ring1: {
@@ -45,42 +45,72 @@ export const DEFAULT_CORE_CONFIG = {
       speedX:           0.25,
       speedY:           0.35,
       speedZ:           0.15,
-      color:            '#FF0A2B',
-      emissive:         '#FF0A2B',
-      emissiveIntensity: 0.80,
-      opacity:          1.0,
-      tiltX:            0.785398,
-      tiltY:            0.0,
-      tiltZ:            0.0,
+      color:            '#a600ff',
+      emissive:         '#ff0040',
+      emissiveIntensity: 0.9,
+      opacity:          1,
+      tiltX:            -3.14,
+      tiltY:            0,
+      tiltZ:            0
     },
     ring2: {
       enabled:          true,
       radiusMultiplier: 1.7,
       tubeRadius:       0.02,
-      speedX:           0.30,
-      speedY:           0.20,
-      speedZ:           0.10,
-      color:            '#B3002D',
-      emissive:         '#B3002D',
-      emissiveIntensity: 0.65,
-      opacity:          0.70,
+      speedX:           0.3,
+      speedY:           0.2,
+      speedZ:           0.1,
+      color:            '#8a0043',
+      emissive:         '#5c003a',
+      emissiveIntensity: 1.9,
+      opacity:          1,
       tiltX:            -1.047198,
-      tiltY:            0.523599,
-      tiltZ:            0.0,
+      tiltY:            3.11,
+      tiltZ:            0
     }
   }
 };
 
 export const DEFAULT_RINGS_CONFIG = {
   rings: [
-    { id: 0, radius: 5.5, tiltX: 1.2, tiltY: 0.5, tiltZ: -0.2, speed: 0.12, color: '#00BAE3', opacity: 0.35, enabled: true },
-    { id: 1, radius: 7.0, tiltX: -0.8, tiltY: 1.1, tiltZ: 0.4, speed: 0.08, color: '#5DBAE1', opacity: 0.35, enabled: true },
-    { id: 2, radius: 8.5, tiltX: 0.3, tiltY: -1.2, tiltZ: 0.9, speed: 0.05, color: '#003268', opacity: 0.35, enabled: true },
+    {
+      id: 0,
+      radius: 5.1,
+      tiltX: 1.31,
+      tiltY: 0.5,
+      tiltZ: -0.2,
+      speed: 0.265,
+      color: '#0091ff',
+      opacity: 0.99,
+      enabled: true
+    },
+    {
+      id: 1,
+      radius: 7.3,
+      tiltX: 2.71,
+      tiltY: 1.36,
+      tiltZ: 0.4,
+      speed: 0.08,
+      color: '#009dff',
+      opacity: 0.99,
+      enabled: true
+    },
+    {
+      id: 2,
+      radius: 8.5,
+      tiltX: 0.3,
+      tiltY: -1.2,
+      tiltZ: 0.9,
+      speed: 0.05,
+      color: '#00ccff',
+      opacity: 0.99,
+      enabled: true
+    }
   ],
   global: {
-    speedMultiplier: 1.0,
-    opacityMultiplier: 1.0,
-    enabled: true,
+    speedMultiplier: 1,
+    opacityMultiplier: 1,
+    enabled: true
   }
 };
 
@@ -242,51 +272,51 @@ export const NEBULA_PRESETS = {
 export const DEFAULT_NEBULA_CONFIG = {
   // NEBULA 1 (RED / CRIMSON) - Independent Configuration
   nebula1: {
-    path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
-    scale: 5,
-    warp: 4.6,
-    brightness: 2.8,
-    dustStrength: 0.76,
+    path: 2,
+    scale: 5.4,
+    warp: 5.7,
+    brightness: 0.8,
+    dustStrength: 0.92,
     pillarStrength: 0.52,
-    maskRadius: 0.24,
-    edgeWarp: 0.64,
-    coreRadius: 0.16,
-    alpha: 0.92,
+    maskRadius: 0.23,
+    edgeWarp: 0.74,
+    coreRadius: 0.17,
+    alpha: 0.72,
     // Multi-Core & Cellular Convection Parameters
-    multiCoreStrength: 0.0,  // 0.0 = single continuous spine, 1.0+ = multiple molten energy hotspots
-    multiCoreScale: 1.8,     // Spatial distribution density of the hotspots
-    voidPinch: 0.0,          // Void channel pinching between blobs (metaball separation)
+    multiCoreStrength: 0.0,
+    multiCoreScale: 1.8,
+    voidPinch: 0.0,
     // Color Palette
     colors: {
-      sii:  '#b1631b', // Golden Amber Outer Wisps
-      ha:   '#e61924', // Vivid Crimson Mid-Body
-      oiii: '#570047', // Deep Violet Void Shadow
-      core: '#ff2465', // Hot Ruby Rose Core
+      sii:  '#bb168f',
+      ha:   '#ff2465',
+      oiii: '#570047',
+      core: '#ff9500',
     },
   },
 
   // NEBULA 2 (TEAL / BLUE) - Independent Configuration
   nebula2: {
-    path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
-    scale: 4.5,
-    warp: 3.8,
-    brightness: 2.8,
-    dustStrength: 0.35,
+    path: 2,
+    scale: 3.1,
+    warp: 6,
+    brightness: 0.7,
+    dustStrength: 0,
     pillarStrength: 0.5,
-    maskRadius: 0.42,
-    edgeWarp: 0.4,
-    coreRadius: 0.25,
-    alpha: 0.88,
+    maskRadius: 0.14,
+    edgeWarp: 1,
+    coreRadius: 0.02,
+    alpha: 1,
     // Multi-Core & Cellular Convection Parameters
-    multiCoreStrength: 0.0,  // 0.0 = single continuous spine, 1.0+ = multiple molten energy hotspots
-    multiCoreScale: 1.8,     // Spatial distribution density of the hotspots
-    voidPinch: 0.0,          // Void channel pinching between blobs (metaball separation)
+    multiCoreStrength: 0.0,
+    multiCoreScale: 1.8,
+    voidPinch: 0.0,
     // Color Palette
     colors: {
-      sii:  '#00a8e6', // Rich deep cyan-turquoise
-      ha:   '#081640', // Deep cosmic navy-cobalt
-      oiii: '#3b008f', // Deep royal violet gas depth
-      core: '#00b8e6', // Rich deep electric cyan core
+      sii:  '#00658a',
+      ha:   '#0031a3',
+      oiii: '#4600a8',
+      core: '#00e1ff',
     },
   },
 
