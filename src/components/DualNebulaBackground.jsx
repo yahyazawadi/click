@@ -12,13 +12,18 @@ export function DualNebulaBackground({
 }) {
   const matRefLayer1 = useRef();
   const matRefLayer2 = useRef();
+  const timeAcc1 = useRef(0);
+  const timeAcc2 = useRef(0);
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
+  useFrame((state, delta) => {
+    // Clamp delta to 0.1s max to prevent sudden leaps on tab blur/focus/reload
+    const safeDelta = Math.min(delta, 0.1);
+
     if (matRefLayer1.current) {
       const n1 = NEBULA_CONFIG.nebula1;
       const speed1 = n1.speed !== undefined ? n1.speed : 0.10;
-      matRefLayer1.current.uTime = time * speed1;
+      timeAcc1.current += safeDelta * speed1;
+      matRefLayer1.current.uTime = timeAcc1.current;
       matRefLayer1.current.uNebulaPath = nebulaPath1;
       matRefLayer1.current.uScale = n1.scale;
       matRefLayer1.current.uWarp = n1.warp;
@@ -50,7 +55,8 @@ export function DualNebulaBackground({
     if (matRefLayer2.current) {
       const n2 = NEBULA_CONFIG.nebula2;
       const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
-      matRefLayer2.current.uTime = time * speed2;
+      timeAcc2.current += safeDelta * speed2;
+      matRefLayer2.current.uTime = timeAcc2.current;
       matRefLayer2.current.uNebulaPath = nebulaPath2;
       matRefLayer2.current.uScale = n2.scale;
       matRefLayer2.current.uWarp = n2.warp;
