@@ -43,7 +43,7 @@ export const SYSTEM_CONFIG = {
       id: 'proj-climamedix',
       title: 'CLIMAMEDIX',
       ringIndex: 0,
-      shapeIndex: 'simple-earth',
+      shapeIndex: 'climamedix',
       startAngle: 2.1,
       size: 0.65,
       color: '#00BAE3',
@@ -56,25 +56,6 @@ export const SYSTEM_CONFIG = {
         'Database: Supabase PostgreSQL & Spatial Schemas',
         'Telemetry: Real-Time Environmental Health Indices',
         'Interface: Multi-Language Disease Intelligence'
-      ]
-    },
-    {
-      id: 'proj-climamedix-terra',
-      title: 'CLIMAMEDIX // TERRA',
-      ringIndex: 2,
-      shapeIndex: 'real-earth',
-      startAngle: 0.8,
-      size: 0.70,
-      color: '#0284C7',
-      category: 'AUTHENTIC NASA CONTINENTS',
-      shortDesc: 'Photorealistic continental Earth with real-world landmasses, oceans, and parallax clouds.',
-      fullDesc: 'An authentic high-definition 3D Earth incorporating real NASA Blue Marble continental mapping, specular ocean reflections, and dynamic atmospheric cloud formations drifting in true 3D parallax.',
-      tags: ['NASA MAPS', 'REAL CONTINENTS', 'PARALLAX CLOUDS', '120 FPS', 'THREE.JS'],
-      specs: [
-        'Mapping: Authentic NASA Continental Geography',
-        'Atmosphere: Real-Time Parallax Cloud Drift',
-        'Oceans: High-Definition Specular Glint Mapping',
-        'Performance: Hardware-Accelerated 120 FPS'
       ]
     },
     {

@@ -17,6 +17,7 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
   const targetCamPos = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
   const normal = useRef(new THREE.Vector3());
+  const tangent = useRef(new THREE.Vector3());
   const upOffset = useRef(new THREE.Vector3(0, 0.5, 0));
 
   // Initialize camera far in deep space on frame 1
@@ -57,12 +58,15 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Fly camera directly to front of selected planet
+      // PLANET FOCUS: Fly camera to front-side of selected planet (angled to clear central sun core from view)
       const distOffset = (isMobile ? 5.2 : 3.2) * zoomFactor;
       normal.current.copy(targetPlanetPosRef.current).normalize();
+      tangent.current.set(-normal.current.z, 0, normal.current.x).normalize();
+
       targetCamPos.current
         .copy(targetPlanetPosRef.current)
-        .add(normal.current.multiplyScalar(distOffset))
+        .addScaledVector(normal.current, distOffset * 0.75)
+        .addScaledVector(tangent.current, distOffset * 0.65)
         .add(upOffset.current);
       targetLookAt.current.copy(targetPlanetPosRef.current);
 
