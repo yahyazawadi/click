@@ -1515,12 +1515,8 @@ export function FpsProfilerOverlay({
                 { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
-                // Multi-Core & Lava Lamp Convection Controls
-                { label: '🔥 MULTI-CORE STRENGTH', key: 'multiCoreStrength', min: 0.0, max: 2.0, step: 0.05 },
-                { label: '🌐 HOTSPOT SCALE', key: 'multiCoreScale', min: 0.5, max: 5.0, step: 0.1 },
-                { label: '🫧 VOID PINCH (METABALLS)', key: 'voidPinch', min: 0.0, max: 1.0, step: 0.05 },
               ].map(({ label, key, min, max, step }) => {
-                const val = currentNebula[key] ?? (key === 'multiCoreScale' ? 1.8 : 0);
+                const val = currentNebula[key];
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
@@ -1541,6 +1537,47 @@ export function FpsProfilerOverlay({
                   </div>
                 );
               })}
+
+              {/* Multi-Core & Lava Lamp Convection Section */}
+              <div style={{
+                marginTop: '0.3rem',
+                paddingTop: '0.35rem',
+                borderTop: '1px solid rgba(255, 119, 0, 0.3)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.35rem'
+              }}>
+                <div style={{ fontSize: '0.62rem', color: '#ff9933', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span>🌋</span>
+                  <span>MULTI-CORE / LAVA LAMP DYNAMICS:</span>
+                </div>
+                {[
+                  { label: '🔥 HOTSPOT INTENSITY', key: 'multiCoreStrength', min: 0.0, max: 2.0, step: 0.05, fallback: 0.0 },
+                  { label: '🌐 CONVECTION SCALE', key: 'multiCoreScale', min: 0.5, max: 5.0, step: 0.1, fallback: 1.8 },
+                  { label: '🫧 VOID PINCH (METABALLS)', key: 'voidPinch', min: 0.0, max: 1.0, step: 0.05, fallback: 0.0 },
+                ].map(({ label, key, min, max, step, fallback }) => {
+                  const val = currentNebula[key] ?? fallback;
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ddd' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: '#ffaa33', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
+                        style={{ width: '100%', accentColor: '#ff9933', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
 
               {/* Color Palette Controls */}
               <div style={{ marginTop: '0.3rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
