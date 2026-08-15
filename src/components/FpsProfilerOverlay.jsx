@@ -352,13 +352,17 @@ export function FpsProfilerOverlay({
 
   const handleGenerateNewNebula = () => {
     pushHistorySnapshot();
-    const current = NEBULA_CONFIG[activeNebulaTab];
-    if (!current) return;
 
-    // Shift spatial noise seed coordinates to roll a brand-new cloud shape
+    // Generate independent procedural seeds for BOTH nebulae simultaneously
     // ALL user parameters, sliders, speed, and colors remain 100% UNTOUCHED!
-    current.seedX = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
-    current.seedY = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+    if (NEBULA_CONFIG.nebula1) {
+      NEBULA_CONFIG.nebula1.seedX = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+      NEBULA_CONFIG.nebula1.seedY = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+    }
+    if (NEBULA_CONFIG.nebula2) {
+      NEBULA_CONFIG.nebula2.seedX = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+      NEBULA_CONFIG.nebula2.seedY = +(Math.floor(Math.random() * 80 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+    }
 
     saveToStorage();
     setGeneratedStatus(true);
