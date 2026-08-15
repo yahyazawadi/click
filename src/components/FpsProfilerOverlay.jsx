@@ -1014,64 +1014,71 @@ export function FpsProfilerOverlay({
                   );
                 })}
 
-                {/* Rotation Speeds */}
-                {activeCoreRing === 'ring1' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
-                      <span>SPIN SPEED (Z):</span>
-                      <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedZ ?? 0.4}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="-2.0"
-                      max="2.0"
-                      step="0.05"
-                      value={currentCoreRing.speedZ ?? 0.4}
-                      onMouseDown={pushHistorySnapshot}
-                      onTouchStart={pushHistorySnapshot}
-                      onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedZ', e.target.value)}
-                      style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
-                    />
+                {/* 3D Gyroscopic Spin Speeds */}
+                <div style={{ marginTop: '0.2rem', paddingTop: '0.2rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div style={{ fontSize: '0.58rem', color: 'var(--secondary-blue)', fontWeight: 'bold', marginBottom: '2px' }}>
+                    3D GYROSCOPIC SPIN SPEEDS:
                   </div>
-                ) : (
-                  <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
-                        <span>SPIN SPEED (X):</span>
-                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedX ?? 0.3}</span>
+                  {[
+                    { label: 'SPIN SPEED (X - PITCH)', key: 'speedX', def: 0.25 },
+                    { label: 'SPIN SPEED (Y - YAW)', key: 'speedY', def: 0.35 },
+                    { label: 'SPIN SPEED (Z - ROLL)', key: 'speedZ', def: 0.15 },
+                  ].map(({ label, key, def }) => {
+                    const val = currentCoreRing[key] ?? def;
+                    return (
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                          <span>{label}:</span>
+                          <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-2.0"
+                          max="2.0"
+                          step="0.05"
+                          value={val}
+                          onMouseDown={pushHistorySnapshot}
+                          onTouchStart={pushHistorySnapshot}
+                          onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value)}
+                          style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                        />
                       </div>
-                      <input
-                        type="range"
-                        min="-2.0"
-                        max="2.0"
-                        step="0.05"
-                        value={currentCoreRing.speedX ?? 0.3}
-                        onMouseDown={pushHistorySnapshot}
-                        onTouchStart={pushHistorySnapshot}
-                        onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedX', e.target.value)}
-                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
-                      />
-                    </div>
+                    );
+                  })}
+                </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
-                        <span>SPIN SPEED (Y):</span>
-                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedY ?? 0.2}</span>
+                {/* 3D Base Tilts */}
+                <div style={{ marginTop: '0.2rem', paddingTop: '0.2rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div style={{ fontSize: '0.58rem', color: 'var(--secondary-blue)', fontWeight: 'bold', marginBottom: '2px' }}>
+                    3D BASE TILT ORIENTATION:
+                  </div>
+                  {[
+                    { label: 'TILT X (PITCH)', key: 'tiltX', def: activeCoreRing === 'ring1' ? 0.785 : -1.047 },
+                    { label: 'TILT Y (YAW)', key: 'tiltY', def: activeCoreRing === 'ring1' ? 0 : 0.523 },
+                    { label: 'TILT Z (ROLL)', key: 'tiltZ', def: 0 },
+                  ].map(({ label, key, def }) => {
+                    const val = currentCoreRing[key] ?? def;
+                    return (
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                          <span>{label}:</span>
+                          <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-3.14"
+                          max="3.14"
+                          step="0.05"
+                          value={val}
+                          onMouseDown={pushHistorySnapshot}
+                          onTouchStart={pushHistorySnapshot}
+                          onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value)}
+                          style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                        />
                       </div>
-                      <input
-                        type="range"
-                        min="-2.0"
-                        max="2.0"
-                        step="0.05"
-                        value={currentCoreRing.speedY ?? 0.2}
-                        onMouseDown={pushHistorySnapshot}
-                        onTouchStart={pushHistorySnapshot}
-                        onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedY', e.target.value)}
-                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
-                      />
-                    </div>
-                  </>
-                )}
+                    );
+                  })}
+                </div>
 
                 {/* Ring Colors */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.2rem' }}>

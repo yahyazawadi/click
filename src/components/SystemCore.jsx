@@ -65,13 +65,16 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
 
     const ring1 = CORE_CONFIG.innerRings?.ring1;
     if (ringRef1.current && ring1?.enabled !== false) {
-      ringRef1.current.rotation.z += delta * (ring1?.speedZ !== undefined ? ring1.speedZ : 0.4);
+      ringRef1.current.rotation.x += delta * (ring1?.speedX !== undefined ? ring1.speedX : 0.25);
+      ringRef1.current.rotation.y += delta * (ring1?.speedY !== undefined ? ring1.speedY : 0.35);
+      ringRef1.current.rotation.z += delta * (ring1?.speedZ !== undefined ? ring1.speedZ : 0.15);
     }
 
     const ring2 = CORE_CONFIG.innerRings?.ring2;
     if (ringRef2.current && ring2?.enabled !== false) {
-      ringRef2.current.rotation.x += delta * (ring2?.speedX !== undefined ? ring2.speedX : 0.3);
-      ringRef2.current.rotation.y += delta * (ring2?.speedY !== undefined ? ring2.speedY : 0.2);
+      ringRef2.current.rotation.x += delta * (ring2?.speedX !== undefined ? ring2.speedX : 0.30);
+      ringRef2.current.rotation.y += delta * (ring2?.speedY !== undefined ? ring2.speedY : 0.20);
+      ringRef2.current.rotation.z += delta * (ring2?.speedZ !== undefined ? ring2.speedZ : 0.10);
     }
   });
 
@@ -105,40 +108,44 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
         />
       </mesh>
 
-      {/* 2. Concentric Core Orbit Ring 1 (Inner Torus) */}
+      {/* 2. Concentric Core Orbit Ring 1 (Inner Torus with Gyro Spin) */}
       {ring1.enabled !== false && (
-        <mesh ref={ringRef1} rotation={[ring1.tiltX ?? (Math.PI / 4), ring1.tiltY ?? 0, ring1.tiltZ ?? 0]}>
-          <torusGeometry args={[coreRadius * (ring1.radiusMultiplier || 1.5), ring1.tubeRadius || 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-          {perfTierFloat >= 0.8 ? (
-            <meshBasicMaterial color={ring1.color || '#FF0A2B'} transparent opacity={ring1.opacity ?? 1.0} />
-          ) : (
-            <meshStandardMaterial
-              color={ring1.color || '#FF0A2B'}
-              emissive={ring1.emissive || '#FF0A2B'}
-              emissiveIntensity={ring1.emissiveIntensity ?? 0.8}
-              transparent={(ring1.opacity ?? 1.0) < 1.0}
-              opacity={ring1.opacity ?? 1.0}
-            />
-          )}
-        </mesh>
+        <group rotation={[ring1.tiltX ?? (Math.PI / 4), ring1.tiltY ?? 0, ring1.tiltZ ?? 0]}>
+          <mesh ref={ringRef1}>
+            <torusGeometry args={[coreRadius * (ring1.radiusMultiplier || 1.5), ring1.tubeRadius || 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+            {perfTierFloat >= 0.8 ? (
+              <meshBasicMaterial color={ring1.color || '#FF0A2B'} transparent opacity={ring1.opacity ?? 1.0} />
+            ) : (
+              <meshStandardMaterial
+                color={ring1.color || '#FF0A2B'}
+                emissive={ring1.emissive || '#FF0A2B'}
+                emissiveIntensity={ring1.emissiveIntensity ?? 0.8}
+                transparent={(ring1.opacity ?? 1.0) < 1.0}
+                opacity={ring1.opacity ?? 1.0}
+              />
+            )}
+          </mesh>
+        </group>
       )}
 
-      {/* 3. Concentric Core Orbit Ring 2 (Outer Torus) */}
+      {/* 3. Concentric Core Orbit Ring 2 (Outer Torus with Gyro Spin) */}
       {ring2.enabled !== false && (
-        <mesh ref={ringRef2} rotation={[ring2.tiltX ?? (-Math.PI / 3), ring2.tiltY ?? (Math.PI / 6), ring2.tiltZ ?? 0]}>
-          <torusGeometry args={[coreRadius * (ring2.radiusMultiplier || 1.7), ring2.tubeRadius || 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-          {perfTierFloat >= 0.8 ? (
-            <meshBasicMaterial color={ring2.color || '#B3002D'} transparent opacity={ring2.opacity ?? 0.7} />
-          ) : (
-            <meshStandardMaterial
-              color={ring2.color || '#B3002D'}
-              emissive={ring2.emissive || '#B3002D'}
-              emissiveIntensity={ring2.emissiveIntensity ?? 0.65}
-              transparent
-              opacity={ring2.opacity ?? 0.7}
-            />
-          )}
-        </mesh>
+        <group rotation={[ring2.tiltX ?? (-Math.PI / 3), ring2.tiltY ?? (Math.PI / 6), ring2.tiltZ ?? 0]}>
+          <mesh ref={ringRef2}>
+            <torusGeometry args={[coreRadius * (ring2.radiusMultiplier || 1.7), ring2.tubeRadius || 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+            {perfTierFloat >= 0.8 ? (
+              <meshBasicMaterial color={ring2.color || '#B3002D'} transparent opacity={ring2.opacity ?? 0.7} />
+            ) : (
+              <meshStandardMaterial
+                color={ring2.color || '#B3002D'}
+                emissive={ring2.emissive || '#B3002D'}
+                emissiveIntensity={ring2.emissiveIntensity ?? 0.65}
+                transparent
+                opacity={ring2.opacity ?? 0.7}
+              />
+            )}
+          </mesh>
+        </group>
       )}
     </group>
   );
