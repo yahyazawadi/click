@@ -317,10 +317,11 @@ export const NebulaMaterial = shaderMaterial(
       float absorption = pow(dustField, dustExponent) * uDustStrength;
       float gasAfterDust = max(0.0, gasDensity - absorption * gasDensity);
 
-      // 5. Pure smooth gas density (zero hard column lines)
-      float finalDensity = clamp(gasAfterDust, 0.0, 1.0);
+      // 5. Dynamic Density Falloff with Gradient Softness Gamma Curve
+      float soft = clamp(uGradientSoftness, 0.1, 3.0);
+      float finalDensity = pow(clamp(gasAfterDust, 0.0, 1.0), 1.0 / soft);
 
-      // 6. Hubble SHO color science — full strength bright core highlights
+      // 6. Hubble SHO color science — bright core highlights & continuous color melting
       float singleCore = smoothstep(uCoreRadius, 0.0, edgeDist);
 
       // Multi-Core & Cellular Convection Field (Lava-Lamp Hotspot Metadynamics)
@@ -335,20 +336,15 @@ export const NebulaMaterial = shaderMaterial(
       float voidField = pow(clamp(fbm(cellUv * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
       float densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
 
-      // 6. Hubble SHO color science with dynamic Gradient Softness
-      float s = clamp(uGradientSoftness, 0.1, 3.0);
-      float wHa   = 0.45 * s;
-      float wSII  = 0.40 * s;
-      float wCore = 0.30 * s;
-
-      float tHa   = smoothstep(max(0.0, 0.35 - wHa),   min(1.0, 0.35 + wHa),   densityMod);
-      float tSII  = smoothstep(max(0.0, 0.65 - wSII),  min(1.0, 0.65 + wSII),  densityMod);
-      float tCore = smoothstep(max(0.0, 0.85 - wCore), min(1.0, 0.85 + wCore), densityMod);
+      // Color layer blending driven by Gradient Softness
+      float tHa   = smoothstep(0.05, mix(0.5, 0.9, soft * 0.5), densityMod);
+      float tSII  = smoothstep(0.25, mix(0.7, 1.0, soft * 0.5), densityMod);
+      float tCore = pow(densityMod, max(1.0, 3.0 / soft)) + coreGlow * (0.5 + 0.5 * uMultiCoreStrength);
 
       vec3 col = uColorOIII;
       col = mix(col, uColorHa,   tHa);
       col = mix(col, uColorSII,  tSII);
-      col = mix(col, uColorCore, tCore + coreGlow * (0.5 + 0.5 * uMultiCoreStrength));
+      col = mix(col, uColorCore, clamp(tCore, 0.0, 1.0));
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
 
       // 7. Volumetric scatter halo (soft inner glow)

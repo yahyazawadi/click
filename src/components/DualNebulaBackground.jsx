@@ -29,6 +29,9 @@ export function DualNebulaBackground({
       matRefLayer1.current.uCoreRadius = n1.coreRadius;
       matRefLayer1.current.uAlpha = n1.alpha;
       matRefLayer1.current.uGradientSoftness = n1.gradientSoftness !== undefined ? n1.gradientSoftness : 1.0;
+      if (matRefLayer1.current.uniforms?.uGradientSoftness) {
+        matRefLayer1.current.uniforms.uGradientSoftness.value = n1.gradientSoftness !== undefined ? n1.gradientSoftness : 1.0;
+      }
       matRefLayer1.current.uMultiCoreStrength = n1.multiCoreStrength !== undefined ? n1.multiCoreStrength : 0.0;
       matRefLayer1.current.uMultiCoreScale = n1.multiCoreScale !== undefined ? n1.multiCoreScale : 1.8;
       matRefLayer1.current.uVoidPinch = n1.voidPinch !== undefined ? n1.voidPinch : 0.0;
@@ -51,6 +54,9 @@ export function DualNebulaBackground({
       matRefLayer2.current.uCoreRadius = n2.coreRadius;
       matRefLayer2.current.uAlpha = n2.alpha;
       matRefLayer2.current.uGradientSoftness = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
+      if (matRefLayer2.current.uniforms?.uGradientSoftness) {
+        matRefLayer2.current.uniforms.uGradientSoftness.value = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
+      }
       matRefLayer2.current.uMultiCoreStrength = n2.multiCoreStrength !== undefined ? n2.multiCoreStrength : 0.0;
       matRefLayer2.current.uMultiCoreScale = n2.multiCoreScale !== undefined ? n2.multiCoreScale : 1.8;
       matRefLayer2.current.uVoidPinch = n2.voidPinch !== undefined ? n2.voidPinch : 0.0;
