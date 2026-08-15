@@ -1515,8 +1515,12 @@ export function FpsProfilerOverlay({
                 { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
+                // Multi-Core & Lava Lamp Convection Controls
+                { label: '🔥 MULTI-CORE STRENGTH', key: 'multiCoreStrength', min: 0.0, max: 2.0, step: 0.05 },
+                { label: '🌐 HOTSPOT SCALE', key: 'multiCoreScale', min: 0.5, max: 5.0, step: 0.1 },
+                { label: '🫧 VOID PINCH (METABALLS)', key: 'voidPinch', min: 0.0, max: 1.0, step: 0.05 },
               ].map(({ label, key, min, max, step }) => {
-                const val = currentNebula[key];
+                const val = currentNebula[key] ?? (key === 'multiCoreScale' ? 1.8 : 0);
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
