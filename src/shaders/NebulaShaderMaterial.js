@@ -29,6 +29,8 @@ export const NebulaMaterial = shaderMaterial(
     uScale: 3.5,
     uWarp: 2.5,
     uMaskRadius: 0.38,
+    uMinSize: 0.05,      // Minimum inner solid radius (guaranteed full density)
+    uMaxSize: 0.35,      // Maximum outer perimeter ceiling (smooth zero cutoff)
     uEdgeWarp: 0.25,
     uParallaxOffset: new THREE.Vector2(0, 0),
     uSeedOffset: new THREE.Vector2(0, 0),
@@ -67,6 +69,8 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uScale;
     uniform float uWarp;
     uniform float uMaskRadius;
+    uniform float uMinSize;
+    uniform float uMaxSize;
     uniform float uEdgeWarp;
     uniform vec2 uParallaxOffset;
     uniform vec2 uSeedOffset;
@@ -184,9 +188,11 @@ export const NebulaMaterial = shaderMaterial(
       float edgeDist = length(centeredUv);
       float planeEdgeFade = smoothstep(0.49, 0.08, edgeDist);
 
-      // 2. Organic boundary mask — 2D Cartesian noise (zero polar fan singularities or radial spoke lines)
-      float edgeN   = fbm(centeredUv * 3.2 + uSeedOffset * 0.15 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
-      float organicMask = smoothstep(uMaskRadius * 1.35, uMaskRadius * 0.05, edgeDist + edgeN);
+      // 2. Organic boundary mask calculated directly on final spatial extent
+      float edgeN = fbm(centeredUv * 3.2 + uSeedOffset * 0.15 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
+      float effectiveMaxSize = uMaxSize > 0.001 ? uMaxSize : (uMaskRadius * 1.35);
+      float effectiveMinSize = uMinSize >= 0.0 ? min(uMinSize, effectiveMaxSize - 0.005) : (uMaskRadius * 0.05);
+      float organicMask = smoothstep(effectiveMaxSize, effectiveMinSize, edgeDist + edgeN);
 
       // 3. Domain-warped gas density (uv = centered on screen, seedUv = procedural variation)
       vec2 uv = centeredUv * uScale + uParallaxOffset;

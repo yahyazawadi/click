@@ -31,6 +31,14 @@ export function DualNebulaBackground({
       matRefLayer1.current.uDustStrength = n1.dustStrength;
       matRefLayer1.current.uPillarStrength = n1.pillarStrength;
       matRefLayer1.current.uMaskRadius = n1.maskRadius;
+      matRefLayer1.current.uMinSize = n1.minSize !== undefined ? n1.minSize : (n1.maskRadius ? n1.maskRadius * 0.05 : 0.03);
+      matRefLayer1.current.uMaxSize = n1.maxSize !== undefined ? n1.maxSize : (n1.maskRadius ? n1.maskRadius * 1.35 : 0.32);
+      if (matRefLayer1.current.uniforms?.uMinSize) {
+        matRefLayer1.current.uniforms.uMinSize.value = matRefLayer1.current.uMinSize;
+      }
+      if (matRefLayer1.current.uniforms?.uMaxSize) {
+        matRefLayer1.current.uniforms.uMaxSize.value = matRefLayer1.current.uMaxSize;
+      }
       matRefLayer1.current.uEdgeWarp = n1.edgeWarp;
       matRefLayer1.current.uCoreRadius = n1.coreRadius;
       matRefLayer1.current.uAlpha = n1.alpha;
@@ -64,6 +72,14 @@ export function DualNebulaBackground({
       matRefLayer2.current.uDustStrength = n2.dustStrength;
       matRefLayer2.current.uPillarStrength = n2.pillarStrength;
       matRefLayer2.current.uMaskRadius = n2.maskRadius;
+      matRefLayer2.current.uMinSize = n2.minSize !== undefined ? n2.minSize : (n2.maskRadius ? n2.maskRadius * 0.05 : 0.02);
+      matRefLayer2.current.uMaxSize = n2.maxSize !== undefined ? n2.maxSize : (n2.maskRadius ? n2.maskRadius * 1.35 : 0.20);
+      if (matRefLayer2.current.uniforms?.uMinSize) {
+        matRefLayer2.current.uniforms.uMinSize.value = matRefLayer2.current.uMinSize;
+      }
+      if (matRefLayer2.current.uniforms?.uMaxSize) {
+        matRefLayer2.current.uniforms.uMaxSize.value = matRefLayer2.current.uMaxSize;
+      }
       matRefLayer2.current.uEdgeWarp = n2.edgeWarp;
       matRefLayer2.current.uCoreRadius = n2.coreRadius;
       matRefLayer2.current.uAlpha = n2.alpha;

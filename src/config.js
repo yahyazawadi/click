@@ -287,6 +287,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     dustStrength: 0.92,
     pillarStrength: 0.52,
     maskRadius: 0.23,
+    minSize: 0.03, // Minimum inner solid radius (guaranteed full density core)
+    maxSize: 0.32, // Maximum outer perimeter cutoff
     edgeWarp: 0.74,
     coreRadius: 0.17,
     alpha: 0.72,
@@ -316,6 +318,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     dustStrength: 0,
     pillarStrength: 0.5,
     maskRadius: 0.14,
+    minSize: 0.02, // Minimum inner solid radius (guaranteed full density core)
+    maxSize: 0.20, // Maximum outer perimeter cutoff
     edgeWarp: 1,
     coreRadius: 0.02,
     alpha: 1,

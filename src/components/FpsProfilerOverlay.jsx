@@ -1618,6 +1618,8 @@ export function FpsProfilerOverlay({
                 { label: 'BRIGHTNESS', key: 'brightness', min: 0.1, max: 6.0, step: 0.1 },
                 { label: 'DUST STRENGTH', key: 'dustStrength', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'PILLAR STRENGTH', key: 'pillarStrength', min: 0.0, max: 1.0, step: 0.02 },
+                { label: 'MIN SIZE (INNER)', key: 'minSize', min: 0.0, max: 0.50, step: 0.005 },
+                { label: 'MAX SIZE (OUTER)', key: 'maxSize', min: 0.05, max: 0.90, step: 0.01 },
                 { label: 'MASK RADIUS', key: 'maskRadius', min: 0.05, max: 0.90, step: 0.01 },
                 { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
@@ -1625,7 +1627,13 @@ export function FpsProfilerOverlay({
                 { label: 'MOVEMENT SPEED', key: 'speed', min: 0.0, max: 0.50, step: 0.005 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
               ].map(({ label, key, min, max, step }) => {
-                const val = currentNebula[key] ?? (key === 'gradientSoftness' ? 1.0 : (key === 'speed' ? 0.0 : undefined));
+                const val = currentNebula[key] ?? (
+                  key === 'gradientSoftness' ? 1.0 :
+                  key === 'speed' ? 0.0 :
+                  key === 'minSize' ? (activeNebulaTab === 'nebula1' ? 0.03 : 0.02) :
+                  key === 'maxSize' ? (activeNebulaTab === 'nebula1' ? 0.32 : 0.20) :
+                  undefined
+                );
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
