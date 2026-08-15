@@ -354,7 +354,8 @@ export function FpsProfilerOverlay({
       const colorField = paramKey.replace('color_', '');
       NEBULA_CONFIG[nebulaKey].colors[colorField] = value;
     } else {
-      NEBULA_CONFIG[nebulaKey][paramKey] = parseFloat(value);
+      const parsed = parseFloat(value);
+      NEBULA_CONFIG[nebulaKey][paramKey] = isNaN(parsed) ? 0 : parsed;
     }
     saveToStorage();
     setRerender((v) => v + 1);
@@ -1645,6 +1646,93 @@ export function FpsProfilerOverlay({
                   </div>
                 );
               })}
+
+              {/* Procedural Seed Input Section */}
+              <div style={{
+                marginTop: '0.2rem',
+                paddingTop: '0.35rem',
+                borderTop: '1px solid rgba(0, 186, 227, 0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.35rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--primary-cyan)', fontWeight: 'bold' }}>
+                    🎲 PROCEDURAL SEED:
+                  </span>
+                  <button
+                    onClick={() => {
+                      pushHistorySnapshot();
+                      const current = NEBULA_CONFIG[activeNebulaTab];
+                      if (!current) return;
+                      current.seedX = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+                      current.seedY = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+                      saveToStorage();
+                      setRerender((v) => v + 1);
+                    }}
+                    title="Reroll seed for this nebula only"
+                    style={{
+                      background: 'rgba(0, 186, 227, 0.2)',
+                      border: '1px solid var(--primary-cyan)',
+                      color: 'var(--primary-cyan)',
+                      borderRadius: '3px',
+                      padding: '1px 6px',
+                      fontSize: '0.55rem',
+                      fontFamily: 'var(--font-mono)',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    REROLL THIS
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '0.56rem', color: '#aaa' }}>SEED X:</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={currentNebula.seedX ?? 0.0}
+                      onFocus={pushHistorySnapshot}
+                      onChange={(e) => updateNebulaParam(activeNebulaTab, 'seedX', e.target.value)}
+                      style={{
+                        background: 'rgba(7, 17, 36, 0.9)',
+                        border: '1px solid rgba(0, 186, 227, 0.4)',
+                        borderRadius: '3px',
+                        color: '#00ffaa',
+                        padding: '2px 5px',
+                        fontSize: '0.65rem',
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 'bold',
+                        width: '100%',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '0.56rem', color: '#aaa' }}>SEED Y:</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={currentNebula.seedY ?? 0.0}
+                      onFocus={pushHistorySnapshot}
+                      onChange={(e) => updateNebulaParam(activeNebulaTab, 'seedY', e.target.value)}
+                      style={{
+                        background: 'rgba(7, 17, 36, 0.9)',
+                        border: '1px solid rgba(0, 186, 227, 0.4)',
+                        borderRadius: '3px',
+                        color: '#00ffaa',
+                        padding: '2px 5px',
+                        fontSize: '0.65rem',
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 'bold',
+                        width: '100%',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* Multi-Core & Lava Lamp Convection Section */}
               <div style={{
