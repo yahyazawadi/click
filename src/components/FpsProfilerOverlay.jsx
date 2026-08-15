@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fpsLogger } from '../utils/fpsLogger';
-import { NEBULA_CONFIG, CORE_CONFIG, RINGS_CONFIG } from '../config';
+import { 
+  NEBULA_CONFIG, 
+  CORE_CONFIG, 
+  RINGS_CONFIG, 
+  DEFAULT_CORE_CONFIG, 
+  DEFAULT_RINGS_CONFIG, 
+  DEFAULT_NEBULA_CONFIG 
+} from '../config';
 
 const TIER_COLORS = {
   high: '#00ffaa',
@@ -45,9 +52,10 @@ export function FpsProfilerOverlay({
 
   const [, setRerender] = useState(0);
 
-  // Copy / Paste notification states
+  // Copy / Paste / Reset notification states
   const [copiedStatus, setCopiedStatus] = useState(false);
   const [pastedStatus, setPastedStatus] = useState(false);
+  const [resetStatus, setResetStatus] = useState(false);
 
   // Recursive deep merge helper to ensure nested properties never get overwritten incorrectly
   const deepMerge = (target, source) => {
@@ -82,7 +90,6 @@ export function FpsProfilerOverlay({
   // Undo / Redo history stacks
   const [historyStack, setHistoryStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
-  const initialConfigRef = useRef(getSystemSnapshot());
 
   const pushHistorySnapshot = () => {
     const currentSnapshot = getSystemSnapshot();
@@ -128,7 +135,23 @@ export function FpsProfilerOverlay({
 
   const handleResetToInitial = () => {
     pushHistorySnapshot();
-    applySnapshot(initialConfigRef.current);
+
+    if (activeMainTab === 'core') {
+      deepMerge(CORE_CONFIG, JSON.parse(JSON.stringify(DEFAULT_CORE_CONFIG)));
+    } else if (activeMainTab === 'rings') {
+      deepMerge(RINGS_CONFIG, JSON.parse(JSON.stringify(DEFAULT_RINGS_CONFIG)));
+    } else if (activeMainTab === 'nebula') {
+      deepMerge(NEBULA_CONFIG, JSON.parse(JSON.stringify(DEFAULT_NEBULA_CONFIG)));
+    } else {
+      deepMerge(CORE_CONFIG, JSON.parse(JSON.stringify(DEFAULT_CORE_CONFIG)));
+      deepMerge(RINGS_CONFIG, JSON.parse(JSON.stringify(DEFAULT_RINGS_CONFIG)));
+      deepMerge(NEBULA_CONFIG, JSON.parse(JSON.stringify(DEFAULT_NEBULA_CONFIG)));
+    }
+
+    saveToStorage();
+    setResetStatus(true);
+    setRerender((v) => v + 1);
+    setTimeout(() => setResetStatus(false), 2000);
   };
 
   const toggleVisibility = () => {
@@ -671,20 +694,21 @@ export function FpsProfilerOverlay({
 
             <button
               onClick={handleResetToInitial}
-              title="Reset to Initial Config"
+              title={`Reset active ${activeMainTab.toUpperCase()} configuration to factory code defaults`}
               style={{
-                background: 'rgba(0, 186, 227, 0.15)',
-                color: 'var(--secondary-blue)',
-                border: '1px solid rgba(93, 186, 225, 0.4)',
+                background: resetStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.15)',
+                color: resetStatus ? '#000' : 'var(--secondary-blue)',
+                border: '1px solid ' + (resetStatus ? '#00ffaa' : 'rgba(93, 186, 225, 0.4)'),
                 padding: '0.2rem 0.3rem',
                 fontSize: '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
+                transition: 'all 0.15s ease',
               }}
             >
-              RESET
+              {resetStatus ? 'RESET!' : 'RESET'}
             </button>
 
             <button

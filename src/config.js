@@ -1,55 +1,42 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  CORE PLANET CONFIGURATION (PHYSICAL, SHADERS, ATMOSPHERE, LIGHTING, RINGS)
+//  FACTORY BASELINE CONSTANTS (IMMUTABLE REFERENCE DEFAULTS FOR RESET)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const CORE_CONFIG = {
-  // Physical / Geometry
-  radius: 1.8,             // Core sphere radius
-  rotationSpeed: 0.15,     // Core planetary spin speed (Y-axis)
-
-  // Surface & Atmospheric Color Palette
+export const DEFAULT_CORE_CONFIG = {
+  radius: 1.8,
+  rotationSpeed: 0.15,
   colors: {
-    deepOcean:      '#041830',  // Deep space ocean trench base
-    midOcean:       '#0a4070',  // Visible ocean mid-tone
-    cloudBand:      '#1a7aaa',  // Cloud belt tone
-    stormHighlight: '#00d4f0',  // Bright storm swirl highlight
-    atmosphere:     '#00BAE3',  // Limb atmosphere Fresnel glow
-    continentColor: '#2d5a6e',  // Lighter teal-cyan landmasses
-    coastColor:     '#1a8090',  // Shallow cyan-turquoise coastal shelf
+    deepOcean:      '#041830',
+    midOcean:       '#0a4070',
+    cloudBand:      '#1a7aaa',
+    stormHighlight: '#00d4f0',
+    atmosphere:     '#00BAE3',
+    continentColor: '#2d5a6e',
+    coastColor:     '#1a8090',
   },
-
-  // Procedural Cloud & Belt Dynamics
   clouds: {
-    driftSpeed:     0.025,      // Cloud movement drift speed
-    scale:          2.5,        // Cloud fractal noise scale
-    bandFrequency:  14.0,       // Latitudinal cloud band density
-    bandWarp:       0.12,       // Latitudinal band distortion
-    stormIntensity: 0.70,       // Storm swirl mask intensity
+    driftSpeed:     0.025,
+    scale:          2.5,
+    bandFrequency:  14.0,
+    bandWarp:       0.12,
+    stormIntensity: 0.70,
   },
-
-  // Procedural Continent Landmass Dynamics
   continents: {
-    driftSpeed:     0.004,      // Continental tectonic drift speed
-    scale:          0.95,       // Continent fractal noise scale
-    seaLevel:       -0.10,      // Ocean / land threshold elevation
+    driftSpeed:     0.004,
+    scale:          0.95,
+    seaLevel:       -0.10,
   },
-
-  // Atmospheric Limb Glow (Fresnel)
   atmosphere: {
-    fresnelPower:     3.0,      // Falloff sharpness
-    fresnelIntensity: 0.80,     // Glow brightness
+    fresnelPower:     3.0,
+    fresnelIntensity: 0.80,
   },
-
-  // World Lighting & Specular Gloss
   lighting: {
-    specularIntensity: 0.35,    // Storm/water specular highlight intensity
-    specularShininess: 32.0,    // Specular roughness exponent
-    ambientLight:      0.25,    // Base ambient light floor
-    diffuseLight:      0.85,    // Directional nebula light intensity
-    polarFade:         0.45,    // Polar darkening shadow factor
+    specularIntensity: 0.35,
+    specularShininess: 32.0,
+    ambientLight:      0.25,
+    diffuseLight:      0.85,
+    polarFade:         0.45,
   },
-
-  // Concentric Core Orbit Torus Rings (Inner Spinning Gyro Rings)
   innerRings: {
     ring1: {
       enabled:          true,
@@ -62,7 +49,7 @@ export const CORE_CONFIG = {
       emissive:         '#FF0A2B',
       emissiveIntensity: 0.80,
       opacity:          1.0,
-      tiltX:            0.785398, // Math.PI / 4
+      tiltX:            0.785398,
       tiltY:            0.0,
       tiltZ:            0.0,
     },
@@ -77,18 +64,14 @@ export const CORE_CONFIG = {
       emissive:         '#B3002D',
       emissiveIntensity: 0.65,
       opacity:          0.70,
-      tiltX:            -1.047198, // -Math.PI / 3
-      tiltY:            0.523599,  // Math.PI / 6
+      tiltX:            -1.047198,
+      tiltY:            0.523599,
       tiltZ:            0.0,
     }
   }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MACRO ORBITAL RINGS CONFIGURATION
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const RINGS_CONFIG = {
+export const DEFAULT_RINGS_CONFIG = {
   rings: [
     { id: 0, radius: 5.5, tiltX: 1.2, tiltY: 0.5, tiltZ: -0.2, speed: 0.12, color: '#00BAE3', opacity: 0.35, enabled: true },
     { id: 1, radius: 7.0, tiltX: -0.8, tiltY: 1.1, tiltZ: 0.4, speed: 0.08, color: '#5DBAE1', opacity: 0.35, enabled: true },
@@ -100,6 +83,14 @@ export const RINGS_CONFIG = {
     enabled: true,
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MUTABLE RUNTIME CONFIGURATIONS (LIVE TUNED IN PROFILER)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const CORE_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CORE_CONFIG));
+export const RINGS_CONFIG = JSON.parse(JSON.stringify(DEFAULT_RINGS_CONFIG));
+
 
 export const SYSTEM_CONFIG = {
   // 1. Color Palette
@@ -248,7 +239,7 @@ export const NEBULA_PRESETS = {
   BOW_SHOCK_ARCS: 7,
 };
 
-export const NEBULA_CONFIG = {
+export const DEFAULT_NEBULA_CONFIG = {
   // NEBULA 1 (RED / CRIMSON) - Independent Configuration
   nebula1: {
     path: NEBULA_PRESETS.ORION_BOW_WAVE,  // Path 2 (Orion Bow Wave)
@@ -294,6 +285,8 @@ export const NEBULA_CONFIG = {
   // Locked Baseline Guard
   isLocked: true,
 };
+
+export const NEBULA_CONFIG = JSON.parse(JSON.stringify(DEFAULT_NEBULA_CONFIG));
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  LOCALSTORAGE PERSISTENCE INITIALIZER
