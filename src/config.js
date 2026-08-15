@@ -269,6 +269,14 @@ export const NEBULA_PRESETS = {
   BOW_SHOCK_ARCS: 7,
 };
 
+// Generate unique, high-entropy procedural seeds based on exact timestamp when website is opened
+export function generateTimeBasedSeed(salt = 0) {
+  const now = typeof Date !== 'undefined' ? Date.now() : 1000;
+  const perf = typeof performance !== 'undefined' ? performance.now() : 500;
+  const hash = Math.sin((now + salt * 997) * 0.0015) * 67.0 + Math.cos((perf + salt * 433) * 0.003) * 49.0 + (Math.random() - 0.5) * 30.0;
+  return +(hash).toFixed(1);
+}
+
 export const DEFAULT_NEBULA_CONFIG = {
   // NEBULA 1 (RED / CRIMSON) - Independent Configuration
   nebula1: {
@@ -284,8 +292,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 0.72,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.10, // Organic cosmic drift speed (0.0 = static freeze, 0.10 = calm majestic drift)
-    seedX: 0.0,
-    seedY: 0.0,
+    seedX: generateTimeBasedSeed(1),
+    seedY: generateTimeBasedSeed(2),
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -313,8 +321,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 1,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.12, // Organic cosmic drift speed (0.0 = static freeze, 0.12 = calm majestic drift)
-    seedX: 0.0,
-    seedY: 0.0,
+    seedX: generateTimeBasedSeed(3),
+    seedY: generateTimeBasedSeed(4),
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -359,6 +367,12 @@ if (typeof window !== 'undefined') {
       if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
       if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
     }
+    
+    // Always generate unique timestamp seeds on session startup for both nebulae
+    NEBULA_CONFIG.nebula1.seedX = generateTimeBasedSeed(1);
+    NEBULA_CONFIG.nebula1.seedY = generateTimeBasedSeed(2);
+    NEBULA_CONFIG.nebula2.seedX = generateTimeBasedSeed(3);
+    NEBULA_CONFIG.nebula2.seedY = generateTimeBasedSeed(4);
   } catch (e) {
     console.warn('LocalStorage config load error:', e);
   }
