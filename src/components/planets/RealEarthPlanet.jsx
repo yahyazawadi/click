@@ -8,8 +8,8 @@ export function RealEarthPlanet({ size = 0.65, isMobile = false, perfTierFloat =
   const cloudsRef = useRef();
 
   const planetRadius = size * 0.88;
-  const cloudRadius  = planetRadius * 1.022; // Parallax cloud altitude
-  const segments     = perfTierFloat >= 0.8 ? 20 : (isMobile ? 24 : 38);
+  const cloudRadius  = planetRadius * 1.025; // Clean soft cloud altitude
+  const segments     = perfTierFloat >= 0.8 ? 20 : (isMobile ? 24 : 36);
 
   // Load authentic NASA planetary textures from local /textures directory
   const textures = useTexture([
@@ -20,7 +20,7 @@ export function RealEarthPlanet({ size = 0.65, isMobile = false, perfTierFloat =
 
   const [earthMap, cloudsMap, specularMap] = textures;
 
-  // Optimize texture filtering for crisp 120 FPS rendering
+  // Optimize texture filtering
   useEffect(() => {
     if (earthMap) {
       earthMap.generateMipmaps = true;
@@ -32,10 +32,10 @@ export function RealEarthPlanet({ size = 0.65, isMobile = false, perfTierFloat =
     }
   }, [earthMap, cloudsMap]);
 
-  // Pre-allocate geometries for clean lifecycle management
+  // Pre-allocate geometries
   const earthGeo = useMemo(() => new THREE.SphereGeometry(planetRadius, segments, segments), [planetRadius, segments]);
   const cloudGeo = useMemo(() => new THREE.SphereGeometry(cloudRadius, segments, segments), [cloudRadius, segments]);
-  const hazeGeo  = useMemo(() => new THREE.SphereGeometry(planetRadius * 1.065, 24, 24), [planetRadius]);
+  const hazeGeo  = useMemo(() => new THREE.SphereGeometry(planetRadius * 1.08, 24, 24), [planetRadius]);
 
   useEffect(() => {
     return () => {
@@ -46,51 +46,58 @@ export function RealEarthPlanet({ size = 0.65, isMobile = false, perfTierFloat =
   }, [earthGeo, cloudGeo, hazeGeo]);
 
   useFrame((_state, delta) => {
-    // Earth surface axial rotation
+    // Smooth, relaxing axial rotation
     if (earthRef.current) {
-      earthRef.current.rotation.y += delta * 0.09;
+      earthRef.current.rotation.y += delta * 0.08;
     }
 
-    // Clouds rotate faster to generate continuous authentic 3D parallax over continents
+    // Gentle cloud drift
     if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += delta * 0.13;
+      cloudsRef.current.rotation.y += delta * 0.11;
     }
   });
 
   return (
-    <group rotation={[0.38, 0, 0.12]}>
-      {/* ── 1. Authentic Real Earth (Africa, Europe, Americas, Asia, Australia, Antarctica) ── */}
+    <group rotation={[0.35, 0, 0.1]}>
+      {/* Soft local ambient fill to keep the planet bright, clear, and easy on the eyes */}
+      <pointLight position={[4, 3, 4]} intensity={2.2} color="#ffffff" distance={15} />
+      <pointLight position={[-4, -2, -4]} intensity={1.0} color="#00BAE3" distance={15} />
+
+      {/* ── 1. Clean, Bright Earth Surface (Always Clearly Visible) ── */}
       <mesh ref={earthRef} geometry={earthGeo}>
         <meshStandardMaterial
           map={earthMap}
           roughnessMap={specularMap}
-          roughness={0.65}
+          roughness={0.45}
           metalness={0.1}
-          emissive="#001428"
-          emissiveIntensity={0.15}
+          emissiveMap={earthMap}
+          emissive="#003554"
+          emissiveIntensity={0.65}
         />
       </mesh>
 
-      {/* ── 2. NASA Parallax Cloud Layer ── */}
+      {/* ── 2. Soft, Gentle White Parallax Cloud Layer ── */}
       <mesh ref={cloudsRef} geometry={cloudGeo}>
         <meshStandardMaterial
           map={cloudsMap}
           transparent
-          opacity={0.82}
+          opacity={0.65}
+          emissive="#ffffff"
+          emissiveIntensity={0.35}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
 
-      {/* ── 3. Atmospheric Blue Limb Glow ── */}
+      {/* ── 3. Calming Cyan Atmospheric Halo ── */}
       <mesh geometry={hazeGeo}>
         <meshStandardMaterial
-          color="#38bdf8"
+          color="#00BAE3"
           transparent
-          opacity={0.09}
+          opacity={0.12}
           side={THREE.BackSide}
-          emissive="#38bdf8"
-          emissiveIntensity={0.45}
+          emissive="#00BAE3"
+          emissiveIntensity={0.6}
         />
       </mesh>
     </group>
