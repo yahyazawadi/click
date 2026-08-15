@@ -6,21 +6,24 @@ import * as THREE from 'three';
 const StylizedEarthMaterial = shaderMaterial(
   {
     uSpecularMap: null,
-    uOceanColor: new THREE.Color('#031528'),
-    uOceanEmissive: new THREE.Color('#062444'),
-    uLandColor: new THREE.Color('#00B4D8'),
-    uLandEmissive: new THREE.Color('#0284C7'),
+    uOceanColor: new THREE.Color('#051E3D'),
+    uOceanDeep: new THREE.Color('#020D1C'),
+    uLandColor: new THREE.Color('#1B8A72'),     // Soothing emerald-teal landmasses
+    uLandCoast: new THREE.Color('#2DD4BF'),     // Gentle luminous coastal shelf
+    uPolarColor: new THREE.Color('#E0F2FE'),    // Soft polar ice cap hue
     uAtmosphereColor: new THREE.Color('#38BDF8'),
   },
   // Vertex Shader
   /* glsl */ `
     varying vec2 vUv;
     varying vec3 vNormal;
+    varying vec3 vWorldNormal;
     varying vec3 vViewPosition;
 
     void main() {
       vUv = uv;
       vNormal = normalize(normalMatrix * normal);
+      vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
       vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
       vViewPosition = -mvPosition.xyz;
       gl_Position = projectionMatrix * mvPosition;
@@ -30,32 +33,57 @@ const StylizedEarthMaterial = shaderMaterial(
   /* glsl */ `
     uniform sampler2D uSpecularMap;
     uniform vec3 uOceanColor;
-    uniform vec3 uOceanEmissive;
+    uniform vec3 uOceanDeep;
     uniform vec3 uLandColor;
-    uniform vec3 uLandEmissive;
+    uniform vec3 uLandCoast;
+    uniform vec3 uPolarColor;
     uniform vec3 uAtmosphereColor;
 
     varying vec2 vUv;
     varying vec3 vNormal;
+    varying vec3 vWorldNormal;
     varying vec3 vViewPosition;
 
     void main() {
-      // Sample specular map: 1.0 is ocean, 0.0 is land
+      // Specular map: 1.0 is ocean, 0.0 is land
       float spec = texture2D(uSpecularMap, vUv).r;
-      float isLand = smoothstep(0.45, 0.15, spec);
+      float isLand = smoothstep(0.40, 0.15, spec);
+      float isCoast = smoothstep(0.55, 0.35, spec) * (1.0 - isLand);
 
-      // Stylized clean base & emissive colors (zero photographic noise)
-      vec3 baseCol = mix(uOceanColor, uLandColor, isLand);
-      vec3 emissiveCol = mix(uOceanEmissive, uLandEmissive, isLand);
+      // Polar ice cap blending at extreme latitudes
+      float polarDist = abs(vUv.y - 0.5) * 2.0; // 0 at equator, 1 at poles
+      float isPolar = smoothstep(0.82, 0.94, polarDist);
 
-      // Soft lighting and atmospheric rim fresnel
+      // 3D Directional Sun Lighting
       vec3 normal = normalize(vNormal);
+      vec3 lightDir = normalize(vec3(4.0, 5.0, 8.0));
+      float NdotL = dot(normal, lightDir);
+      float diffuse = max(0.0, NdotL);
+      float ambient = 0.28;
+      float light = ambient + diffuse * 0.82;
+
+      // Ocean color with subtle depth
+      vec3 oceanCol = mix(uOceanDeep, uOceanColor, max(0.0, NdotL * 0.7 + 0.3));
+
+      // Land color with gentle coastal shelf
+      vec3 landCol = mix(uLandColor, uLandCoast, isCoast * 0.6);
+      landCol = mix(landCol, uPolarColor, isPolar * 0.85);
+
+      // Combine base surface
+      vec3 surfaceCol = mix(oceanCol, landCol, isLand);
+      surfaceCol *= light;
+
+      // Soft Ocean Specular Glint
       vec3 viewDir = normalize(vViewPosition);
-      float fresnel = pow(1.0 - max(0.0, dot(normal, viewDir)), 2.8);
+      vec3 halfVector = normalize(lightDir + viewDir);
+      float specHighlight = pow(max(0.0, dot(normal, halfVector)), 32.0);
+      surfaceCol += uAtmosphereColor * (specHighlight * (1.0 - isLand) * 0.35);
 
-      vec3 finalCol = baseCol * 0.6 + emissiveCol * 0.85 + uAtmosphereColor * fresnel * 0.5;
+      // Atmospheric Rim Fresnel
+      float fresnel = pow(1.0 - max(0.0, dot(normal, viewDir)), 2.5);
+      surfaceCol += uAtmosphereColor * fresnel * 0.35;
 
-      gl_FragColor = vec4(finalCol, 1.0);
+      gl_FragColor = vec4(surfaceCol, 1.0);
     }
   `
 );
