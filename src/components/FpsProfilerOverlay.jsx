@@ -163,7 +163,7 @@ export function FpsProfilerOverlay({
     }
   };
 
-  // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo, Ctrl+Shift+R Re-Roll Seeds)
+  // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo, Ctrl+Shift+R / Alt+R Re-Roll Seeds)
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore global hotkeys if the user is actively typing in a text field or textarea
@@ -173,21 +173,27 @@ export function FpsProfilerOverlay({
       if (e.key === '`' || e.key === '~') {
         toggleVisibility();
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z' || e.code === 'KeyZ') && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
       }
-      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      if ((e.ctrlKey || e.metaKey) && ((e.key === 'y' || e.key === 'Y' || e.code === 'KeyY') || (e.shiftKey && (e.key === 'z' || e.key === 'Z' || e.code === 'KeyZ')))) {
         e.preventDefault();
         handleRedo();
       }
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'r') {
+      // Re-roll procedural nebula seeds: Ctrl+Shift+R OR Alt+R
+      const isR = e.key === 'r' || e.key === 'R' || e.code === 'KeyR';
+      if (((e.ctrlKey || e.metaKey) && e.shiftKey && isR) || (e.altKey && isR)) {
         e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') {
+          e.stopImmediatePropagation();
+        }
         handleGenerateNewNebula();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
   }, [onToggle, historyStack, redoStack]);
 
   const [frameHistory, setFrameHistory] = useState([]);
