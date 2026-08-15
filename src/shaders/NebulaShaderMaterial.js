@@ -39,6 +39,10 @@ export const NebulaMaterial = shaderMaterial(
     uStarCount: 12.0,    // number of embedded young stars per nebula
     uGlowRadius: 0.32,   // volumetric halo radius (0..0.5)
     uNebulaPath: 0,      // DEV: 0=Silky Wisps  1=Deep Ocean  2=Orion Ribbon  3=Bioluminescent Veins
+    // Multi-Core & Cellular Convection Parameters
+    uMultiCoreStrength: 0.0,
+    uMultiCoreScale: 1.8,
+    uVoidPinch: 0.0,
   },
   // Vertex Shader
   /* glsl */ `
@@ -70,6 +74,9 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uCoreRadius;
     uniform float uStarCount;
     uniform float uGlowRadius;
+    uniform float uMultiCoreStrength;
+    uniform float uMultiCoreScale;
+    uniform float uVoidPinch;
 
     varying vec2 vUv;
 
@@ -312,12 +319,24 @@ export const NebulaMaterial = shaderMaterial(
       float finalDensity = clamp(gasAfterDust, 0.0, 1.0);
 
       // 6. Hubble SHO color science — full strength bright core highlights
-      float coreGlow = smoothstep(uCoreRadius, 0.0, edgeDist);
+      float singleCore = smoothstep(uCoreRadius, 0.0, edgeDist);
+
+      // Multi-Core & Cellular Convection Field (Lava-Lamp Hotspot Metadynamics)
+      vec2 cellUv = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + vec2(uTime * 0.008, -uTime * 0.006);
+      float cellNoise = fbm(cellUv + qLen * 0.6);
+      float multiCoreField = pow(clamp(cellNoise * 1.5 + 0.35, 0.0, 1.0), 3.0) * 3.5;
+      float multiCore = smoothstep(0.35, 1.0, multiCoreField) * smoothstep(0.05, 0.75, finalDensity);
+
+      float coreGlow = mix(singleCore, multiCore, clamp(uMultiCoreStrength, 0.0, 1.0));
+
+      // Optional void channel pinching (metaball bubble separation)
+      float voidField = pow(clamp(fbm(cellUv * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
+      float densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
 
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  finalDensity));
-      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, finalDensity));
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, finalDensity) + coreGlow * 0.5);
+      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  densityMod));
+      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, densityMod));
+      col = mix(col, uColorCore, smoothstep(0.75, 1.0, densityMod) + coreGlow * (0.5 + 0.5 * uMultiCoreStrength));
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
 
       // 7. Volumetric scatter halo (soft inner glow)

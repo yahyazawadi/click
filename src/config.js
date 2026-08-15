@@ -252,6 +252,10 @@ export const DEFAULT_NEBULA_CONFIG = {
     edgeWarp: 0.64,
     coreRadius: 0.16,
     alpha: 0.92,
+    // Multi-Core & Cellular Convection Parameters
+    multiCoreStrength: 0.0,  // 0.0 = single continuous spine, 1.0+ = multiple molten energy hotspots
+    multiCoreScale: 1.8,     // Spatial distribution density of the hotspots
+    voidPinch: 0.0,          // Void channel pinching between blobs (metaball separation)
     // Color Palette
     colors: {
       sii:  '#b1631b', // Golden Amber Outer Wisps
@@ -273,6 +277,10 @@ export const DEFAULT_NEBULA_CONFIG = {
     edgeWarp: 0.4,
     coreRadius: 0.25,
     alpha: 0.88,
+    // Multi-Core & Cellular Convection Parameters
+    multiCoreStrength: 0.0,  // 0.0 = single continuous spine, 1.0+ = multiple molten energy hotspots
+    multiCoreScale: 1.8,     // Spatial distribution density of the hotspots
+    voidPinch: 0.0,          // Void channel pinching between blobs (metaball separation)
     // Color Palette
     colors: {
       sii:  '#00a8e6', // Rich deep cyan-turquoise

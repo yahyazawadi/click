@@ -28,6 +28,9 @@ export function DualNebulaBackground({
       matRefLayer1.current.uEdgeWarp = n1.edgeWarp;
       matRefLayer1.current.uCoreRadius = n1.coreRadius;
       matRefLayer1.current.uAlpha = n1.alpha;
+      matRefLayer1.current.uMultiCoreStrength = n1.multiCoreStrength !== undefined ? n1.multiCoreStrength : 0.0;
+      matRefLayer1.current.uMultiCoreScale = n1.multiCoreScale !== undefined ? n1.multiCoreScale : 1.8;
+      matRefLayer1.current.uVoidPinch = n1.voidPinch !== undefined ? n1.voidPinch : 0.0;
       matRefLayer1.current.uColorSII.set(n1.colors.sii);
       matRefLayer1.current.uColorHa.set(n1.colors.ha);
       matRefLayer1.current.uColorOIII.set(n1.colors.oiii);
@@ -46,6 +49,9 @@ export function DualNebulaBackground({
       matRefLayer2.current.uEdgeWarp = n2.edgeWarp;
       matRefLayer2.current.uCoreRadius = n2.coreRadius;
       matRefLayer2.current.uAlpha = n2.alpha;
+      matRefLayer2.current.uMultiCoreStrength = n2.multiCoreStrength !== undefined ? n2.multiCoreStrength : 0.0;
+      matRefLayer2.current.uMultiCoreScale = n2.multiCoreScale !== undefined ? n2.multiCoreScale : 1.8;
+      matRefLayer2.current.uVoidPinch = n2.voidPinch !== undefined ? n2.voidPinch : 0.0;
       matRefLayer2.current.uColorSII.set(n2.colors.sii);
       matRefLayer2.current.uColorHa.set(n2.colors.ha);
       matRefLayer2.current.uColorOIII.set(n2.colors.oiii);
@@ -92,6 +98,9 @@ export function DualNebulaBackground({
           uDustStrength={n1.dustStrength}
           uPillarStrength={n1.pillarStrength}
           uCoreRadius={n1.coreRadius}
+          uMultiCoreStrength={n1.multiCoreStrength || 0.0}
+          uMultiCoreScale={n1.multiCoreScale || 1.8}
+          uVoidPinch={n1.voidPinch || 0.0}
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}
@@ -117,6 +126,9 @@ export function DualNebulaBackground({
           uDustStrength={n2.dustStrength}
           uPillarStrength={n2.pillarStrength}
           uCoreRadius={n2.coreRadius}
+          uMultiCoreStrength={n2.multiCoreStrength || 0.0}
+          uMultiCoreScale={n2.multiCoreScale || 1.8}
+          uVoidPinch={n2.voidPinch || 0.0}
           transparent
           depthWrite={false}
           blending={THREE.AdditiveBlending}
