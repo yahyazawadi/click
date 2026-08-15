@@ -165,6 +165,10 @@ export function FpsProfilerOverlay({
   // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo)
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Ignore global hotkeys if the user is actively typing in a text field or textarea
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        return;
+      }
       if (e.key === '`' || e.key === '~') {
         toggleVisibility();
       }
@@ -454,6 +458,12 @@ export function FpsProfilerOverlay({
       // Direct section objects
       if (parsed.colors || parsed.clouds || parsed.continents || parsed.atmosphere || parsed.lighting || parsed.innerRings) {
         deepMerge(CORE_CONFIG, parsed);
+      } else if (parsed.radius !== undefined || parsed.rotationSpeed !== undefined) {
+        deepMerge(CORE_CONFIG, parsed);
+      }
+
+      if (parsed.ring1 || parsed.ring2) {
+        deepMerge(CORE_CONFIG.innerRings, parsed);
       }
 
       // Macro Rings array or object
