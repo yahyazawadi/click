@@ -52,10 +52,11 @@ export function FpsProfilerOverlay({
 
   const [, setRerender] = useState(0);
 
-  // Copy / Paste / Reset notification states
+  // Copy / Paste / Reset / Generate notification states
   const [copiedStatus, setCopiedStatus] = useState(false);
   const [pastedStatus, setPastedStatus] = useState(false);
   const [resetStatus, setResetStatus] = useState(false);
+  const [generatedStatus, setGeneratedStatus] = useState(false);
 
   // Recursive deep merge helper to ensure nested properties never get overwritten incorrectly
   const deepMerge = (target, source) => {
@@ -348,8 +349,6 @@ export function FpsProfilerOverlay({
     saveToStorage();
     setRerender((v) => v + 1);
   };
-
-  const [generatedStatus, setGeneratedStatus] = useState(false);
 
   const handleGenerateNewNebula = () => {
     pushHistorySnapshot();
