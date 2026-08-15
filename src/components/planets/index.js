@@ -5,6 +5,7 @@ import { SculptedHeartPlanet } from './SculptedHeartPlanet';
 import { FlowerPlanet } from './FlowerPlanet';
 import { ClimamedixPlanet } from './ClimamedixPlanet';
 import { RealEarthPlanet } from './RealEarthPlanet';
+import { SimpleEarthPlanet } from './SimpleEarthPlanet';
 
 export {
   ScissorPlanet,
@@ -14,6 +15,8 @@ export {
   FlowerPlanet,
   ClimamedixPlanet,
   RealEarthPlanet,
+  SimpleEarthPlanet,
 };
+
 
 

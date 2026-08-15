@@ -8,10 +8,14 @@ import {
   SculptedHeartPlanet,
   FlowerPlanet,
   RealEarthPlanet,
+  SimpleEarthPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
 function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMobile, perfTierFloat }) {
+  if (type === 'simple-earth' || type === 'climamedix-simple') {
+    return <SimpleEarthPlanet size={size} color={color} isMobile={isMobile} />;
+  }
   if (type === 'climamedix' || type === 'real-earth' || type === 'earth-real') {
     return <RealEarthPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
