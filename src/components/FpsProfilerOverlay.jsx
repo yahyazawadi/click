@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fpsLogger } from '../utils/fpsLogger';
-import { NEBULA_CONFIG } from '../config';
+import { NEBULA_CONFIG, CORE_CONFIG, RINGS_CONFIG } from '../config';
 
 const TIER_COLORS = {
   high: '#00ffaa',
@@ -34,56 +34,83 @@ export function FpsProfilerOverlay({
 
   const visible = isOpen !== undefined ? isOpen : internalVisible;
 
-  // Active nebula tab state ('nebula1' or 'nebula2')
-  const [activeNebulaTab, setActiveNebulaTab] = useState('nebula1');
+  // Main Category Tab: 'core' | 'rings' | 'nebula'
+  const [activeMainTab, setActiveMainTab] = useState('core');
+
+  // Sub-tabs for each section
+  const [activeCoreSubTab, setActiveCoreSubTab] = useState('surface'); // 'surface' | 'dynamics' | 'lighting' | 'innerRings'
+  const [activeCoreRing, setActiveCoreRing] = useState('ring1'); // 'ring1' | 'ring2'
+  const [activeOrbitRingTab, setActiveOrbitRingTab] = useState(0); // 0 | 1 | 2 | 'global'
+  const [activeNebulaTab, setActiveNebulaTab] = useState('nebula1'); // 'nebula1' | 'nebula2'
+
   const [, setRerender] = useState(0);
 
   // Copy / Paste notification states
   const [copiedStatus, setCopiedStatus] = useState(false);
   const [pastedStatus, setPastedStatus] = useState(false);
 
+  // Deep clone helper
+  const getSystemSnapshot = () => ({
+    nebula: JSON.parse(JSON.stringify(NEBULA_CONFIG)),
+    core: JSON.parse(JSON.stringify(CORE_CONFIG)),
+    rings: JSON.parse(JSON.stringify(RINGS_CONFIG)),
+  });
+
   // Undo / Redo history stacks
   const [historyStack, setHistoryStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
-  const initialConfigRef = useRef(JSON.parse(JSON.stringify(NEBULA_CONFIG)));
+  const initialConfigRef = useRef(getSystemSnapshot());
 
   const pushHistorySnapshot = () => {
-    const currentSnapshot = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+    const currentSnapshot = getSystemSnapshot();
     setHistoryStack((prev) => [...prev.slice(-40), currentSnapshot]);
     setRedoStack([]);
+  };
+
+  const applySnapshot = (snapshot) => {
+    if (snapshot.nebula) {
+      if (snapshot.nebula.nebula1) Object.assign(NEBULA_CONFIG.nebula1, snapshot.nebula.nebula1);
+      if (snapshot.nebula.nebula2) Object.assign(NEBULA_CONFIG.nebula2, snapshot.nebula.nebula2);
+    }
+    if (snapshot.core) {
+      Object.assign(CORE_CONFIG, snapshot.core);
+    }
+    if (snapshot.rings) {
+      if (snapshot.rings.rings) {
+        snapshot.rings.rings.forEach((r, idx) => {
+          if (RINGS_CONFIG.rings[idx]) Object.assign(RINGS_CONFIG.rings[idx], r);
+        });
+      }
+      if (snapshot.rings.global) Object.assign(RINGS_CONFIG.global, snapshot.rings.global);
+    }
+    setRerender((v) => v + 1);
   };
 
   const handleUndo = () => {
     if (historyStack.length === 0) return;
     const previousState = historyStack[historyStack.length - 1];
-    const currentState = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+    const currentState = getSystemSnapshot();
 
     setRedoStack((prev) => [...prev, currentState]);
     setHistoryStack((prev) => prev.slice(0, -1));
 
-    Object.assign(NEBULA_CONFIG.nebula1, previousState.nebula1);
-    Object.assign(NEBULA_CONFIG.nebula2, previousState.nebula2);
-    setRerender((v) => v + 1);
+    applySnapshot(previousState);
   };
 
   const handleRedo = () => {
     if (redoStack.length === 0) return;
     const nextState = redoStack[redoStack.length - 1];
-    const currentState = JSON.parse(JSON.stringify(NEBULA_CONFIG));
+    const currentState = getSystemSnapshot();
 
     setHistoryStack((prev) => [...prev, currentState]);
     setRedoStack((prev) => prev.slice(0, -1));
 
-    Object.assign(NEBULA_CONFIG.nebula1, nextState.nebula1);
-    Object.assign(NEBULA_CONFIG.nebula2, nextState.nebula2);
-    setRerender((v) => v + 1);
+    applySnapshot(nextState);
   };
 
   const handleResetToInitial = () => {
     pushHistorySnapshot();
-    Object.assign(NEBULA_CONFIG.nebula1, JSON.parse(JSON.stringify(initialConfigRef.current.nebula1)));
-    Object.assign(NEBULA_CONFIG.nebula2, JSON.parse(JSON.stringify(initialConfigRef.current.nebula2)));
-    setRerender((v) => v + 1);
+    applySnapshot(initialConfigRef.current);
   };
 
   const toggleVisibility = () => {
@@ -204,7 +231,53 @@ export function FpsProfilerOverlay({
     return null;
   }
 
-  // Update a parameter directly on NEBULA_CONFIG and trigger state re-render
+  // --- PARAMETER UPDATE HELPERS ---
+
+  const updateCoreParam = (section, key, value, isNumeric = true) => {
+    if (section === 'root') {
+      CORE_CONFIG[key] = isNumeric ? parseFloat(value) : value;
+    } else if (section === 'colors') {
+      CORE_CONFIG.colors[key] = value;
+    } else {
+      CORE_CONFIG[section][key] = isNumeric ? parseFloat(value) : value;
+    }
+    setRerender((v) => v + 1);
+  };
+
+  const updateCoreRingParam = (ringKey, key, value, isNumeric = true) => {
+    if (!CORE_CONFIG.innerRings[ringKey]) return;
+    if (key === 'enabled') {
+      CORE_CONFIG.innerRings[ringKey].enabled = value;
+    } else if (key === 'color' || key === 'emissive') {
+      CORE_CONFIG.innerRings[ringKey][key] = value;
+    } else {
+      CORE_CONFIG.innerRings[ringKey][key] = isNumeric ? parseFloat(value) : value;
+    }
+    setRerender((v) => v + 1);
+  };
+
+  const updateOrbitRingParam = (ringIndex, key, value, isNumeric = true) => {
+    const ring = RINGS_CONFIG.rings[ringIndex];
+    if (!ring) return;
+    if (key === 'enabled') {
+      ring.enabled = value;
+    } else if (key === 'color') {
+      ring.color = value;
+    } else {
+      ring[key] = isNumeric ? parseFloat(value) : value;
+    }
+    setRerender((v) => v + 1);
+  };
+
+  const updateGlobalRingParam = (key, value, isNumeric = true) => {
+    if (key === 'enabled') {
+      RINGS_CONFIG.global.enabled = value;
+    } else {
+      RINGS_CONFIG.global[key] = isNumeric ? parseFloat(value) : value;
+    }
+    setRerender((v) => v + 1);
+  };
+
   const updateNebulaParam = (nebulaKey, paramKey, value) => {
     if (paramKey.startsWith('color_')) {
       const colorField = paramKey.replace('color_', '');
@@ -216,8 +289,13 @@ export function FpsProfilerOverlay({
   };
 
   const copyConfigJson = () => {
-    const configStr = JSON.stringify(NEBULA_CONFIG, null, 2);
-    navigator.clipboard.writeText(configStr);
+    let payload = {};
+    if (activeMainTab === 'core') payload = { CORE_CONFIG };
+    else if (activeMainTab === 'rings') payload = { RINGS_CONFIG };
+    else if (activeMainTab === 'nebula') payload = { NEBULA_CONFIG };
+    else payload = { CORE_CONFIG, RINGS_CONFIG, NEBULA_CONFIG };
+
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
     setCopiedStatus(true);
     setTimeout(() => setCopiedStatus(false), 2000);
   };
@@ -228,14 +306,29 @@ export function FpsProfilerOverlay({
       if (!text) return;
       const parsed = JSON.parse(text);
       pushHistorySnapshot();
-      if (parsed.nebula1 || parsed.nebula2) {
-        if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
-        if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
-      } else if (parsed.scale !== undefined || parsed.brightness !== undefined) {
-        Object.assign(NEBULA_CONFIG[activeNebulaTab], parsed);
-      } else {
-        return;
+
+      if (parsed.CORE_CONFIG || parsed.core) {
+        Object.assign(CORE_CONFIG, parsed.CORE_CONFIG || parsed.core);
+      } else if (parsed.colors || parsed.clouds || parsed.innerRings) {
+        Object.assign(CORE_CONFIG, parsed);
       }
+
+      if (parsed.RINGS_CONFIG || parsed.rings) {
+        const ringsData = parsed.RINGS_CONFIG || parsed.rings;
+        if (Array.isArray(ringsData)) {
+          ringsData.forEach((r, i) => { if (RINGS_CONFIG.rings[i]) Object.assign(RINGS_CONFIG.rings[i], r); });
+        } else if (ringsData.rings) {
+          ringsData.rings.forEach((r, i) => { if (RINGS_CONFIG.rings[i]) Object.assign(RINGS_CONFIG.rings[i], r); });
+          if (ringsData.global) Object.assign(RINGS_CONFIG.global, ringsData.global);
+        }
+      }
+
+      if (parsed.NEBULA_CONFIG || parsed.nebula1 || parsed.nebula2) {
+        const nebData = parsed.NEBULA_CONFIG || parsed;
+        if (nebData.nebula1) Object.assign(NEBULA_CONFIG.nebula1, nebData.nebula1);
+        if (nebData.nebula2) Object.assign(NEBULA_CONFIG.nebula2, nebData.nebula2);
+      }
+
       setPastedStatus(true);
       setRerender((v) => v + 1);
       setTimeout(() => setPastedStatus(false), 2000);
@@ -245,6 +338,8 @@ export function FpsProfilerOverlay({
   };
 
   const currentNebula = NEBULA_CONFIG[activeNebulaTab];
+  const currentRing = RINGS_CONFIG.rings[activeOrbitRingTab];
+  const currentCoreRing = CORE_CONFIG.innerRings[activeCoreRing];
 
   return (
     <div 
@@ -254,10 +349,10 @@ export function FpsProfilerOverlay({
         position: 'fixed',
         top: '12px',
         right: '12px',
-        width: '340px',
+        width: '350px',
         maxHeight: '92vh',
         zIndex: 9999,
-        background: 'rgba(7, 17, 36, 0.96)',
+        background: 'rgba(7, 17, 36, 0.97)',
         border: '1px solid var(--primary-cyan)',
         boxShadow: '0 0 25px rgba(0, 186, 227, 0.3)',
         borderRadius: '10px',
@@ -275,7 +370,7 @@ export function FpsProfilerOverlay({
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem' }}>
         <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.05em' }}>
-          TELEMETRY PROFILER
+          TELEMETRY PROFILER & TUNER
         </span>
         <button 
           onClick={toggleVisibility}
@@ -301,7 +396,7 @@ export function FpsProfilerOverlay({
         <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)', marginBottom: '2px' }}>
           FRAME TIME GRAPH (ms) - 16.6ms target
         </div>
-        <canvas ref={canvasRef} width={300} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
+        <canvas ref={canvasRef} width={310} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
       </div>
 
       {/* GPU Tier Switcher */}
@@ -378,7 +473,9 @@ export function FpsProfilerOverlay({
         </div>
       </div>
 
-      {/* NEBULA LIVE PARAMETER TUNER */}
+      {/* ─────────────────────────────────────────────────────────────
+          MASTER INSPECTOR / TUNER SECTION
+      ───────────────────────────────────────────────────────────── */}
       <div style={{
         marginTop: '0.4rem',
         paddingTop: '0.5rem',
@@ -387,9 +484,10 @@ export function FpsProfilerOverlay({
         flexDirection: 'column',
         gap: '0.5rem'
       }}>
+        {/* Main Category Header & History Actions */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
-            NEBULA SHAPE TUNER
+            SYSTEM LIVE TUNER
           </span>
           <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <button
@@ -484,136 +582,829 @@ export function FpsProfilerOverlay({
           </div>
         </div>
 
-        {/* Tab Selection */}
+        {/* Master Category Tabs (CORE PLANET | ORBIT RINGS | NEBULA) */}
         <div style={{ display: 'flex', gap: '0.3rem' }}>
-          <button
-            onClick={() => setActiveNebulaTab('nebula1')}
-            style={{
-              flex: 1,
-              padding: '0.35rem',
-              fontSize: '0.63rem',
-              fontFamily: 'var(--font-mono)',
-              border: '1px solid ' + (activeNebulaTab === 'nebula1' ? '#ff3550' : '#444'),
-              background: activeNebulaTab === 'nebula1' ? 'rgba(255, 53, 80, 0.2)' : 'transparent',
-              color: activeNebulaTab === 'nebula1' ? '#ff3550' : '#888',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: activeNebulaTab === 'nebula1' ? 'bold' : 'normal'
-            }}
-          >
-            NEBULA 1 (RED)
-          </button>
-
-          <button
-            onClick={() => setActiveNebulaTab('nebula2')}
-            style={{
-              flex: 1,
-              padding: '0.35rem',
-              fontSize: '0.63rem',
-              fontFamily: 'var(--font-mono)',
-              border: '1px solid ' + (activeNebulaTab === 'nebula2' ? '#00bae3' : '#444'),
-              background: activeNebulaTab === 'nebula2' ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
-              color: activeNebulaTab === 'nebula2' ? '#00bae3' : '#888',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: activeNebulaTab === 'nebula2' ? 'bold' : 'normal'
-            }}
-          >
-            NEBULA 2 (BLUE)
-          </button>
-        </div>
-
-        {/* Sliders Grid */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.4rem',
-          background: 'rgba(0, 50, 104, 0.15)',
-          padding: '0.5rem',
-          borderRadius: '6px',
-          border: '1px solid rgba(0, 186, 227, 0.15)'
-        }}>
           {[
-            { label: 'SCALE', key: 'scale', min: 1.0, max: 10.0, step: 0.1 },
-            { label: 'WARP', key: 'warp', min: 0.0, max: 10.0, step: 0.1 },
-            { label: 'BRIGHTNESS', key: 'brightness', min: 0.1, max: 6.0, step: 0.1 },
-            { label: 'DUST STRENGTH', key: 'dustStrength', min: 0.0, max: 1.0, step: 0.02 },
-            { label: 'PILLAR STRENGTH', key: 'pillarStrength', min: 0.0, max: 1.0, step: 0.02 },
-            { label: 'MASK RADIUS', key: 'maskRadius', min: 0.05, max: 0.90, step: 0.01 },
-            { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
-            { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
-            { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
-          ].map(({ label, key, min, max, step }) => {
-            const val = currentNebula[key];
+            { key: 'core', label: '🪐 CORE PLANET', color: '#00BAE3' },
+            { key: 'rings', label: '⭕ ORBIT RINGS', color: '#5DBAE1' },
+            { key: 'nebula', label: '🌌 NEBULA', color: '#ff3550' },
+          ].map(({ key, label, color }) => {
+            const isActive = activeMainTab === key;
             return (
-              <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
-                  <span>{label}:</span>
-                  <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
-                </div>
-                <input
-                  type="range"
-                  min={min}
-                  max={max}
-                  step={step}
-                  value={val}
-                  onMouseDown={pushHistorySnapshot}
-                  onTouchStart={pushHistorySnapshot}
-                  onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
-                  style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
-                />
-              </div>
+              <button
+                key={key}
+                onClick={() => setActiveMainTab(key)}
+                style={{
+                  flex: 1,
+                  padding: '0.4rem 0.2rem',
+                  fontSize: '0.62rem',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: isActive ? 'bold' : 'normal',
+                  border: `1px solid ${isActive ? color : '#444'}`,
+                  background: isActive ? `${color}25` : 'transparent',
+                  color: isActive ? color : '#888',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  boxShadow: isActive ? `0 0 10px ${color}33` : 'none',
+                }}
+              >
+                {label}
+              </button>
             );
           })}
+        </div>
 
-          {/* Color Palette Controls */}
-          <div style={{ marginTop: '0.3rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-            <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
-              COLOR PALETTE (HEX):
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem' }}>
+        {/* ═══════════════════════════════════════════════════════════
+            TAB 1: CORE PLANET INSPECTOR
+        ═══════════════════════════════════════════════════════════ */}
+        {activeMainTab === 'core' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            {/* Core Sub-Tabs */}
+            <div style={{ display: 'flex', gap: '0.25rem', overflowX: 'auto' }}>
               {[
-                { label: 'SII (WISPS)', key: 'color_sii' },
-                { label: 'HA (MID)', key: 'color_ha' },
-                { label: 'OIII (VOID)', key: 'color_oiii' },
-                { label: 'CORE', key: 'color_core' },
-              ].map(({ label, key }) => {
-                const colorField = key.replace('color_', '');
-                const hexVal = currentNebula.colors[colorField];
+                { key: 'surface', label: 'SURFACE & COLORS' },
+                { key: 'dynamics', label: 'DYNAMICS & LAND' },
+                { key: 'lighting', label: 'ATMOSPHERE & LIGHT' },
+                { key: 'innerRings', label: 'INNER RINGS' },
+              ].map(({ key, label }) => {
+                const isActive = activeCoreSubTab === key;
                 return (
-                  <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.58rem', color: '#aaa' }}>{label}:</span>
-                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                      <input
-                        type="color"
-                        value={hexVal}
-                        onMouseDown={pushHistorySnapshot}
-                        onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
-                        style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                      />
-                      <input
-                        type="text"
-                        value={hexVal}
-                        onFocus={pushHistorySnapshot}
-                        onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
-                        style={{
-                          width: '100%',
-                          background: 'rgba(0, 0, 0, 0.4)',
-                          border: '1px solid #444',
-                          color: '#fff',
-                          fontSize: '0.58rem',
-                          fontFamily: 'var(--font-mono)',
-                          borderRadius: '3px',
-                          padding: '2px 4px'
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <button
+                    key={key}
+                    onClick={() => setActiveCoreSubTab(key)}
+                    style={{
+                      flex: 1,
+                      whiteSpace: 'nowrap',
+                      padding: '0.3rem 0.25rem',
+                      fontSize: '0.56rem',
+                      fontFamily: 'var(--font-mono)',
+                      border: '1px solid ' + (isActive ? 'var(--primary-cyan)' : '#333'),
+                      background: isActive ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                      color: isActive ? 'var(--primary-cyan)' : '#888',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      fontWeight: isActive ? 'bold' : 'normal'
+                    }}
+                  >
+                    {label}
+                  </button>
                 );
               })}
             </div>
+
+            {/* Sub-Tab: Surface & Colors */}
+            {activeCoreSubTab === 'surface' && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                {/* Physical Sliders */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
+                    <span>CORE RADIUS:</span>
+                    <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{CORE_CONFIG.radius}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="5.0"
+                    step="0.05"
+                    value={CORE_CONFIG.radius}
+                    onMouseDown={pushHistorySnapshot}
+                    onTouchStart={pushHistorySnapshot}
+                    onChange={(e) => updateCoreParam('root', 'radius', e.target.value)}
+                    style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
+                    <span>ROTATION SPEED:</span>
+                    <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{CORE_CONFIG.rotationSpeed}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="-1.0"
+                    max="1.0"
+                    step="0.01"
+                    value={CORE_CONFIG.rotationSpeed}
+                    onMouseDown={pushHistorySnapshot}
+                    onTouchStart={pushHistorySnapshot}
+                    onChange={(e) => updateCoreParam('root', 'rotationSpeed', e.target.value)}
+                    style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                  />
+                </div>
+
+                {/* Color Palette Grid */}
+                <div style={{ marginTop: '0.2rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                    SURFACE COLOR PALETTE:
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem' }}>
+                    {[
+                      { label: 'DEEP OCEAN', key: 'deepOcean' },
+                      { label: 'MID OCEAN', key: 'midOcean' },
+                      { label: 'CLOUD BELT', key: 'cloudBand' },
+                      { label: 'STORM HIGHLIGHT', key: 'stormHighlight' },
+                      { label: 'ATMOSPHERE GLOW', key: 'atmosphere' },
+                      { label: 'CONTINENT LAND', key: 'continentColor' },
+                      { label: 'COASTAL SHELF', key: 'coastColor' },
+                    ].map(({ label, key }) => {
+                      const hexVal = CORE_CONFIG.colors[key];
+                      return (
+                        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.56rem', color: '#aaa' }}>{label}:</span>
+                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            <input
+                              type="color"
+                              value={hexVal}
+                              onMouseDown={pushHistorySnapshot}
+                              onChange={(e) => updateCoreParam('colors', key, e.target.value, false)}
+                              style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            />
+                            <input
+                              type="text"
+                              value={hexVal}
+                              onFocus={pushHistorySnapshot}
+                              onChange={(e) => updateCoreParam('colors', key, e.target.value, false)}
+                              style={{
+                                width: '100%',
+                                background: 'rgba(0, 0, 0, 0.4)',
+                                border: '1px solid #444',
+                                color: '#fff',
+                                fontSize: '0.56rem',
+                                fontFamily: 'var(--font-mono)',
+                                borderRadius: '3px',
+                                padding: '2px 4px'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-Tab: Dynamics & Land */}
+            {activeCoreSubTab === 'dynamics' && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  ATMOSPHERIC CLOUD & BELT DYNAMICS:
+                </div>
+                {[
+                  { label: 'CLOUD DRIFT SPEED', section: 'clouds', key: 'driftSpeed', min: 0.0, max: 0.1, step: 0.002 },
+                  { label: 'CLOUD SCALE', section: 'clouds', key: 'scale', min: 0.5, max: 6.0, step: 0.1 },
+                  { label: 'BAND FREQUENCY', section: 'clouds', key: 'bandFrequency', min: 2.0, max: 30.0, step: 0.5 },
+                  { label: 'BAND WARP', section: 'clouds', key: 'bandWarp', min: 0.0, max: 0.5, step: 0.01 },
+                  { label: 'STORM INTENSITY', section: 'clouds', key: 'stormIntensity', min: 0.0, max: 2.0, step: 0.05 },
+                ].map(({ label, section, key, min, max, step }) => {
+                  const val = CORE_CONFIG[section][key];
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreParam(section, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+
+                <div style={{ marginTop: '0.3rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  CONTINENTAL TECTONICS:
+                </div>
+                {[
+                  { label: 'CONTINENT DRIFT', section: 'continents', key: 'driftSpeed', min: 0.0, max: 0.05, step: 0.001 },
+                  { label: 'CONTINENT SCALE', section: 'continents', key: 'scale', min: 0.2, max: 3.0, step: 0.05 },
+                  { label: 'SEA LEVEL ELEVATION', section: 'continents', key: 'seaLevel', min: -0.60, max: 0.60, step: 0.02 },
+                ].map(({ label, section, key, min, max, step }) => {
+                  const val = CORE_CONFIG[section][key];
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreParam(section, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Sub-Tab: Atmosphere & Lighting */}
+            {activeCoreSubTab === 'lighting' && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  ATMOSPHERE LIMB GLOW (FRESNEL):
+                </div>
+                {[
+                  { label: 'FRESNEL POWER', section: 'atmosphere', key: 'fresnelPower', min: 0.5, max: 8.0, step: 0.1 },
+                  { label: 'FRESNEL INTENSITY', section: 'atmosphere', key: 'fresnelIntensity', min: 0.0, max: 3.0, step: 0.05 },
+                ].map(({ label, section, key, min, max, step }) => {
+                  const val = CORE_CONFIG[section][key];
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreParam(section, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+
+                <div style={{ marginTop: '0.3rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  WORLD LIGHTING & SPECULAR HIGHLIGHTS:
+                </div>
+                {[
+                  { label: 'SPECULAR INTENSITY', section: 'lighting', key: 'specularIntensity', min: 0.0, max: 2.0, step: 0.05 },
+                  { label: 'SPECULAR SHININESS', section: 'lighting', key: 'specularShininess', min: 4.0, max: 128.0, step: 2.0 },
+                  { label: 'AMBIENT LIGHT FLOOR', section: 'lighting', key: 'ambientLight', min: 0.0, max: 1.0, step: 0.02 },
+                  { label: 'DIFFUSE LIGHT', section: 'lighting', key: 'diffuseLight', min: 0.0, max: 2.0, step: 0.05 },
+                  { label: 'POLAR DARKENING FADE', section: 'lighting', key: 'polarFade', min: 0.0, max: 1.0, step: 0.05 },
+                ].map(({ label, section, key, min, max, step }) => {
+                  const val = CORE_CONFIG[section][key];
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreParam(section, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Sub-Tab: Inner Concentric Rings */}
+            {activeCoreSubTab === 'innerRings' && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                <div style={{ display: 'flex', gap: '0.3rem' }}>
+                  {['ring1', 'ring2'].map((ringKey) => {
+                    const isActive = activeCoreRing === ringKey;
+                    return (
+                      <button
+                        key={ringKey}
+                        onClick={() => setActiveCoreRing(ringKey)}
+                        style={{
+                          flex: 1,
+                          padding: '0.3rem',
+                          fontSize: '0.6rem',
+                          fontFamily: 'var(--font-mono)',
+                          border: '1px solid ' + (isActive ? 'var(--primary-cyan)' : '#444'),
+                          background: isActive ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                          color: isActive ? 'var(--primary-cyan)' : '#888',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: isActive ? 'bold' : 'normal'
+                        }}
+                      >
+                        {ringKey === 'ring1' ? 'INNER RING 1' : 'OUTER RING 2'}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Active Core Ring Controls */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.2rem' }}>
+                  <span style={{ fontSize: '0.62rem', color: '#ccc' }}>RING STATUS:</span>
+                  <button
+                    onClick={() => {
+                      pushHistorySnapshot();
+                      updateCoreRingParam(activeCoreRing, 'enabled', currentCoreRing.enabled === false);
+                    }}
+                    style={{
+                      padding: '0.2rem 0.5rem',
+                      fontSize: '0.58rem',
+                      fontFamily: 'var(--font-mono)',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      border: '1px solid ' + (currentCoreRing.enabled !== false ? '#00ffaa' : '#ff4444'),
+                      background: currentCoreRing.enabled !== false ? 'rgba(0, 255, 170, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                      color: currentCoreRing.enabled !== false ? '#00ffaa' : '#ff4444',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {currentCoreRing.enabled !== false ? 'ENABLED' : 'DISABLED'}
+                  </button>
+                </div>
+
+                {/* Radius, Tube & Opacity */}
+                {[
+                  { label: 'RADIUS MULTIPLIER', key: 'radiusMultiplier', min: 1.0, max: 4.0, step: 0.05 },
+                  { label: 'TUBE THICKNESS', key: 'tubeRadius', min: 0.005, max: 0.1, step: 0.002 },
+                  { label: 'OPACITY', key: 'opacity', min: 0.0, max: 1.0, step: 0.05 },
+                  { label: 'EMISSIVE INTENSITY', key: 'emissiveIntensity', min: 0.0, max: 3.0, step: 0.05 },
+                ].map(({ label, key, min, max, step }) => {
+                  const val = currentCoreRing[key] ?? (key === 'opacity' ? 1.0 : key === 'emissiveIntensity' ? 0.8 : 1.5);
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Rotation Speeds */}
+                {activeCoreRing === 'ring1' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                      <span>SPIN SPEED (Z):</span>
+                      <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedZ ?? 0.4}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-2.0"
+                      max="2.0"
+                      step="0.05"
+                      value={currentCoreRing.speedZ ?? 0.4}
+                      onMouseDown={pushHistorySnapshot}
+                      onTouchStart={pushHistorySnapshot}
+                      onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedZ', e.target.value)}
+                      style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>SPIN SPEED (X):</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedX ?? 0.3}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-2.0"
+                        max="2.0"
+                        step="0.05"
+                        value={currentCoreRing.speedX ?? 0.3}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedX', e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>SPIN SPEED (Y):</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{currentCoreRing.speedY ?? 0.2}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-2.0"
+                        max="2.0"
+                        step="0.05"
+                        value={currentCoreRing.speedY ?? 0.2}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateCoreRingParam(activeCoreRing, 'speedY', e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Ring Colors */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.2rem' }}>
+                  {[
+                    { label: 'BASE COLOR', key: 'color' },
+                    { label: 'EMISSIVE GLOW', key: 'emissive' },
+                  ].map(({ label, key }) => {
+                    const hexVal = currentCoreRing[key] || '#FF0A2B';
+                    return (
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.56rem', color: '#aaa' }}>{label}:</span>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          <input
+                            type="color"
+                            value={hexVal}
+                            onMouseDown={pushHistorySnapshot}
+                            onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value, false)}
+                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                          />
+                          <input
+                            type="text"
+                            value={hexVal}
+                            onFocus={pushHistorySnapshot}
+                            onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value, false)}
+                            style={{
+                              width: '100%',
+                              background: 'rgba(0, 0, 0, 0.4)',
+                              border: '1px solid #444',
+                              color: '#fff',
+                              fontSize: '0.56rem',
+                              fontFamily: 'var(--font-mono)',
+                              borderRadius: '3px',
+                              padding: '2px 4px'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════
+            TAB 2: ORBITAL RINGS / CIRCLES INSPECTOR
+        ═══════════════════════════════════════════════════════════ */}
+        {activeMainTab === 'rings' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            {/* Ring Selector Sub-Tabs */}
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              {[0, 1, 2, 'global'].map((tabKey) => {
+                const isActive = activeOrbitRingTab === tabKey;
+                const label = tabKey === 'global' ? 'GLOBAL' : `RING ${tabKey}`;
+                return (
+                  <button
+                    key={String(tabKey)}
+                    onClick={() => setActiveOrbitRingTab(tabKey)}
+                    style={{
+                      flex: 1,
+                      padding: '0.3rem 0.2rem',
+                      fontSize: '0.6rem',
+                      fontFamily: 'var(--font-mono)',
+                      border: '1px solid ' + (isActive ? 'var(--secondary-blue)' : '#444'),
+                      background: isActive ? 'rgba(93, 186, 225, 0.2)' : 'transparent',
+                      color: isActive ? 'var(--secondary-blue)' : '#888',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: isActive ? 'bold' : 'normal'
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Individual Ring Settings */}
+            {activeOrbitRingTab !== 'global' && currentRing && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.62rem', color: '#ccc' }}>RING {activeOrbitRingTab} STATUS:</span>
+                  <button
+                    onClick={() => {
+                      pushHistorySnapshot();
+                      updateOrbitRingParam(activeOrbitRingTab, 'enabled', currentRing.enabled === false);
+                    }}
+                    style={{
+                      padding: '0.2rem 0.5rem',
+                      fontSize: '0.58rem',
+                      fontFamily: 'var(--font-mono)',
+                      borderRadius: '3px',
+                      cursor: 'pointer',
+                      border: '1px solid ' + (currentRing.enabled !== false ? '#00ffaa' : '#ff4444'),
+                      background: currentRing.enabled !== false ? 'rgba(0, 255, 170, 0.2)' : 'rgba(255, 68, 68, 0.2)',
+                      color: currentRing.enabled !== false ? '#00ffaa' : '#ff4444',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {currentRing.enabled !== false ? 'VISIBLE' : 'HIDDEN'}
+                  </button>
+                </div>
+
+                {/* Orbit Sliders */}
+                {[
+                  { label: 'ORBIT RADIUS', key: 'radius', min: 2.0, max: 20.0, step: 0.1 },
+                  { label: 'ORBIT SPEED', key: 'speed', min: -0.5, max: 0.5, step: 0.005 },
+                  { label: 'TILT X (PITCH)', key: 'tiltX', min: -3.14, max: 3.14, step: 0.05 },
+                  { label: 'TILT Y (YAW)', key: 'tiltY', min: -3.14, max: 3.14, step: 0.05 },
+                  { label: 'TILT Z (ROLL)', key: 'tiltZ', min: -3.14, max: 3.14, step: 0.05 },
+                  { label: 'RING OPACITY', key: 'opacity', min: 0.05, max: 1.0, step: 0.02 },
+                ].map(({ label, key, min, max, step }) => {
+                  const val = currentRing[key] ?? (key === 'opacity' ? 0.35 : 0);
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateOrbitRingParam(activeOrbitRingTab, key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Ring Color */}
+                <div style={{ marginTop: '0.2rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <div style={{ fontSize: '0.58rem', color: '#aaa', marginBottom: '3px' }}>RING COLOR:</div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <input
+                      type="color"
+                      value={currentRing.color || '#00BAE3'}
+                      onMouseDown={pushHistorySnapshot}
+                      onChange={(e) => updateOrbitRingParam(activeOrbitRingTab, 'color', e.target.value, false)}
+                      style={{ width: '24px', height: '24px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                    />
+                    <input
+                      type="text"
+                      value={currentRing.color || '#00BAE3'}
+                      onFocus={pushHistorySnapshot}
+                      onChange={(e) => updateOrbitRingParam(activeOrbitRingTab, 'color', e.target.value, false)}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(0, 0, 0, 0.4)',
+                        border: '1px solid #444',
+                        color: '#fff',
+                        fontSize: '0.6rem',
+                        fontFamily: 'var(--font-mono)',
+                        borderRadius: '3px',
+                        padding: '2px 4px'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Global Rings Settings */}
+            {activeOrbitRingTab === 'global' && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: 'rgba(0, 50, 104, 0.15)',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid rgba(0, 186, 227, 0.15)'
+              }}>
+                <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  GLOBAL ORBIT SYSTEM MULTIPLIERS:
+                </div>
+                {[
+                  { label: 'GLOBAL SPEED MULTIPLIER', key: 'speedMultiplier', min: 0.0, max: 3.0, step: 0.05 },
+                  { label: 'GLOBAL OPACITY MULTIPLIER', key: 'opacityMultiplier', min: 0.0, max: 2.0, step: 0.05 },
+                ].map(({ label, key, min, max, step }) => {
+                  const val = RINGS_CONFIG.global[key] ?? 1.0;
+                  return (
+                    <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.58rem', color: '#ccc' }}>
+                        <span>{label}:</span>
+                        <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={val}
+                        onMouseDown={pushHistorySnapshot}
+                        onTouchStart={pushHistorySnapshot}
+                        onChange={(e) => updateGlobalRingParam(key, e.target.value)}
+                        style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════
+            TAB 3: NEBULA LIVE SHAPE TUNER (100% PRESERVED)
+        ═══════════════════════════════════════════════════════════ */}
+        {activeMainTab === 'nebula' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            {/* Tab Selection */}
+            <div style={{ display: 'flex', gap: '0.3rem' }}>
+              <button
+                onClick={() => setActiveNebulaTab('nebula1')}
+                style={{
+                  flex: 1,
+                  padding: '0.35rem',
+                  fontSize: '0.63rem',
+                  fontFamily: 'var(--font-mono)',
+                  border: '1px solid ' + (activeNebulaTab === 'nebula1' ? '#ff3550' : '#444'),
+                  background: activeNebulaTab === 'nebula1' ? 'rgba(255, 53, 80, 0.2)' : 'transparent',
+                  color: activeNebulaTab === 'nebula1' ? '#ff3550' : '#888',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: activeNebulaTab === 'nebula1' ? 'bold' : 'normal'
+                }}
+              >
+                NEBULA 1 (RED)
+              </button>
+
+              <button
+                onClick={() => setActiveNebulaTab('nebula2')}
+                style={{
+                  flex: 1,
+                  padding: '0.35rem',
+                  fontSize: '0.63rem',
+                  fontFamily: 'var(--font-mono)',
+                  border: '1px solid ' + (activeNebulaTab === 'nebula2' ? '#00bae3' : '#444'),
+                  background: activeNebulaTab === 'nebula2' ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
+                  color: activeNebulaTab === 'nebula2' ? '#00bae3' : '#888',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: activeNebulaTab === 'nebula2' ? 'bold' : 'normal'
+                }}
+              >
+                NEBULA 2 (BLUE)
+              </button>
+            </div>
+
+            {/* Sliders Grid */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.4rem',
+              background: 'rgba(0, 50, 104, 0.15)',
+              padding: '0.5rem',
+              borderRadius: '6px',
+              border: '1px solid rgba(0, 186, 227, 0.15)'
+            }}>
+              {[
+                { label: 'SCALE', key: 'scale', min: 1.0, max: 10.0, step: 0.1 },
+                { label: 'WARP', key: 'warp', min: 0.0, max: 10.0, step: 0.1 },
+                { label: 'BRIGHTNESS', key: 'brightness', min: 0.1, max: 6.0, step: 0.1 },
+                { label: 'DUST STRENGTH', key: 'dustStrength', min: 0.0, max: 1.0, step: 0.02 },
+                { label: 'PILLAR STRENGTH', key: 'pillarStrength', min: 0.0, max: 1.0, step: 0.02 },
+                { label: 'MASK RADIUS', key: 'maskRadius', min: 0.05, max: 0.90, step: 0.01 },
+                { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
+                { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
+                { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
+              ].map(({ label, key, min, max, step }) => {
+                const val = currentNebula[key];
+                return (
+                  <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>
+                      <span>{label}:</span>
+                      <span style={{ color: 'var(--primary-cyan)', fontWeight: 'bold' }}>{val}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={min}
+                      max={max}
+                      step={step}
+                      value={val}
+                      onMouseDown={pushHistorySnapshot}
+                      onTouchStart={pushHistorySnapshot}
+                      onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
+                      style={{ width: '100%', accentColor: 'var(--primary-cyan)', cursor: 'pointer' }}
+                    />
+                  </div>
+                );
+              })}
+
+              {/* Color Palette Controls */}
+              <div style={{ marginTop: '0.3rem', paddingTop: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <div style={{ fontSize: '0.62rem', color: 'var(--secondary-blue)', fontWeight: 'bold' }}>
+                  COLOR PALETTE (HEX):
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem' }}>
+                  {[
+                    { label: 'SII (WISPS)', key: 'color_sii' },
+                    { label: 'HA (MID)', key: 'color_ha' },
+                    { label: 'OIII (VOID)', key: 'color_oiii' },
+                    { label: 'CORE', key: 'color_core' },
+                  ].map(({ label, key }) => {
+                    const colorField = key.replace('color_', '');
+                    const hexVal = currentNebula.colors[colorField];
+                    return (
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.58rem', color: '#aaa' }}>{label}:</span>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          <input
+                            type="color"
+                            value={hexVal}
+                            onMouseDown={pushHistorySnapshot}
+                            onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
+                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                          />
+                          <input
+                            type="text"
+                            value={hexVal}
+                            onFocus={pushHistorySnapshot}
+                            onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
+                            style={{
+                              width: '100%',
+                              background: 'rgba(0, 0, 0, 0.4)',
+                              border: '1px solid #444',
+                              color: '#fff',
+                              fontSize: '0.58rem',
+                              fontFamily: 'var(--font-mono)',
+                              borderRadius: '3px',
+                              padding: '2px 4px'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Download Action Buttons */}

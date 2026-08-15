@@ -14,8 +14,8 @@ export const CORE_CONFIG = {
     cloudBand:      '#1a7aaa',  // Cloud belt tone
     stormHighlight: '#00d4f0',  // Bright storm swirl highlight
     atmosphere:     '#00BAE3',  // Limb atmosphere Fresnel glow
-    continentColor: '#9E2A2B',  // Artistic Volcanic Crimson landmasses
-    coastColor:     '#5C1924',  // Deep Crimson-Rose coastal shelf
+    continentColor: '#2d5a6e',  // Lighter teal-cyan landmasses
+    coastColor:     '#1a8090',  // Shallow cyan-turquoise coastal shelf
   },
 
   // Procedural Cloud & Belt Dynamics
