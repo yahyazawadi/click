@@ -1614,7 +1614,7 @@ export function FpsProfilerOverlay({
                 { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
                 { label: 'GRADIENT SOFTNESS', key: 'gradientSoftness', min: 0.1, max: 2.5, step: 0.05 },
-                { label: 'DRIFT SPEED', key: 'speed', min: 0.0, max: 0.50, step: 0.005 },
+                { label: 'MOVEMENT SPEED', key: 'speed', min: 0.0, max: 0.50, step: 0.005 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
               ].map(({ label, key, min, max, step }) => {
                 const val = currentNebula[key] ?? (key === 'gradientSoftness' ? 1.0 : (key === 'speed' ? (activeNebulaTab === 'nebula1' ? 0.10 : 0.12) : undefined));
