@@ -842,9 +842,9 @@ export function FpsProfilerOverlay({
         {/* Master Category Tabs (CORE PLANET | ORBIT RINGS | NEBULA) */}
         <div style={{ display: 'flex', gap: '0.3rem' }}>
           {[
-            { key: 'core', label: '🪐 CORE PLANET', color: '#00BAE3' },
-            { key: 'rings', label: '⭕ ORBIT RINGS', color: '#5DBAE1' },
-            { key: 'nebula', label: '🌌 NEBULA', color: '#ff3550' },
+            { key: 'core', label: 'CORE PLANET', color: '#00BAE3' },
+            { key: 'rings', label: 'ORBIT RINGS', color: '#5DBAE1' },
+            { key: 'nebula', label: 'NEBULA', color: '#ff3550' },
           ].map(({ key, label, color }) => {
             const isActive = activeMainTab === key;
             return (
@@ -879,10 +879,10 @@ export function FpsProfilerOverlay({
             {/* Core Sub-Tabs in a clean 2x2 Grid so NEAR RINGS is instantly visible! */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem' }}>
               {[
-                { key: 'surface', label: '🎨 SURFACE & COLORS' },
-                { key: 'innerRings', label: '💫 NEAR / INNER RINGS' },
-                { key: 'dynamics', label: '🌪️ DYNAMICS & LAND' },
-                { key: 'lighting', label: '✨ ATMOSPHERE & LIGHT' },
+                { key: 'surface', label: 'SURFACE & COLORS' },
+                { key: 'innerRings', label: 'NEAR / INNER RINGS' },
+                { key: 'dynamics', label: 'DYNAMICS & LAND' },
+                { key: 'lighting', label: 'ATMOSPHERE & LIGHT' },
               ].map(({ key, label }) => {
                 const isActive = activeCoreSubTab === key;
                 return (
@@ -1598,7 +1598,6 @@ export function FpsProfilerOverlay({
                 boxShadow: generatedStatus ? '0 0 10px rgba(0, 255, 170, 0.4)' : 'none',
               }}
             >
-              <span style={{ fontSize: '0.75rem' }}>{generatedStatus ? '✨' : '🔄'}</span>
               <span>{generatedStatus ? 'NEW NEBULA GENERATED!' : 'GENERATE NEW NEBULA'}</span>
             </button>
 
@@ -1666,7 +1665,7 @@ export function FpsProfilerOverlay({
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.62rem', color: 'var(--primary-cyan)', fontWeight: 'bold' }}>
-                    🎲 PROCEDURAL SEED:
+                    PROCEDURAL SEED:
                   </span>
                   <button
                     onClick={() => {
@@ -1751,14 +1750,13 @@ export function FpsProfilerOverlay({
                 flexDirection: 'column',
                 gap: '0.35rem'
               }}>
-                <div style={{ fontSize: '0.62rem', color: '#ff9933', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span>🌋</span>
-                  <span>MULTI-CORE / LAVA LAMP DYNAMICS:</span>
+                <div style={{ fontSize: '0.62rem', color: '#ff9933', fontWeight: 'bold' }}>
+                  MULTI-CORE / LAVA LAMP DYNAMICS:
                 </div>
                 {[
-                  { label: '🔥 HOTSPOT INTENSITY', key: 'multiCoreStrength', min: 0.0, max: 2.0, step: 0.05, fallback: 0.0 },
-                  { label: '🌐 CONVECTION SCALE', key: 'multiCoreScale', min: 0.5, max: 5.0, step: 0.1, fallback: 1.8 },
-                  { label: '🫧 VOID PINCH (METABALLS)', key: 'voidPinch', min: 0.0, max: 1.0, step: 0.05, fallback: 0.0 },
+                  { label: 'HOTSPOT INTENSITY', key: 'multiCoreStrength', min: 0.0, max: 2.0, step: 0.05, fallback: 0.0 },
+                  { label: 'CONVECTION SCALE', key: 'multiCoreScale', min: 0.5, max: 5.0, step: 0.1, fallback: 1.8 },
+                  { label: 'VOID PINCH (METABALLS)', key: 'voidPinch', min: 0.0, max: 1.0, step: 0.05, fallback: 0.0 },
                 ].map(({ label, key, min, max, step, fallback }) => {
                   const val = currentNebula[key] ?? fallback;
                   return (
