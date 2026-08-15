@@ -349,6 +349,31 @@ export function FpsProfilerOverlay({
     setRerender((v) => v + 1);
   };
 
+  const [generatedStatus, setGeneratedStatus] = useState(false);
+
+  const handleGenerateNewNebula = () => {
+    pushHistorySnapshot();
+    const current = NEBULA_CONFIG[activeNebulaTab];
+    if (!current) return;
+
+    // 1. Shift spatial seed coordinates into a fresh sector of procedural space
+    current.seedX = +((Math.random() - 0.5) * 800.0).toFixed(1);
+    current.seedY = +((Math.random() - 0.5) * 800.0).toFixed(1);
+
+    // 2. Harmonious organic shape variations
+    current.scale = +(3.2 + Math.random() * 2.8).toFixed(1);
+    current.warp = +(3.2 + Math.random() * 2.8).toFixed(1);
+    current.maskRadius = +(0.18 + Math.random() * 0.35).toFixed(2);
+    current.edgeWarp = +(0.30 + Math.random() * 0.45).toFixed(2);
+    current.dustStrength = +(0.15 + Math.random() * 0.70).toFixed(2);
+    current.gradientSoftness = +(0.85 + Math.random() * 0.90).toFixed(2);
+
+    saveToStorage();
+    setGeneratedStatus(true);
+    setRerender((v) => v + 1);
+    setTimeout(() => setGeneratedStatus(false), 1500);
+  };
+
   const copyTextToClipboard = async (text) => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1494,6 +1519,33 @@ export function FpsProfilerOverlay({
                 NEBULA 2 (BLUE)
               </button>
             </div>
+
+            {/* Refresh / Generate New Nebula Button */}
+            <button
+              onClick={handleGenerateNewNebula}
+              title="Generate a brand-new unique procedural cosmic cloud shape"
+              style={{
+                padding: '0.45rem 0.6rem',
+                fontSize: '0.65rem',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 'bold',
+                background: generatedStatus ? 'rgba(0, 255, 170, 0.25)' : 'rgba(0, 186, 227, 0.15)',
+                color: generatedStatus ? '#00ffaa' : 'var(--primary-cyan)',
+                border: '1px solid ' + (generatedStatus ? '#00ffaa' : 'var(--primary-cyan)'),
+                borderRadius: '5px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                letterSpacing: '0.04em',
+                transition: 'all 0.15s ease',
+                boxShadow: generatedStatus ? '0 0 10px rgba(0, 255, 170, 0.4)' : 'none',
+              }}
+            >
+              <span style={{ fontSize: '0.75rem' }}>{generatedStatus ? '✨' : '🔄'}</span>
+              <span>{generatedStatus ? 'NEW NEBULA GENERATED!' : 'GENERATE NEW NEBULA'}</span>
+            </button>
 
             {/* Sliders Grid */}
             <div style={{

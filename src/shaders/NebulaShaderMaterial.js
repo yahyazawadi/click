@@ -31,6 +31,7 @@ export const NebulaMaterial = shaderMaterial(
     uMaskRadius: 0.38,
     uEdgeWarp: 0.25,
     uParallaxOffset: new THREE.Vector2(0, 0),
+    uSeedOffset: new THREE.Vector2(0, 0),
     uAlpha: 1.0,
     uBrightness: 2.2,
     uDustStrength: 0.55,
@@ -68,6 +69,7 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uMaskRadius;
     uniform float uEdgeWarp;
     uniform vec2 uParallaxOffset;
+    uniform vec2 uSeedOffset;
     uniform float uAlpha;
     uniform float uBrightness;
     uniform float uDustStrength;
@@ -183,11 +185,11 @@ export const NebulaMaterial = shaderMaterial(
       float planeEdgeFade = smoothstep(0.49, 0.08, edgeDist);
 
       // 2. Organic boundary mask — 2D Cartesian noise (zero polar fan singularities or radial spoke lines)
-      float edgeN   = fbm(centeredUv * 3.2 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
+      float edgeN   = fbm(centeredUv * 3.2 + uSeedOffset * 0.15 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius * 1.35, uMaskRadius * 0.05, edgeDist + edgeN);
 
       // 3. Domain-warped gas density
-      vec2 uv = centeredUv * uScale + uParallaxOffset;
+      vec2 uv = centeredUv * uScale + uParallaxOffset + uSeedOffset;
       float density = 0.0;
       float qLen = 0.0;
       float pathBrightness = 1.0;
@@ -311,7 +313,7 @@ export const NebulaMaterial = shaderMaterial(
       float gasDensity = smoothstep(0.0, 0.5, density);
 
       // 4. Dark dust absorption lanes — soft gas shadows
-      vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + vec2(17.3, 8.1);
+      vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + uSeedOffset + vec2(17.3, 8.1);
       float dustField = dustFbm(dustUv + vec2(uTime * 0.008, -uTime * 0.006));
       float dustExponent = uPerfTier < 0.3 ? 2.8 : 2.5;
       float absorption = pow(dustField, dustExponent) * uDustStrength;
@@ -325,7 +327,7 @@ export const NebulaMaterial = shaderMaterial(
       float singleCore = smoothstep(uCoreRadius, 0.0, edgeDist);
 
       // Multi-Core & Cellular Convection Field (Lava-Lamp Hotspot Metadynamics)
-      vec2 cellUv = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + vec2(uTime * 0.008, -uTime * 0.006);
+      vec2 cellUv = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + uSeedOffset + vec2(uTime * 0.008, -uTime * 0.006);
       float cellNoise = fbm(cellUv + qLen * 0.6);
       float multiCoreField = pow(clamp(cellNoise * 1.5 + 0.35, 0.0, 1.0), 3.0) * 3.5;
       float multiCore = smoothstep(0.35, 1.0, multiCoreField) * smoothstep(0.05, 0.75, finalDensity);

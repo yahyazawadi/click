@@ -32,6 +32,12 @@ export function DualNebulaBackground({
       if (matRefLayer1.current.uniforms?.uGradientSoftness) {
         matRefLayer1.current.uniforms.uGradientSoftness.value = n1.gradientSoftness !== undefined ? n1.gradientSoftness : 1.0;
       }
+      if (matRefLayer1.current.uSeedOffset) {
+        matRefLayer1.current.uSeedOffset.set(n1.seedX || 0.0, n1.seedY || 0.0);
+      }
+      if (matRefLayer1.current.uniforms?.uSeedOffset) {
+        matRefLayer1.current.uniforms.uSeedOffset.value.set(n1.seedX || 0.0, n1.seedY || 0.0);
+      }
       matRefLayer1.current.uMultiCoreStrength = n1.multiCoreStrength !== undefined ? n1.multiCoreStrength : 0.0;
       matRefLayer1.current.uMultiCoreScale = n1.multiCoreScale !== undefined ? n1.multiCoreScale : 1.8;
       matRefLayer1.current.uVoidPinch = n1.voidPinch !== undefined ? n1.voidPinch : 0.0;
@@ -56,6 +62,12 @@ export function DualNebulaBackground({
       matRefLayer2.current.uGradientSoftness = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
       if (matRefLayer2.current.uniforms?.uGradientSoftness) {
         matRefLayer2.current.uniforms.uGradientSoftness.value = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
+      }
+      if (matRefLayer2.current.uSeedOffset) {
+        matRefLayer2.current.uSeedOffset.set(n2.seedX || 0.0, n2.seedY || 0.0);
+      }
+      if (matRefLayer2.current.uniforms?.uSeedOffset) {
+        matRefLayer2.current.uniforms.uSeedOffset.value.set(n2.seedX || 0.0, n2.seedY || 0.0);
       }
       matRefLayer2.current.uMultiCoreStrength = n2.multiCoreStrength !== undefined ? n2.multiCoreStrength : 0.0;
       matRefLayer2.current.uMultiCoreScale = n2.multiCoreScale !== undefined ? n2.multiCoreScale : 1.8;
