@@ -147,36 +147,32 @@ export const PlanetCoreMaterial = shaderMaterial(
       vec3 N = normalize(vWorldNormal);
 
       // ---- 1. Organic atmospheric cloud bands ----
-      // Differential zonal winds: equatorial bands drift faster than polar bands
-      vec3 p = normalize(vPosition);
-      float zonalShear = 1.0 + 0.45 * sin(p.y * uBandFrequency * 0.4);
-      float drift = uCloudPhase * zonalShear;
+      float drift = uCloudPhase;
       float c = cos(drift);
       float s = sin(drift);
       mat3 rotY = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c);
-      
-      // Morphing 3D noise sample position along with zonal rotation
-      vec3 morphOffset = vec3(0.0, uCloudPhase * 0.08, uCloudPhase * 0.12);
-      vec3 driftP = (rotY * p) + morphOffset;
+      vec3 p = normalize(vPosition);
+      vec3 driftP = rotY * p;
 
-      vec2 q = vec2(fbm(driftP * (uCloudScale * 0.8)), fbm(driftP * (uCloudScale * 0.8) + vec3(5.2, 1.3, 2.9)));
+      float baseCloudScale = uCloudScale;
+      vec2 q = vec2(fbm(driftP * (baseCloudScale * 0.8)), fbm(driftP * (baseCloudScale * 0.8) + vec3(5.2, 1.3, 2.9)));
       
       vec2 r;
       float cloudField;
       if (uPerfTier >= 0.8) {
         // LOW: skip domain warp, direct fbm
         r = q;
-        cloudField = fbm(driftP * uCloudScale);
+        cloudField = fbm(driftP * baseCloudScale);
       } else if (uPerfTier >= 0.3) {
         // MED: single warp level
         r = q;
-        cloudField = fbm(driftP * uCloudScale + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
+        cloudField = fbm(driftP * baseCloudScale + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
       } else {
         // HIGH: full double domain warp
-        vec3 driftP2 = (rotY * (p * uCloudScale)) + morphOffset + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
+        vec3 driftP2 = rotY * (p * baseCloudScale) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
         r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
                  fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
-        cloudField = fbm(driftP * (uCloudScale * 1.2) + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
+        cloudField = fbm(driftP * (baseCloudScale * 1.2) + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
       }
 
       // ---- 2. Latitudinal band structure ----
