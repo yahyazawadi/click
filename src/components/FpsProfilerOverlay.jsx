@@ -49,6 +49,29 @@ export function FpsProfilerOverlay({
   const [copiedStatus, setCopiedStatus] = useState(false);
   const [pastedStatus, setPastedStatus] = useState(false);
 
+  // Recursive deep merge helper to ensure nested properties never get overwritten incorrectly
+  const deepMerge = (target, source) => {
+    if (!source || typeof source !== 'object') return target;
+    for (const key of Object.keys(source)) {
+      if (Array.isArray(source[key])) {
+        if (!Array.isArray(target[key])) target[key] = [];
+        source[key].forEach((item, idx) => {
+          if (typeof item === 'object' && item !== null) {
+            target[key][idx] = deepMerge(target[key][idx] || {}, item);
+          } else {
+            target[key][idx] = item;
+          }
+        });
+      } else if (typeof source[key] === 'object' && source[key] !== null) {
+        if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+        deepMerge(target[key], source[key]);
+      } else if (source[key] !== undefined) {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  };
+
   // Deep clone helper
   const getSystemSnapshot = () => ({
     nebula: JSON.parse(JSON.stringify(NEBULA_CONFIG)),
@@ -68,21 +91,16 @@ export function FpsProfilerOverlay({
   };
 
   const applySnapshot = (snapshot) => {
-    if (snapshot.nebula) {
-      if (snapshot.nebula.nebula1) Object.assign(NEBULA_CONFIG.nebula1, snapshot.nebula.nebula1);
-      if (snapshot.nebula.nebula2) Object.assign(NEBULA_CONFIG.nebula2, snapshot.nebula.nebula2);
-    }
-    if (snapshot.core) {
-      Object.assign(CORE_CONFIG, snapshot.core);
-    }
-    if (snapshot.rings) {
-      if (snapshot.rings.rings) {
-        snapshot.rings.rings.forEach((r, idx) => {
-          if (RINGS_CONFIG.rings[idx]) Object.assign(RINGS_CONFIG.rings[idx], r);
-        });
-      }
-      if (snapshot.rings.global) Object.assign(RINGS_CONFIG.global, snapshot.rings.global);
-    }
+    if (!snapshot) return;
+    if (snapshot.nebula) deepMerge(NEBULA_CONFIG, snapshot.nebula);
+    if (snapshot.core) deepMerge(CORE_CONFIG, snapshot.core);
+    if (snapshot.rings) deepMerge(RINGS_CONFIG, snapshot.rings);
+
+    if (snapshot.NEBULA_CONFIG) deepMerge(NEBULA_CONFIG, snapshot.NEBULA_CONFIG);
+    if (snapshot.CORE_CONFIG) deepMerge(CORE_CONFIG, snapshot.CORE_CONFIG);
+    if (snapshot.RINGS_CONFIG) deepMerge(RINGS_CONFIG, snapshot.RINGS_CONFIG);
+
+    saveToStorage();
     setRerender((v) => v + 1);
   };
 
@@ -304,45 +322,145 @@ export function FpsProfilerOverlay({
     setRerender((v) => v + 1);
   };
 
-  const copyConfigJson = () => {
-    let payload = {};
-    if (activeMainTab === 'core') payload = { CORE_CONFIG };
-    else if (activeMainTab === 'rings') payload = { RINGS_CONFIG };
-    else if (activeMainTab === 'nebula') payload = { NEBULA_CONFIG };
-    else payload = { CORE_CONFIG, RINGS_CONFIG, NEBULA_CONFIG };
+  const copyTextToClipboard = async (text) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) {
+      console.warn('Clipboard API write failed, falling back:', e);
+    }
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return true;
+    } catch (e2) {
+      console.warn('Fallback copy failed:', e2);
+      return false;
+    }
+  };
 
-    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+  const cleanAndParseConfig = (text) => {
+    let cleaned = text.trim();
+    // 1. Strip ES module export wrappers: "export const CORE_CONFIG = { ... };"
+    cleaned = cleaned.replace(/^export\s+(const|let|var)\s+\w+\s*=\s*/m, '');
+    cleaned = cleaned.replace(/^const\s+\w+\s*=\s*/m, '');
+    cleaned = cleaned.replace(/;\s*$/, '');
+    // 2. Strip single and multiline comments
+    cleaned = cleaned.replace(/\/\/.*$/gm, '');
+    cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+    cleaned = cleaned.trim();
+
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      // 3. If standard JSON.parse fails (e.g. unquoted JS keys or single quotes), use Function evaluator
+      try {
+        const fn = new Function(`return (${cleaned});`);
+        return fn();
+      } catch (e2) {
+        throw new Error('Could not parse configuration data as JSON or JS object.');
+      }
+    }
+  };
+
+  const copyConfigJson = async () => {
+    let payload = {};
+    if (activeMainTab === 'core') {
+      payload = { CORE_CONFIG: JSON.parse(JSON.stringify(CORE_CONFIG)) };
+    } else if (activeMainTab === 'rings') {
+      payload = { RINGS_CONFIG: JSON.parse(JSON.stringify(RINGS_CONFIG)) };
+    } else if (activeMainTab === 'nebula') {
+      payload = { NEBULA_CONFIG: JSON.parse(JSON.stringify(NEBULA_CONFIG)) };
+    } else {
+      payload = {
+        CORE_CONFIG: JSON.parse(JSON.stringify(CORE_CONFIG)),
+        RINGS_CONFIG: JSON.parse(JSON.stringify(RINGS_CONFIG)),
+        NEBULA_CONFIG: JSON.parse(JSON.stringify(NEBULA_CONFIG)),
+      };
+    }
+
+    const formatted = JSON.stringify(payload, null, 2);
+    await copyTextToClipboard(formatted);
     setCopiedStatus(true);
     setTimeout(() => setCopiedStatus(false), 2000);
   };
 
   const pasteConfigJson = async () => {
     try {
-      const text = await navigator.clipboard.readText();
-      if (!text) return;
-      const parsed = JSON.parse(text);
-      pushHistorySnapshot();
-
-      if (parsed.CORE_CONFIG || parsed.core) {
-        Object.assign(CORE_CONFIG, parsed.CORE_CONFIG || parsed.core);
-      } else if (parsed.colors || parsed.clouds || parsed.innerRings) {
-        Object.assign(CORE_CONFIG, parsed);
-      }
-
-      if (parsed.RINGS_CONFIG || parsed.rings) {
-        const ringsData = parsed.RINGS_CONFIG || parsed.rings;
-        if (Array.isArray(ringsData)) {
-          ringsData.forEach((r, i) => { if (RINGS_CONFIG.rings[i]) Object.assign(RINGS_CONFIG.rings[i], r); });
-        } else if (ringsData.rings) {
-          ringsData.rings.forEach((r, i) => { if (RINGS_CONFIG.rings[i]) Object.assign(RINGS_CONFIG.rings[i], r); });
-          if (ringsData.global) Object.assign(RINGS_CONFIG.global, ringsData.global);
+      let text = '';
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          text = await navigator.clipboard.readText();
+        } catch (e) {
+          console.warn('Clipboard read error:', e);
         }
       }
+      if (!text) {
+        text = prompt('Paste your JSON or JS config here:');
+      }
+      if (!text) return;
 
-      if (parsed.NEBULA_CONFIG || parsed.nebula1 || parsed.nebula2) {
-        const nebData = parsed.NEBULA_CONFIG || parsed;
-        if (nebData.nebula1) Object.assign(NEBULA_CONFIG.nebula1, nebData.nebula1);
-        if (nebData.nebula2) Object.assign(NEBULA_CONFIG.nebula2, nebData.nebula2);
+      const parsed = cleanAndParseConfig(text);
+      if (!parsed || typeof parsed !== 'object') {
+        alert('Invalid configuration format.');
+        return;
+      }
+
+      pushHistorySnapshot();
+
+      // Master bundles
+      if (parsed.CORE_CONFIG || parsed.core) {
+        deepMerge(CORE_CONFIG, parsed.CORE_CONFIG || parsed.core);
+      }
+      if (parsed.RINGS_CONFIG || parsed.ringsConfig) {
+        deepMerge(RINGS_CONFIG, parsed.RINGS_CONFIG || parsed.ringsConfig);
+      }
+      if (parsed.NEBULA_CONFIG || parsed.nebulaConfig) {
+        deepMerge(NEBULA_CONFIG, parsed.NEBULA_CONFIG || parsed.nebulaConfig);
+      }
+
+      // Direct section objects
+      if (parsed.colors || parsed.clouds || parsed.continents || parsed.atmosphere || parsed.lighting || parsed.innerRings) {
+        deepMerge(CORE_CONFIG, parsed);
+      }
+
+      // Macro Rings array or object
+      if (Array.isArray(parsed)) {
+        parsed.forEach((r, i) => {
+          if (RINGS_CONFIG.rings[i]) deepMerge(RINGS_CONFIG.rings[i], r);
+        });
+      } else if (parsed.rings && Array.isArray(parsed.rings)) {
+        parsed.rings.forEach((r, i) => {
+          if (RINGS_CONFIG.rings[i]) deepMerge(RINGS_CONFIG.rings[i], r);
+        });
+        if (parsed.global) deepMerge(RINGS_CONFIG.global, parsed.global);
+      }
+
+      // Nebulae
+      if (parsed.nebula1 || parsed.nebula2) {
+        if (parsed.nebula1) deepMerge(NEBULA_CONFIG.nebula1, parsed.nebula1);
+        if (parsed.nebula2) deepMerge(NEBULA_CONFIG.nebula2, parsed.nebula2);
+      }
+
+      // Single Ring payload pasted directly
+      if (parsed.radius !== undefined && parsed.tiltX !== undefined && typeof activeOrbitRingTab === 'number') {
+        deepMerge(RINGS_CONFIG.rings[activeOrbitRingTab], parsed);
+      }
+
+      // Single Inner Ring payload pasted directly
+      if ((parsed.radiusMultiplier !== undefined || parsed.tubeRadius !== undefined) && activeCoreRing) {
+        if (CORE_CONFIG.innerRings[activeCoreRing]) {
+          deepMerge(CORE_CONFIG.innerRings[activeCoreRing], parsed);
+        }
       }
 
       saveToStorage();
@@ -350,7 +468,8 @@ export function FpsProfilerOverlay({
       setRerender((v) => v + 1);
       setTimeout(() => setPastedStatus(false), 2000);
     } catch (err) {
-      console.warn("Clipboard paste error or invalid JSON", err);
+      console.warn('Clipboard paste error or invalid config:', err);
+      alert('Could not paste config: ' + err.message);
     }
   };
 
