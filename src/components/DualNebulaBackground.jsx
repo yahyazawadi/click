@@ -17,7 +17,8 @@ export function DualNebulaBackground({
     const time = state.clock.getElapsedTime();
     if (matRefLayer1.current) {
       const n1 = NEBULA_CONFIG.nebula1;
-      matRefLayer1.current.uTime = time * 0.35;
+      const speed1 = n1.speed !== undefined ? n1.speed : 0.10;
+      matRefLayer1.current.uTime = time * speed1;
       matRefLayer1.current.uNebulaPath = nebulaPath1;
       matRefLayer1.current.uScale = n1.scale;
       matRefLayer1.current.uWarp = n1.warp;
@@ -48,7 +49,8 @@ export function DualNebulaBackground({
     }
     if (matRefLayer2.current) {
       const n2 = NEBULA_CONFIG.nebula2;
-      matRefLayer2.current.uTime = time * 0.55;
+      const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
+      matRefLayer2.current.uTime = time * speed2;
       matRefLayer2.current.uNebulaPath = nebulaPath2;
       matRefLayer2.current.uScale = n2.scale;
       matRefLayer2.current.uWarp = n2.warp;
