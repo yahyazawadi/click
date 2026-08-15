@@ -39,6 +39,7 @@ export const NebulaMaterial = shaderMaterial(
     uStarCount: 12.0,    // number of embedded young stars per nebula
     uGlowRadius: 0.32,   // volumetric halo radius (0..0.5)
     uNebulaPath: 0,      // DEV: 0=Silky Wisps  1=Deep Ocean  2=Orion Ribbon  3=Bioluminescent Veins
+    uGradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     // Multi-Core & Cellular Convection Parameters
     uMultiCoreStrength: 0.0,
     uMultiCoreScale: 1.8,
@@ -74,6 +75,7 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uCoreRadius;
     uniform float uStarCount;
     uniform float uGlowRadius;
+    uniform float uGradientSoftness;
     uniform float uMultiCoreStrength;
     uniform float uMultiCoreScale;
     uniform float uVoidPinch;
@@ -333,10 +335,20 @@ export const NebulaMaterial = shaderMaterial(
       float voidField = pow(clamp(fbm(cellUv * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
       float densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
 
+      // 6. Hubble SHO color science with dynamic Gradient Softness
+      float s = clamp(uGradientSoftness, 0.1, 3.0);
+      float wHa   = 0.45 * s;
+      float wSII  = 0.40 * s;
+      float wCore = 0.30 * s;
+
+      float tHa   = smoothstep(max(0.0, 0.35 - wHa),   min(1.0, 0.35 + wHa),   densityMod);
+      float tSII  = smoothstep(max(0.0, 0.65 - wSII),  min(1.0, 0.65 + wSII),  densityMod);
+      float tCore = smoothstep(max(0.0, 0.85 - wCore), min(1.0, 0.85 + wCore), densityMod);
+
       vec3 col = uColorOIII;
-      col = mix(col, uColorHa,   smoothstep(0.1, 0.6,  densityMod));
-      col = mix(col, uColorSII,  smoothstep(0.5, 0.85, densityMod));
-      col = mix(col, uColorCore, smoothstep(0.75, 1.0, densityMod) + coreGlow * (0.5 + 0.5 * uMultiCoreStrength));
+      col = mix(col, uColorHa,   tHa);
+      col = mix(col, uColorSII,  tSII);
+      col = mix(col, uColorCore, tCore + coreGlow * (0.5 + 0.5 * uMultiCoreStrength));
       col += uColorOIII * pow(max(0.0, qLen - 0.3), 2.0) * pathScatter;
 
       // 7. Volumetric scatter halo (soft inner glow)

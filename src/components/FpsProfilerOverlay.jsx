@@ -1514,9 +1514,10 @@ export function FpsProfilerOverlay({
                 { label: 'MASK RADIUS', key: 'maskRadius', min: 0.05, max: 0.90, step: 0.01 },
                 { label: 'EDGE WARP', key: 'edgeWarp', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'CORE RADIUS', key: 'coreRadius', min: 0.02, max: 0.60, step: 0.01 },
+                { label: 'GRADIENT SOFTNESS', key: 'gradientSoftness', min: 0.1, max: 2.5, step: 0.05 },
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
               ].map(({ label, key, min, max, step }) => {
-                const val = currentNebula[key];
+                const val = currentNebula[key] ?? (key === 'gradientSoftness' ? 1.0 : undefined);
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#ccc' }}>

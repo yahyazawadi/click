@@ -282,6 +282,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     edgeWarp: 0.74,
     coreRadius: 0.17,
     alpha: 0.72,
+    gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -307,6 +308,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     edgeWarp: 1,
     coreRadius: 0.02,
     alpha: 1,
+    gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
