@@ -355,17 +355,10 @@ export function FpsProfilerOverlay({
     const current = NEBULA_CONFIG[activeNebulaTab];
     if (!current) return;
 
-    // 1. Shift spatial seed coordinates into a fresh sector of procedural space
-    current.seedX = +((Math.random() - 0.5) * 800.0).toFixed(1);
-    current.seedY = +((Math.random() - 0.5) * 800.0).toFixed(1);
-
-    // 2. Harmonious organic shape variations
-    current.scale = +(3.2 + Math.random() * 2.8).toFixed(1);
-    current.warp = +(3.2 + Math.random() * 2.8).toFixed(1);
-    current.maskRadius = +(0.18 + Math.random() * 0.35).toFixed(2);
-    current.edgeWarp = +(0.30 + Math.random() * 0.45).toFixed(2);
-    current.dustStrength = +(0.15 + Math.random() * 0.70).toFixed(2);
-    current.gradientSoftness = +(0.85 + Math.random() * 0.90).toFixed(2);
+    // Shift spatial noise seed coordinates to roll a brand-new cloud shape
+    // ALL user parameters, sliders, speed, and colors remain 100% UNTOUCHED!
+    current.seedX = +((Math.random() - 0.5) * 1200.0).toFixed(1);
+    current.seedY = +((Math.random() - 0.5) * 1200.0).toFixed(1);
 
     saveToStorage();
     setGeneratedStatus(true);
