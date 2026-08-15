@@ -163,7 +163,7 @@ export function FpsProfilerOverlay({
     }
   };
 
-  // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo)
+  // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo, Ctrl+Shift+R Re-Roll Seeds)
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore global hotkeys if the user is actively typing in a text field or textarea
@@ -180,6 +180,10 @@ export function FpsProfilerOverlay({
       if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
         e.preventDefault();
         handleRedo();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        handleGenerateNewNebula();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -570,7 +574,7 @@ export function FpsProfilerOverlay({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={handleGenerateNewNebula}
-            title="Generate new procedural nebula seed (Ctrl+Z to undo)"
+            title="Generate new procedural nebula seeds for both clouds (Ctrl+Shift+R | Ctrl+Z to undo)"
             style={{
               background: 'transparent',
               border: 'none',
