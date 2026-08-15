@@ -571,12 +571,37 @@ export function FpsProfilerOverlay({
             AUTO-SAVED
           </span>
         </div>
-        <button 
-          onClick={toggleVisibility}
-          style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem' }}
-        >
-          X
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={handleGenerateNewNebula}
+            title="Generate a brand new procedural nebula shape (Ctrl+Z to undo)"
+            style={{
+              background: generatedStatus ? 'rgba(0, 255, 170, 0.25)' : 'rgba(0, 186, 227, 0.15)',
+              color: generatedStatus ? '#00ffaa' : 'var(--primary-cyan)',
+              border: '1px solid ' + (generatedStatus ? '#00ffaa' : 'var(--primary-cyan)'),
+              borderRadius: '4px',
+              padding: '2px 7px',
+              fontSize: '0.62rem',
+              fontFamily: 'var(--font-mono)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontWeight: 'bold',
+              transition: 'all 0.15s ease',
+              boxShadow: generatedStatus ? '0 0 8px rgba(0, 255, 170, 0.4)' : 'none',
+            }}
+          >
+            <span>{generatedStatus ? '✨' : '🔄'}</span>
+            <span>{generatedStatus ? 'NEW NEBULA!' : 'REFRESH NEBULA'}</span>
+          </button>
+          <button 
+            onClick={toggleVisibility}
+            style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem', padding: '0 2px' }}
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       {/* Metrics Grid */}
