@@ -573,30 +573,53 @@ export function FpsProfilerOverlay({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={handleGenerateNewNebula}
-            title="Generate a brand new procedural nebula shape (Ctrl+Z to undo)"
+            title="Generate new procedural nebula seed (Ctrl+Z to undo)"
             style={{
-              background: generatedStatus ? 'rgba(0, 255, 170, 0.25)' : 'rgba(0, 186, 227, 0.15)',
-              color: generatedStatus ? '#00ffaa' : 'var(--primary-cyan)',
-              border: '1px solid ' + (generatedStatus ? '#00ffaa' : 'var(--primary-cyan)'),
-              borderRadius: '4px',
-              padding: '2px 7px',
-              fontSize: '0.62rem',
-              fontFamily: 'var(--font-mono)',
+              background: 'transparent',
+              border: 'none',
+              color: generatedStatus ? '#00ffaa' : '#888',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
-              fontWeight: 'bold',
-              transition: 'all 0.15s ease',
-              boxShadow: generatedStatus ? '0 0 8px rgba(0, 255, 170, 0.4)' : 'none',
+              justifyContent: 'center',
+              padding: '2px',
+              transition: 'color 0.2s ease, transform 0.35s ease',
+              transform: generatedStatus ? 'rotate(180deg)' : 'rotate(0deg)',
             }}
+            onMouseEnter={(e) => { if (!generatedStatus) e.currentTarget.style.color = 'var(--primary-cyan)'; }}
+            onMouseLeave={(e) => { if (!generatedStatus) e.currentTarget.style.color = '#888'; }}
           >
-            <span>{generatedStatus ? '✨' : '🔄'}</span>
-            <span>{generatedStatus ? 'NEW NEBULA!' : 'REFRESH NEBULA'}</span>
+            <svg 
+              width="13" 
+              height="13" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+            </svg>
           </button>
           <button 
             onClick={toggleVisibility}
-            style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem', padding: '0 2px' }}
+            title="Close overlay"
+            style={{ 
+              background: 'transparent', 
+              border: 'none', 
+              color: '#888', 
+              cursor: 'pointer', 
+              fontSize: '0.9rem', 
+              padding: '0 2px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#ff4444'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; }}
           >
             ✕
           </button>
