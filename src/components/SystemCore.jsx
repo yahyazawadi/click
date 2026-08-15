@@ -13,6 +13,8 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
   const ringRef2 = useRef();
   const matRef1 = useRef();
   const matRef2 = useRef();
+  const cloudPhase = useRef(0);
+  const continentPhase = useRef(0);
   const [hovered, setHovered] = useState(false);
 
   // Pre-allocated THREE.Color instances to avoid garbage collection
@@ -33,12 +35,19 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
+    // Accumulate continuous drift phases smoothly without phase-jump snapping
+    cloudPhase.current += delta * (CORE_CONFIG.clouds.driftSpeed !== undefined ? CORE_CONFIG.clouds.driftSpeed : 0.025);
+    continentPhase.current += delta * (CORE_CONFIG.continents.driftSpeed !== undefined ? CORE_CONFIG.continents.driftSpeed : 0.004);
+
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = time;
 
       // Direct GPU Uniform Synchronization in-place every frame
       const u = shaderMatRef.current.uniforms;
       if (u) {
+        if (u.uCloudPhase) u.uCloudPhase.value = cloudPhase.current;
+        if (u.uContinentPhase) u.uContinentPhase.value = continentPhase.current;
+
         if (u.uDeepOcean?.value?.set) u.uDeepOcean.value.set(CORE_CONFIG.colors.deepOcean);
         if (u.uMidOcean?.value?.set) u.uMidOcean.value.set(CORE_CONFIG.colors.midOcean);
         if (u.uCloudBand?.value?.set) u.uCloudBand.value.set(CORE_CONFIG.colors.cloudBand);

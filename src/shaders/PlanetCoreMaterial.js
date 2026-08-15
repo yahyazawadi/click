@@ -5,6 +5,8 @@ import { extend } from '@react-three/fiber';
 export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
+    uCloudPhase: 0.0,
+    uContinentPhase: 0.0,
     uPerfTier: 0.0,  // 0.0=high, 0.5=med, 1.0=low
 
     // Surface & Atmospheric Colors
@@ -13,8 +15,8 @@ export const PlanetCoreMaterial = shaderMaterial(
     uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt tone
     uStormHighlight: new THREE.Color('#00d4f0'),  // Bright storm cyan highlight
     uAtmosphere:     new THREE.Color('#00BAE3'),  // Limb atmosphere Fresnel glow
-    uContinentColor: new THREE.Color('#9E2A2B'),  // Artistic Volcanic Crimson landmass
-    uCoastColor:     new THREE.Color('#5C1924'),  // Deep Crimson-Rose coastal shelf
+    uContinentColor: new THREE.Color('#2d5a6e'),  // Celestial Cyan-Teal landmass
+    uCoastColor:     new THREE.Color('#1a8090'),  // Shallow Turquoise coastal shelf
 
     // Cloud & Latitudinal Belt Dynamics
     uCloudDriftSpeed: 0.025,
@@ -59,6 +61,8 @@ export const PlanetCoreMaterial = shaderMaterial(
   // Fragment Shader — World-space lighting aligned with Nebula 1 (Top-Left)
   /* glsl */ `
     uniform float uTime;
+    uniform float uCloudPhase;
+    uniform float uContinentPhase;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
 
     // Color uniforms
@@ -143,12 +147,17 @@ export const PlanetCoreMaterial = shaderMaterial(
       vec3 N = normalize(vWorldNormal);
 
       // ---- 1. Organic atmospheric cloud bands ----
-      float drift = uTime * uCloudDriftSpeed;
+      // Differential zonal winds: equatorial bands drift faster than polar bands
+      vec3 p = normalize(vPosition);
+      float zonalShear = 1.0 + 0.45 * sin(p.y * uBandFrequency * 0.4);
+      float drift = uCloudPhase * zonalShear;
       float c = cos(drift);
       float s = sin(drift);
       mat3 rotY = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c);
-      vec3 p = normalize(vPosition);
-      vec3 driftP = rotY * p;
+      
+      // Morphing 3D noise sample position along with zonal rotation
+      vec3 morphOffset = vec3(0.0, uCloudPhase * 0.08, uCloudPhase * 0.12);
+      vec3 driftP = (rotY * p) + morphOffset;
 
       vec2 q = vec2(fbm(driftP * (uCloudScale * 0.8)), fbm(driftP * (uCloudScale * 0.8) + vec3(5.2, 1.3, 2.9)));
       
@@ -164,7 +173,7 @@ export const PlanetCoreMaterial = shaderMaterial(
         cloudField = fbm(driftP * uCloudScale + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
       } else {
         // HIGH: full double domain warp
-        vec3 driftP2 = rotY * (p * uCloudScale) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
+        vec3 driftP2 = (rotY * (p * uCloudScale)) + morphOffset + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
         r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
                  fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
         cloudField = fbm(driftP * (uCloudScale * 1.2) + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
@@ -188,7 +197,7 @@ export const PlanetCoreMaterial = shaderMaterial(
       col = mix(col, uStormHighlight, stormMask * uStormIntensity);
 
       // ---- 3b. Continent landmasses ----
-      float continentDrift = uTime * uContinentDriftSpeed;
+      float continentDrift = uContinentPhase;
       float cC = cos(continentDrift);
       float cS = sin(continentDrift);
       mat3 rotCY = mat3(cC, 0.0, cS, 0.0, 1.0, 0.0, -cS, 0.0, cC);
