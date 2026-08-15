@@ -188,8 +188,9 @@ export const NebulaMaterial = shaderMaterial(
       float edgeN   = fbm(centeredUv * 3.2 + uSeedOffset * 0.15 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
       float organicMask = smoothstep(uMaskRadius * 1.35, uMaskRadius * 0.05, edgeDist + edgeN);
 
-      // 3. Domain-warped gas density
-      vec2 uv = centeredUv * uScale + uParallaxOffset + uSeedOffset;
+      // 3. Domain-warped gas density (uv = centered on screen, seedUv = procedural variation)
+      vec2 uv = centeredUv * uScale + uParallaxOffset;
+      vec2 seedUv = uv + uSeedOffset;
       float density = 0.0;
       float qLen = 0.0;
       float pathBrightness = 1.0;
@@ -200,11 +201,11 @@ export const NebulaMaterial = shaderMaterial(
       if (path == 0) {
         // PATH 0 — Silky Wisps: single warp + delicate micro-filaments
         vec2 q0;
-        q0.x = fbm(uv + vec2(0.0, uTime * 0.018));
-        q0.y = fbm(uv + vec2(5.2, uTime * 0.013));
+        q0.x = fbm(seedUv + vec2(0.0, uTime * 0.018));
+        q0.y = fbm(seedUv + vec2(5.2, uTime * 0.013));
         qLen = length(q0);
-        float base0 = fbm(uv + uWarp * q0);
-        float filament0 = fbm(uv * 2.4 + q0 * 0.4) * 0.18;
+        float base0 = fbm(seedUv + uWarp * q0);
+        float filament0 = fbm(seedUv * 2.4 + q0 * 0.4) * 0.18;
         density = base0 + filament0 * smoothstep(0.1, 0.7, base0);
         pathBrightness = 1.0;
         pathScatter = 0.35;
@@ -212,14 +213,14 @@ export const NebulaMaterial = shaderMaterial(
       } else if (path == 1) {
         // PATH 1 — Deep Ocean Pillars: two soft warp passes (LOCKED BASELINE)
         vec2 q1;
-        q1.x = fbm(uv + vec2(0.0,  uTime * 0.014));
-        q1.y = fbm(uv + vec2(3.7,  uTime * 0.010));
+        q1.x = fbm(seedUv + vec2(0.0,  uTime * 0.014));
+        q1.y = fbm(seedUv + vec2(3.7,  uTime * 0.010));
         qLen = length(q1);
         vec2 r1;
-        r1.x = fbm(uv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
-        r1.y = fbm(uv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
-        float base1 = fbm(uv + uWarp * q1);
-        float deep1 = fbm(uv + uWarp * r1 * 0.5);
+        r1.x = fbm(seedUv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
+        r1.y = fbm(seedUv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
+        float base1 = fbm(seedUv + uWarp * q1);
+        float deep1 = fbm(seedUv + uWarp * r1 * 0.5);
         density = mix(base1, deep1, 0.32);
         pathBrightness = 1.0;
         pathScatter = 0.35;
@@ -229,10 +230,11 @@ export const NebulaMaterial = shaderMaterial(
         float bowAngle = uTime * 0.006;
         mat2 bowRot = mat2(cos(bowAngle), -sin(bowAngle), sin(bowAngle), cos(bowAngle));
         vec2 q2;
-        q2.x = fbm(bowRot * uv + vec2(0.0, uTime * 0.016));
-        q2.y = fbm(bowRot * uv + vec2(6.1, uTime * 0.011));
+        q2.x = fbm(bowRot * seedUv + vec2(0.0, uTime * 0.016));
+        q2.y = fbm(bowRot * seedUv + vec2(6.1, uTime * 0.011));
         qLen = length(q2);
-        float base2 = fbm(uv + uWarp * q2);
+        float base2 = fbm(seedUv + uWarp * q2);
+        // Macro bow front remains locked to centered screen space:
         vec2 rUv = bowRot * uv;
         float bowFront2 = exp(-pow((rUv.y * 0.35 - rUv.x * 0.25), 2.0)) * 0.35;
         density = (base2 * 0.75 + bowFront2 * smoothstep(0.05, 0.45, base2 + 0.20)) * 0.92;
@@ -242,11 +244,11 @@ export const NebulaMaterial = shaderMaterial(
       } else if (path == 3) {
         // PATH 3 — Plasma Canopy: massive connected gas flow with sweeping energy streams
         vec2 q3;
-        q3.x = fbm(uv + vec2(0.0, uTime * 0.018));
-        q3.y = fbm(uv + vec2(5.2, uTime * 0.013));
+        q3.x = fbm(seedUv + vec2(0.0, uTime * 0.018));
+        q3.y = fbm(seedUv + vec2(5.2, uTime * 0.013));
         qLen = length(q3);
-        float base3 = fbm(uv + uWarp * q3);
-        vec2 fUv = uv * 2.2 + q3 * 1.4 + vec2(uTime * 0.0035, uTime * 0.0028);
+        float base3 = fbm(seedUv + uWarp * q3);
+        vec2 fUv = seedUv * 2.2 + q3 * 1.4 + vec2(uTime * 0.0035, uTime * 0.0028);
         float ridgeA = fbm(fUv);
         float threadA = pow(1.0 - abs(ridgeA - 0.48) * 2.2, 3.0) * 0.28;
         density = (base3 * 0.80 + threadA * smoothstep(0.08, 0.55, base3 + 0.15)) * 0.90;
@@ -296,10 +298,10 @@ export const NebulaMaterial = shaderMaterial(
       } else {
         // PATH 7 — Bow Shock Arcs: compressed gas sheets from stellar wind (GOLD STANDARD FOR TEAL)
         vec2 q7;
-        q7.x = fbm(uv + vec2(0.0, uTime * 0.013));
-        q7.y = fbm(uv + vec2(4.8, uTime * 0.009));
+        q7.x = fbm(seedUv + vec2(0.0, uTime * 0.013));
+        q7.y = fbm(seedUv + vec2(4.8, uTime * 0.009));
         qLen = length(q7);
-        float base7 = fbm(uv + uWarp * q7 * 0.8);
+        float base7 = fbm(seedUv + uWarp * q7 * 0.8);
         float windAngle = uTime * 0.012;
         vec2 windDir7 = vec2(cos(windAngle) * 0.6 + 0.3, sin(windAngle) * 0.4 + 0.2);
         float windDot7 = dot(uv + q7 * 0.18, normalize(windDir7));
