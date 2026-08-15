@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 
-export function OrbitalPath({ radius, tiltX = 0, tiltY = 0, tiltZ = 0, color = '#00BAE3' }) {
+export function OrbitalPath({ radius, tiltX = 0, tiltY = 0, tiltZ = 0, color = '#00BAE3', opacity = 0.35, enabled = true }) {
   // Create a thin circular line curve for the orbit (Memoized to prevent memory leaks)
   const geometry = useMemo(() => {
     const points = [];
@@ -13,10 +13,12 @@ export function OrbitalPath({ radius, tiltX = 0, tiltY = 0, tiltZ = 0, color = '
     return new THREE.BufferGeometry().setFromPoints(points);
   }, [radius]);
 
-  // Clean up geometry from GPU memory on unmount
+  // Clean up geometry from GPU memory on unmount or radius change
   useEffect(() => {
     return () => geometry.dispose();
   }, [geometry]);
+
+  if (!enabled) return null;
 
   return (
     <group rotation={[tiltX, tiltY, tiltZ]}>
@@ -24,7 +26,7 @@ export function OrbitalPath({ radius, tiltX = 0, tiltY = 0, tiltZ = 0, color = '
         <lineBasicMaterial
           color={color}
           transparent
-          opacity={0.35}
+          opacity={opacity}
           linewidth={1}
         />
       </line>

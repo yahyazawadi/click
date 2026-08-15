@@ -1,7 +1,7 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { SYSTEM_CONFIG } from '../config';
+import { CORE_CONFIG, SYSTEM_CONFIG } from '../config';
 import '../shaders/PlanetCoreMaterial';
 
 export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected = false }) {
@@ -11,37 +11,73 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
   const ringRef2 = useRef();
   const [hovered, setHovered] = useState(false);
 
+  // Pre-allocated THREE.Color instances to avoid garbage collection
+  const colors = useMemo(() => ({
+    deepOcean:      new THREE.Color(CORE_CONFIG.colors.deepOcean),
+    midOcean:       new THREE.Color(CORE_CONFIG.colors.midOcean),
+    cloudBand:      new THREE.Color(CORE_CONFIG.colors.cloudBand),
+    stormHighlight: new THREE.Color(CORE_CONFIG.colors.stormHighlight),
+    atmosphere:     new THREE.Color(CORE_CONFIG.colors.atmosphere),
+    continentColor: new THREE.Color(CORE_CONFIG.colors.continentColor),
+    coastColor:     new THREE.Color(CORE_CONFIG.colors.coastColor),
+  }), []);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = time;
+
+      // Sync color uniforms from CORE_CONFIG
+      colors.deepOcean.set(CORE_CONFIG.colors.deepOcean);
+      colors.midOcean.set(CORE_CONFIG.colors.midOcean);
+      colors.cloudBand.set(CORE_CONFIG.colors.cloudBand);
+      colors.stormHighlight.set(CORE_CONFIG.colors.stormHighlight);
+      colors.atmosphere.set(CORE_CONFIG.colors.atmosphere);
+      colors.continentColor.set(CORE_CONFIG.colors.continentColor);
+      colors.coastColor.set(CORE_CONFIG.colors.coastColor);
+
+      // Sync procedural dynamics uniforms
+      shaderMatRef.current.uCloudDriftSpeed = CORE_CONFIG.clouds.driftSpeed;
+      shaderMatRef.current.uCloudScale = CORE_CONFIG.clouds.scale;
+      shaderMatRef.current.uBandFrequency = CORE_CONFIG.clouds.bandFrequency;
+      shaderMatRef.current.uBandWarp = CORE_CONFIG.clouds.bandWarp;
+      shaderMatRef.current.uStormIntensity = CORE_CONFIG.clouds.stormIntensity;
+
+      shaderMatRef.current.uContinentDriftSpeed = CORE_CONFIG.continents.driftSpeed;
+      shaderMatRef.current.uContinentScale = CORE_CONFIG.continents.scale;
+      shaderMatRef.current.uSeaLevel = CORE_CONFIG.continents.seaLevel;
+
+      shaderMatRef.current.uAtmosphereFresnelPower = CORE_CONFIG.atmosphere.fresnelPower;
+      shaderMatRef.current.uAtmosphereFresnelIntensity = CORE_CONFIG.atmosphere.fresnelIntensity;
+
+      shaderMatRef.current.uSpecularIntensity = CORE_CONFIG.lighting.specularIntensity;
+      shaderMatRef.current.uSpecularShininess = CORE_CONFIG.lighting.specularShininess;
+      shaderMatRef.current.uAmbientLight = CORE_CONFIG.lighting.ambientLight;
+      shaderMatRef.current.uDiffuseLight = CORE_CONFIG.lighting.diffuseLight;
+      shaderMatRef.current.uPolarFade = CORE_CONFIG.lighting.polarFade;
     }
 
+    const rotSpeed = CORE_CONFIG.rotationSpeed !== undefined ? CORE_CONFIG.rotationSpeed : 0.15;
     if (innerCoreRef.current) {
-      innerCoreRef.current.rotation.y += delta * 0.15;
+      innerCoreRef.current.rotation.y += delta * rotSpeed;
     }
-    if (ringRef1.current) {
-      ringRef1.current.rotation.z += delta * 0.4;
+
+    const ring1 = CORE_CONFIG.innerRings?.ring1;
+    if (ringRef1.current && ring1?.enabled !== false) {
+      ringRef1.current.rotation.z += delta * (ring1?.speedZ !== undefined ? ring1.speedZ : 0.4);
     }
-    if (ringRef2.current) {
-      ringRef2.current.rotation.x += delta * 0.3;
-      ringRef2.current.rotation.y += delta * 0.2;
+
+    const ring2 = CORE_CONFIG.innerRings?.ring2;
+    if (ringRef2.current && ring2?.enabled !== false) {
+      ringRef2.current.rotation.x += delta * (ring2?.speedX !== undefined ? ring2.speedX : 0.3);
+      ringRef2.current.rotation.y += delta * (ring2?.speedY !== undefined ? ring2.speedY : 0.2);
     }
   });
 
-  const coreRadius = SYSTEM_CONFIG.core.radius || 1.8;
-
-  // Memoize color objects — avoids rebuilding THREE.Color on every React re-render
-  const colors = useMemo(() => ({
-    deepOcean:      new THREE.Color('#041830'),
-    midOcean:       new THREE.Color('#0a4070'),
-    cloudBand:      new THREE.Color('#1a7aaa'),
-    stormHighlight: new THREE.Color('#00d4f0'),
-    atmosphere:     new THREE.Color('#00BAE3'),
-    continentColor: new THREE.Color('#9E2A2B'), // Artistic Volcanic Crimson landmasses
-    coastColor:     new THREE.Color('#5C1924'), // Deep Crimson-Rose coastal shelf
-  }), []);
+  const coreRadius = CORE_CONFIG.radius || SYSTEM_CONFIG.core.radius || 1.8;
+  const ring1 = CORE_CONFIG.innerRings?.ring1 || {};
+  const ring2 = CORE_CONFIG.innerRings?.ring2 || {};
 
   return (
     <group
@@ -69,35 +105,41 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
         />
       </mesh>
 
-      {/* 3. Concentric Core Orbit Ring 1 (Bright Scarlet Red) */}
-      <mesh ref={ringRef1} rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[coreRadius * 1.5, 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-        {perfTierFloat >= 0.8 ? (
-          <meshBasicMaterial color="#FF0A2B" />
-        ) : (
-          <meshStandardMaterial
-            color="#FF0A2B"
-            emissive="#FF0A2B"
-            emissiveIntensity={0.8}
-          />
-        )}
-      </mesh>
+      {/* 2. Concentric Core Orbit Ring 1 (Inner Torus) */}
+      {ring1.enabled !== false && (
+        <mesh ref={ringRef1} rotation={[ring1.tiltX ?? (Math.PI / 4), ring1.tiltY ?? 0, ring1.tiltZ ?? 0]}>
+          <torusGeometry args={[coreRadius * (ring1.radiusMultiplier || 1.5), ring1.tubeRadius || 0.03, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+          {perfTierFloat >= 0.8 ? (
+            <meshBasicMaterial color={ring1.color || '#FF0A2B'} transparent opacity={ring1.opacity ?? 1.0} />
+          ) : (
+            <meshStandardMaterial
+              color={ring1.color || '#FF0A2B'}
+              emissive={ring1.emissive || '#FF0A2B'}
+              emissiveIntensity={ring1.emissiveIntensity ?? 0.8}
+              transparent={(ring1.opacity ?? 1.0) < 1.0}
+              opacity={ring1.opacity ?? 1.0}
+            />
+          )}
+        </mesh>
+      )}
 
-      {/* 4. Concentric Core Orbit Ring 2 (Deep Ruby Crimson Red) */}
-      <mesh ref={ringRef2} rotation={[-Math.PI / 3, Math.PI / 6, 0]}>
-        <torusGeometry args={[coreRadius * 1.7, 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
-        {perfTierFloat >= 0.8 ? (
-          <meshBasicMaterial color="#B3002D" transparent opacity={0.7} />
-        ) : (
-          <meshStandardMaterial
-            color="#B3002D"
-            emissive="#B3002D"
-            emissiveIntensity={0.65}
-            transparent
-            opacity={0.7}
-          />
-        )}
-      </mesh>
+      {/* 3. Concentric Core Orbit Ring 2 (Outer Torus) */}
+      {ring2.enabled !== false && (
+        <mesh ref={ringRef2} rotation={[ring2.tiltX ?? (-Math.PI / 3), ring2.tiltY ?? (Math.PI / 6), ring2.tiltZ ?? 0]}>
+          <torusGeometry args={[coreRadius * (ring2.radiusMultiplier || 1.7), ring2.tubeRadius || 0.02, perfTierFloat >= 0.8 ? 8 : 12, perfTierFloat >= 0.8 ? 24 : 48]} />
+          {perfTierFloat >= 0.8 ? (
+            <meshBasicMaterial color={ring2.color || '#B3002D'} transparent opacity={ring2.opacity ?? 0.7} />
+          ) : (
+            <meshStandardMaterial
+              color={ring2.color || '#B3002D'}
+              emissive={ring2.emissive || '#B3002D'}
+              emissiveIntensity={ring2.emissiveIntensity ?? 0.65}
+              transparent
+              opacity={ring2.opacity ?? 0.7}
+            />
+          )}
+        </mesh>
+      )}
     </group>
   );
 }

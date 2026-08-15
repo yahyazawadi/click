@@ -1,5 +1,102 @@
-// YAHYA.CLICK — CENTRAL SYSTEM CONFIGURATION
-// Everything in this file is designed to be easily editable!
+// ─────────────────────────────────────────────────────────────────────────────
+//  CORE PLANET CONFIGURATION (PHYSICAL, SHADERS, ATMOSPHERE, LIGHTING, RINGS)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const CORE_CONFIG = {
+  // Physical / Geometry
+  radius: 1.8,             // Core sphere radius
+  rotationSpeed: 0.15,     // Core planetary spin speed (Y-axis)
+
+  // Surface & Atmospheric Color Palette
+  colors: {
+    deepOcean:      '#041830',  // Deep space ocean trench base
+    midOcean:       '#0a4070',  // Visible ocean mid-tone
+    cloudBand:      '#1a7aaa',  // Cloud belt tone
+    stormHighlight: '#00d4f0',  // Bright storm swirl highlight
+    atmosphere:     '#00BAE3',  // Limb atmosphere Fresnel glow
+    continentColor: '#9E2A2B',  // Artistic Volcanic Crimson landmasses
+    coastColor:     '#5C1924',  // Deep Crimson-Rose coastal shelf
+  },
+
+  // Procedural Cloud & Belt Dynamics
+  clouds: {
+    driftSpeed:     0.025,      // Cloud movement drift speed
+    scale:          2.5,        // Cloud fractal noise scale
+    bandFrequency:  14.0,       // Latitudinal cloud band density
+    bandWarp:       0.12,       // Latitudinal band distortion
+    stormIntensity: 0.70,       // Storm swirl mask intensity
+  },
+
+  // Procedural Continent Landmass Dynamics
+  continents: {
+    driftSpeed:     0.004,      // Continental tectonic drift speed
+    scale:          0.95,       // Continent fractal noise scale
+    seaLevel:       -0.10,      // Ocean / land threshold elevation
+  },
+
+  // Atmospheric Limb Glow (Fresnel)
+  atmosphere: {
+    fresnelPower:     3.0,      // Falloff sharpness
+    fresnelIntensity: 0.80,     // Glow brightness
+  },
+
+  // World Lighting & Specular Gloss
+  lighting: {
+    specularIntensity: 0.35,    // Storm/water specular highlight intensity
+    specularShininess: 32.0,    // Specular roughness exponent
+    ambientLight:      0.25,    // Base ambient light floor
+    diffuseLight:      0.85,    // Directional nebula light intensity
+    polarFade:         0.45,    // Polar darkening shadow factor
+  },
+
+  // Concentric Core Orbit Torus Rings (Inner Spinning Gyro Rings)
+  innerRings: {
+    ring1: {
+      enabled:          true,
+      radiusMultiplier: 1.5,
+      tubeRadius:       0.03,
+      speedZ:           0.40,
+      color:            '#FF0A2B',
+      emissive:         '#FF0A2B',
+      emissiveIntensity: 0.80,
+      opacity:          1.0,
+      tiltX:            0.785398, // Math.PI / 4
+      tiltY:            0.0,
+      tiltZ:            0.0,
+    },
+    ring2: {
+      enabled:          true,
+      radiusMultiplier: 1.7,
+      tubeRadius:       0.02,
+      speedX:           0.30,
+      speedY:           0.20,
+      color:            '#B3002D',
+      emissive:         '#B3002D',
+      emissiveIntensity: 0.65,
+      opacity:          0.70,
+      tiltX:            -1.047198, // -Math.PI / 3
+      tiltY:            0.523599,  // Math.PI / 6
+      tiltZ:            0.0,
+    }
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MACRO ORBITAL RINGS CONFIGURATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const RINGS_CONFIG = {
+  rings: [
+    { id: 0, radius: 5.5, tiltX: 1.2, tiltY: 0.5, tiltZ: -0.2, speed: 0.12, color: '#00BAE3', opacity: 0.35, enabled: true },
+    { id: 1, radius: 7.0, tiltX: -0.8, tiltY: 1.1, tiltZ: 0.4, speed: 0.08, color: '#5DBAE1', opacity: 0.35, enabled: true },
+    { id: 2, radius: 8.5, tiltX: 0.3, tiltY: -1.2, tiltZ: 0.9, speed: 0.05, color: '#003268', opacity: 0.35, enabled: true },
+  ],
+  global: {
+    speedMultiplier: 1.0,
+    opacityMultiplier: 1.0,
+    enabled: true,
+  }
+};
 
 export const SYSTEM_CONFIG = {
   // 1. Color Palette
@@ -16,9 +113,9 @@ export const SYSTEM_CONFIG = {
 
   // 3. Central Sphere ("Sun" Core - Flexible Size!)
   core: {
-    radius: 1.8,             // Change core size anytime!
-    color: '#003268',        // NOT yellow/white
-    emissive: '#00BAE3',     // Emissive rim glow
+    get radius() { return CORE_CONFIG.radius; },
+    color: '#003268',
+    emissive: '#00BAE3',
     title: 'YAHYA CORE',
     subtitle: 'SYSTEM ARCHITECT & DEVELOPER',
     aboutText: `Welcome to yahya.click. I craft high-concurrency platforms, real-time architectures, and interactive spatial interfaces. Driven by sleek minimalism, robust system design, and effortless user experiences.`,
@@ -30,12 +127,7 @@ export const SYSTEM_CONFIG = {
   },
 
   // 4. Tilted Macro Orbital Rings
-  // Rings now configured to dramatically intersect (like a gyroscope) and stay perfectly in view!
-  rings: [
-    { id: 0, radius: 5.5, tiltX: 1.2, tiltY: 0.5, tiltZ: -0.2, speed: 0.12, color: '#00BAE3' },
-    { id: 1, radius: 7.0, tiltX: -0.8, tiltY: 1.1, tiltZ: 0.4, speed: 0.08, color: '#5DBAE1' },
-    { id: 2, radius: 8.5, tiltX: 0.3, tiltY: -1.2, tiltZ: 0.9, speed: 0.05, color: '#003268' },
-  ],
+  rings: RINGS_CONFIG.rings,
 
   // 5. Planetary Projects Data
   projects: [

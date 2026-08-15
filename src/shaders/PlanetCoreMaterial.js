@@ -6,13 +6,38 @@ export const PlanetCoreMaterial = shaderMaterial(
   {
     uTime: 0,
     uPerfTier: 0.0,  // 0.0=high, 0.5=med, 1.0=low
-    uDeepOcean:      new THREE.Color('#041830'),  // Deep space blue
+
+    // Surface & Atmospheric Colors
+    uDeepOcean:      new THREE.Color('#041830'),  // Deep space ocean trench base
     uMidOcean:       new THREE.Color('#0a4070'),  // Visible ocean mid-tone
-    uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt teal-blue
-    uStormHighlight: new THREE.Color('#00d4f0'),  // Bright storm cyan
-    uAtmosphere:     new THREE.Color('#00BAE3'),  // Limb atmosphere glow
-    uContinentColor: new THREE.Color('#2d5a6e'),  // Lighter teal landmass
-    uCoastColor:     new THREE.Color('#1a8090'),  // Shallow coastal shelf
+    uCloudBand:      new THREE.Color('#1a7aaa'),  // Cloud belt tone
+    uStormHighlight: new THREE.Color('#00d4f0'),  // Bright storm cyan highlight
+    uAtmosphere:     new THREE.Color('#00BAE3'),  // Limb atmosphere Fresnel glow
+    uContinentColor: new THREE.Color('#9E2A2B'),  // Artistic Volcanic Crimson landmass
+    uCoastColor:     new THREE.Color('#5C1924'),  // Deep Crimson-Rose coastal shelf
+
+    // Cloud & Latitudinal Belt Dynamics
+    uCloudDriftSpeed: 0.025,
+    uCloudScale:      2.5,
+    uBandFrequency:   14.0,
+    uBandWarp:        0.12,
+    uStormIntensity:  0.70,
+
+    // Continent Landmass Dynamics
+    uContinentDriftSpeed: 0.004,
+    uContinentScale:      0.95,
+    uSeaLevel:           -0.10,
+
+    // Atmospheric Limb Glow
+    uAtmosphereFresnelPower:     3.0,
+    uAtmosphereFresnelIntensity: 0.80,
+
+    // World Lighting & Specular Gloss
+    uSpecularIntensity: 0.35,
+    uSpecularShininess: 32.0,
+    uAmbientLight:      0.25,
+    uDiffuseLight:      0.85,
+    uPolarFade:         0.45,
   },
   // Vertex Shader — calculate World Position and World Normal correctly
   /* glsl */ `
@@ -35,6 +60,8 @@ export const PlanetCoreMaterial = shaderMaterial(
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
+
+    // Color uniforms
     uniform vec3 uDeepOcean;
     uniform vec3 uMidOcean;
     uniform vec3 uCloudBand;
@@ -42,6 +69,26 @@ export const PlanetCoreMaterial = shaderMaterial(
     uniform vec3 uAtmosphere;
     uniform vec3 uContinentColor;
     uniform vec3 uCoastColor;
+
+    // Dynamics uniforms
+    uniform float uCloudDriftSpeed;
+    uniform float uCloudScale;
+    uniform float uBandFrequency;
+    uniform float uBandWarp;
+    uniform float uStormIntensity;
+
+    uniform float uContinentDriftSpeed;
+    uniform float uContinentScale;
+    uniform float uSeaLevel;
+
+    uniform float uAtmosphereFresnelPower;
+    uniform float uAtmosphereFresnelIntensity;
+
+    uniform float uSpecularIntensity;
+    uniform float uSpecularShininess;
+    uniform float uAmbientLight;
+    uniform float uDiffuseLight;
+    uniform float uPolarFade;
 
     varying vec2 vUv;
     varying vec3 vWorldNormal;
@@ -97,39 +144,39 @@ export const PlanetCoreMaterial = shaderMaterial(
       vec3 N = normalize(vWorldNormal);
 
       // ---- 1. Organic atmospheric cloud bands ----
-      float drift = uTime * 0.025;
+      float drift = uTime * uCloudDriftSpeed;
       float c = cos(drift);
       float s = sin(drift);
       mat3 rotY = mat3(c, 0.0, s, 0.0, 1.0, 0.0, -s, 0.0, c);
       vec3 p = normalize(vPosition);
       vec3 driftP = rotY * p;
 
-      vec2 q = vec2(fbm(driftP * 2.0), fbm(driftP * 2.0 + vec3(5.2, 1.3, 2.9)));
+      vec2 q = vec2(fbm(driftP * (uCloudScale * 0.8)), fbm(driftP * (uCloudScale * 0.8) + vec3(5.2, 1.3, 2.9)));
       
       vec2 r;
       float cloudField;
       if (uPerfTier >= 0.8) {
         // LOW: skip domain warp, direct fbm
         r = q;
-        cloudField = fbm(driftP * 2.5);
+        cloudField = fbm(driftP * uCloudScale);
       } else if (uPerfTier >= 0.3) {
         // MED: single warp level
         r = q;
-        cloudField = fbm(driftP * 2.5 + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
+        cloudField = fbm(driftP * uCloudScale + vec3(1.8 * q.x, 1.8 * q.y, 0.0));
       } else {
         // HIGH: full double domain warp
-        vec3 driftP2 = rotY * (p * 2.5) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
+        vec3 driftP2 = rotY * (p * uCloudScale) + vec3(1.7 * q.x, 1.7 * q.y, 0.0);
         r = vec2(fbm(driftP2 + vec3(1.7, 9.2, 4.3)),
                  fbm(driftP2 + vec3(8.3, 2.8, 1.1)));
-        cloudField = fbm(driftP * 3.0 + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
+        cloudField = fbm(driftP * (uCloudScale * 1.2) + vec3(1.8 * r.x, 1.8 * r.y, 0.0));
       }
 
       // ---- 2. Latitudinal band structure ----
       float lat = vUv.y;
-      float warpedLat = lat + cloudField * 0.12;
-      float bands = sin(warpedLat * 14.0) * 0.4
-                  + sin(warpedLat * 28.0 + cloudField * 2.0) * 0.2
-                  + sin(warpedLat * 6.0 + r.x * 1.5) * 0.4;
+      float warpedLat = lat + cloudField * uBandWarp;
+      float bands = sin(warpedLat * uBandFrequency) * 0.4
+                  + sin(warpedLat * (uBandFrequency * 2.0) + cloudField * 2.0) * 0.2
+                  + sin(warpedLat * (uBandFrequency * 0.43) + r.x * 1.5) * 0.4;
       bands = bands * 0.5 + 0.5;
 
       // ---- 3. Color blending based on bands + cloud density ----
@@ -139,10 +186,10 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       float stormIntensity = length(r) * 0.5;
       float stormMask = smoothstep(0.3, 0.7, stormIntensity) * smoothstep(0.6, 0.85, bands);
-      col = mix(col, uStormHighlight, stormMask * 0.7);
+      col = mix(col, uStormHighlight, stormMask * uStormIntensity);
 
       // ---- 3b. Continent landmasses ----
-      float continentDrift = uTime * 0.004;
+      float continentDrift = uTime * uContinentDriftSpeed;
       float cC = cos(continentDrift);
       float cS = sin(continentDrift);
       mat3 rotCY = mat3(cC, 0.0, cS, 0.0, 1.0, 0.0, -cS, 0.0, cC);
@@ -151,19 +198,19 @@ export const PlanetCoreMaterial = shaderMaterial(
       float continentField;
       if (uPerfTier >= 0.8) {
         // LOW: skip domain warp
-        continentField = fbm(cP * 0.95 + vec3(8.2, 61.3, 3.4));
+        continentField = fbm(cP * uContinentScale + vec3(8.2, 61.3, 3.4));
       } else if (uPerfTier >= 0.3) {
         // MED: single warp level
-        vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)), 0.0);
-        continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.0, 0.0) + vec3(8.2, 61.3, 3.4));
+        vec2 cq = vec2(fbm(cP * (uContinentScale * 0.74) + vec3(31.7, 12.5, 4.1)), 0.0);
+        continentField = fbm(cP * uContinentScale + vec3(0.5 * cq.x, 0.0, 0.0) + vec3(8.2, 61.3, 3.4));
       } else {
         // HIGH: full double domain warp
-        vec2 cq = vec2(fbm(cP * 0.7 + vec3(31.7, 12.5, 4.1)),
-                       fbm(cP * 0.7 + vec3(14.3, 47.8, 2.2)));
-        continentField = fbm(cP * 0.9 + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
+        vec2 cq = vec2(fbm(cP * (uContinentScale * 0.74) + vec3(31.7, 12.5, 4.1)),
+                       fbm(cP * (uContinentScale * 0.74) + vec3(14.3, 47.8, 2.2)));
+        continentField = fbm(cP * uContinentScale + vec3(0.5 * cq.x, 0.5 * cq.y, 0.0) + vec3(8.2, 61.3, 3.4));
       }
 
-      float seaLevel   = -0.10;
+      float seaLevel   = uSeaLevel;
       float landHeight = smoothstep(seaLevel, seaLevel + 0.30, continentField);
       float coastShelf = smoothstep(seaLevel - 0.15, seaLevel + 0.05, continentField)
                        * (1.0 - landHeight);
@@ -173,7 +220,7 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       // Polar darkening
       float polarFade = pow(sin(lat * 3.14159), 0.4);
-      col *= mix(0.45, 1.0, polarFade);
+      col *= mix(uPolarFade, 1.0, polarFade);
 
       // ---- 4. World-Space Physically-Based Lighting ----
       // Nebula 1 position in world space is approx (-35, 20, -40).
@@ -183,20 +230,19 @@ export const PlanetCoreMaterial = shaderMaterial(
 
       // Diffuse lighting calculation (World space)
       float diffuse = max(0.0, dot(N, lightDir));
-      float ambient = 0.25;
-      float light = ambient + diffuse * 0.85;
+      float light = uAmbientLight + diffuse * uDiffuseLight;
 
       col *= light;
 
       // Specular highlight (World space)
       vec3 viewDir = normalize(cameraPosition - vWorldPosition);
       vec3 halfDir = normalize(lightDir + viewDir);
-      float spec = pow(max(0.0, dot(N, halfDir)), 32.0);
-      col += uStormHighlight * spec * 0.35;
+      float spec = pow(max(0.0, dot(N, halfDir)), uSpecularShininess);
+      col += uStormHighlight * spec * uSpecularIntensity;
 
       // ---- 5. Atmospheric Limb Glow (Fresnel in World Space) ----
-      float fresnel = pow(1.0 - max(0.0, dot(N, viewDir)), 3.0);
-      col += uAtmosphere * fresnel * 0.8;
+      float fresnel = pow(1.0 - max(0.0, dot(N, viewDir)), uAtmosphereFresnelPower);
+      col += uAtmosphere * fresnel * uAtmosphereFresnelIntensity;
 
       gl_FragColor = vec4(col, 1.0);
     }
