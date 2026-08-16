@@ -15,6 +15,7 @@ class FPSLogger {
     this.tierChangeEvents = [];
     this.userInteractions = [];
     this.unlockEvents = [];
+    this.tabLifecycleEvents = [];
     this.maxLogs = 600; // 10 minutes at 1 snapshot/sec
     this.startTime = Date.now();
     this.sessionInfo = this.getDeviceInfo();
@@ -24,6 +25,35 @@ class FPSLogger {
     // Global reference for debugging in devtools console
     if (typeof window !== 'undefined') {
       window.__FPS_LOGGER__ = this;
+
+      // Automated Tab Visibility & Wakeup Latency Telemetry
+      let tabHiddenTime = null;
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          tabHiddenTime = performance.now();
+          this.logTabLifecycle({
+            action: 'TAB_BACKGROUNDED',
+            details: { timestampISO: new Date().toISOString() }
+          });
+        } else {
+          const inactiveDurationMs = tabHiddenTime ? Math.round(performance.now() - tabHiddenTime) : 0;
+          const resumeStart = performance.now();
+          requestAnimationFrame(() => {
+            const resumeLatencyMs = Math.round(performance.now() - resumeStart);
+            this.logTabLifecycle({
+              action: 'TAB_RESUMED',
+              durationInactiveMs: inactiveDurationMs,
+              resumeLatencyMs,
+              details: {
+                inactiveSeconds: Math.round(inactiveDurationMs / 1000),
+                resumeLatencyMs,
+                gpuTier: (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('yahya_gpu_tier')) || 'unknown'
+              }
+            });
+            console.log(`[Telemetry] ⚡ TAB RESUMED: was inactive for ${(inactiveDurationMs / 1000).toFixed(1)}s, frame 1 rendered in ${resumeLatencyMs}ms!`);
+          });
+        }
+      });
 
       // Track window resizes as interaction events
       let resizeTimer = null;
@@ -132,19 +162,20 @@ class FPSLogger {
     this.tierChangeEvents.push(evt);
   }
 
-  // Record tab visibility changes & duration spent in background
-  logVisibilityEvent({ state, durationHiddenMs = 0 }) {
+  // Record tab visibility / background / resume lifecycle event
+  logTabLifecycle({ action, durationInactiveMs = 0, resumeLatencyMs = 0, details = {} }) {
     if (!this.isRecording) return;
     const evt = {
-      event: 'VISIBILITY_CHANGE',
+      event: 'TAB_LIFECYCLE',
       timestamp: Date.now(),
       timestampISO: new Date().toISOString(),
       elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
-      state,
-      durationHiddenMs,
+      action,
+      durationInactiveMs,
+      resumeLatencyMs,
+      details,
     };
-    console.log(`[Telemetry] VISIBILITY: ${state.toUpperCase()}${state === 'visible' && durationHiddenMs > 0 ? ` (resumed after ${(durationHiddenMs / 1000).toFixed(2)}s)` : ''}`);
-    this.userInteractions.push(evt);
+    this.tabLifecycleEvents.push(evt);
   }
 
   // Record a per-second telemetry snapshot
@@ -277,7 +308,9 @@ class FPSLogger {
         avgFps: this.logs.length ? Math.round(this.logs.reduce((acc, l) => acc + l.fps, 0) / this.logs.length) : 0,
         lowest1PercentFps: this.logs.length ? Math.min(...this.logs.map(l => l.onePercentLow)) : 0,
         worstStutterFrameMs: this.stutterEvents.length ? Math.max(...this.stutterEvents.map(s => s.frameDurationMs)) : 0,
+        tabResumesCount: this.tabLifecycleEvents.filter(e => e.action === 'TAB_RESUMED').length,
       },
+      tabLifecycleEvents: this.tabLifecycleEvents,
       userInteractions: this.userInteractions,
       unlockEvents: this.unlockEvents,
       tierChangeEvents: this.tierChangeEvents,

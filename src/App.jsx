@@ -42,16 +42,10 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     }
   }, []);
 
-  // Clean accumulator reset & telemetry tracking on tab visibility change (instant wakeup without time-warp)
+  // Clean accumulator reset on tab visibility change (instant wakeup without time-warp)
   useEffect(() => {
-    let hiddenStartTime = 0;
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        hiddenStartTime = Date.now();
-        fpsLogger.logVisibilityEvent({ state: 'hidden', durationHiddenMs: 0 });
-      } else if (document.visibilityState === 'visible') {
-        const durationHiddenMs = hiddenStartTime > 0 ? Date.now() - hiddenStartTime : 0;
-        fpsLogger.logVisibilityEvent({ state: 'visible', durationHiddenMs });
+      if (document.visibilityState === 'visible') {
         fpsAcc.current = 0;
         frameCount.current = 0;
         stableTimer.current = 0;
