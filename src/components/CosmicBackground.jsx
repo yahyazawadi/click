@@ -9,8 +9,9 @@ export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0
 
   // Very slow background rotation for deep space ambiance (skipped on LOW tier)
   useFrame((state, delta) => {
+    const safeDelta = Math.min(delta, 0.1);
     if (starsRef.current && perfTierFloat < 0.8) {
-      starsRef.current.rotation.y += delta * 0.01;
+      starsRef.current.rotation.y += safeDelta * 0.01;
     }
   });
 

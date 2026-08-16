@@ -131,14 +131,15 @@ export function SimpleEarthPlanet({ size = 0.65, isMobile = false }) {
   }, [earthGeo, cloudGeo, hazeGeo]);
 
   useFrame((_state, delta) => {
+    const safeDelta = Math.min(delta, 0.1);
     // Stylized Earth surface rotation
     if (earthRef.current) {
-      earthRef.current.rotation.y += delta * 0.09;
+      earthRef.current.rotation.y += safeDelta * 0.09;
     }
 
     // Clouds rotate faster for continuous 3D parallax over stylized continents
     if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += delta * 0.13;
+      cloudsRef.current.rotation.y += safeDelta * 0.13;
     }
   });
 

@@ -83,6 +83,7 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
+    const safeDelta = Math.min(delta, 0.1);
 
     // Feed time + tier to planet shader
     if (shaderMatRef.current) {
@@ -91,7 +92,7 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
     }
 
     // Slow planetary rotation
-    if (planetRef.current) planetRef.current.rotation.y += delta * 0.14;
+    if (planetRef.current) planetRef.current.rotation.y += safeDelta * 0.14;
 
     // Each scissor snips with its own speed, amplitude, and dual-harmonic organic wave
     scissorDefs.forEach((def, i) => {

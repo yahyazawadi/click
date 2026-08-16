@@ -34,10 +34,11 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
 
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
+    const safeDelta = Math.min(delta, 0.1);
 
     // Accumulate continuous drift phases smoothly without phase-jump snapping
-    cloudPhase.current += delta * (CORE_CONFIG.clouds.driftSpeed !== undefined ? CORE_CONFIG.clouds.driftSpeed : 0.025);
-    continentPhase.current += delta * (CORE_CONFIG.continents.driftSpeed !== undefined ? CORE_CONFIG.continents.driftSpeed : 0.004);
+    cloudPhase.current += safeDelta * (CORE_CONFIG.clouds.driftSpeed !== undefined ? CORE_CONFIG.clouds.driftSpeed : 0.025);
+    continentPhase.current += safeDelta * (CORE_CONFIG.continents.driftSpeed !== undefined ? CORE_CONFIG.continents.driftSpeed : 0.004);
 
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = time;

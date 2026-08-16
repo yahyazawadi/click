@@ -77,7 +77,8 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
     }
 
     // Smooth lerp camera position & lookAt target (slight initial ease-in during reload intro)
-    const lerpFactor = isIntroAnimating.current ? delta * 1.5 : delta * 2.2;
+    const safeDelta = Math.min(delta, 0.1);
+    const lerpFactor = isIntroAnimating.current ? safeDelta * 1.5 : safeDelta * 2.2;
     camera.position.lerp(targetCamPos.current, lerpFactor);
     currentLookAt.current.lerp(targetLookAt.current, lerpFactor);
     camera.lookAt(currentLookAt.current);

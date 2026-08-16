@@ -35,6 +35,7 @@ export function SculptedHeartPlanet({ color, size, isMobile, perfTierFloat = 0.0
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
+    const safeDelta = Math.min(delta, 0.1);
 
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = t;
@@ -42,7 +43,7 @@ export function SculptedHeartPlanet({ color, size, isMobile, perfTierFloat = 0.0
     }
 
     if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.4;
+      meshRef.current.rotation.y += safeDelta * 0.4;
       meshRef.current.position.y = Math.sin(t * 1.5) * 0.08;
     }
   });

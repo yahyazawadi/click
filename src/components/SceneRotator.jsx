@@ -99,10 +99,12 @@ export function SceneRotator({ children, disabled = false }) {
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
 
+    const safeDelta = Math.min(delta, 0.1);
+
     // Intro Spinup (540 deg total: 180 + 360)
     if (isIntroSpinning.current) {
       // Ease out spin over ~1.8 seconds
-      introProgress.current += delta * 0.75;
+      introProgress.current += safeDelta * 0.75;
       if (introProgress.current >= 1) {
         introProgress.current = 1;
         isIntroSpinning.current = false;
@@ -112,7 +114,7 @@ export function SceneRotator({ children, disabled = false }) {
       }
 
       // Calculate incremental rotation angle for this specific frame
-      const tPrev = Math.max(0, introProgress.current - delta * 0.75);
+      const tPrev = Math.max(0, introProgress.current - safeDelta * 0.75);
       const tCurr = Math.min(1, introProgress.current);
 
       const easePrev = 1 - Math.pow(1 - tPrev, 3);
@@ -175,7 +177,7 @@ export function SceneRotator({ children, disabled = false }) {
       }
 
       // Smoothly slerp to target quaternion during inertia release
-      groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(0.001, delta));
+      groupRef.current.quaternion.slerp(targetQuaternion.current, 1 - Math.pow(0.001, safeDelta));
     }
   });
 

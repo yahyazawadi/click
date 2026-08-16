@@ -51,6 +51,7 @@ export function FlowerPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
+    const safeDelta = Math.min(delta, 0.1);
 
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime = t;
@@ -58,12 +59,12 @@ export function FlowerPlanet({ color, size, isMobile, perfTierFloat = 0.0 }) {
     }
 
     if (meshRef.current) {
-      meshRef.current.rotation.z += delta * 0.25;
+      meshRef.current.rotation.z += safeDelta * 0.25;
       meshRef.current.rotation.y = Math.sin(t * 0.8) * 0.2;
     }
 
     if (ringRef.current) {
-      ringRef.current.rotation.z += delta * 0.12;
+      ringRef.current.rotation.z += safeDelta * 0.12;
       ringRef.current.rotation.x = Math.sin(t * 0.5) * 0.1 + 0.4;
     }
   });

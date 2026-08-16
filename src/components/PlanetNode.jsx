@@ -28,6 +28,23 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
 
+// Instant-mount procedural fallback sphere while high-res textures decode
+function PlanetFallbackMesh({ color, size }) {
+  const planetRadius = (size || 0.5) * 0.85;
+  return (
+    <mesh>
+      <sphereGeometry args={[planetRadius, 20, 20]} />
+      <meshStandardMaterial
+        color={color || SYSTEM_CONFIG.colors.primaryCyan}
+        emissive={color || SYSTEM_CONFIG.colors.primaryCyan}
+        emissiveIntensity={0.35}
+        roughness={0.6}
+        metalness={0.1}
+      />
+    </mesh>
+  );
+}
+
 export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true, perfTierFloat = 0.0 }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -47,7 +64,8 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
   useFrame((state, delta) => {
     if (!ring) return;
 
-    angleRef.current += delta * (ring.speed || 0.1);
+    const safeDelta = Math.min(delta, 0.1);
+    angleRef.current += safeDelta * (ring.speed || 0.1);
 
     const theta = angleRef.current;
     const r = ring.radius;
@@ -58,7 +76,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
 
     // Smooth scale lerp for progressive fade-in
     const targetScale = isUnlocked ? 1.0 : 0.0;
-    currentScaleRef.current = THREE.MathUtils.lerp(currentScaleRef.current, targetScale, Math.min(1.0, delta * 5.0));
+    currentScaleRef.current = THREE.MathUtils.lerp(currentScaleRef.current, targetScale, Math.min(1.0, safeDelta * 5.0));
 
     if (groupRef.current) {
       groupRef.current.position.copy(localPos.current);
@@ -109,14 +127,16 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
       }}
     >
       {shouldRenderMesh && (
-        <ProceduralPlanetMesh
-          type={shapeIndex}
-          color={planetColor}
-          size={project.size || 0.5}
-          isSelected={isSelected}
-          isMobile={isMobile}
-          perfTierFloat={perfTierFloat}
-        />
+        <React.Suspense fallback={<PlanetFallbackMesh color={planetColor} size={project.size || 0.5} />}>
+          <ProceduralPlanetMesh
+            type={shapeIndex}
+            color={planetColor}
+            size={project.size || 0.5}
+            isSelected={isSelected}
+            isMobile={isMobile}
+            perfTierFloat={perfTierFloat}
+          />
+        </React.Suspense>
       )}
       {/* Floating HTML Title Label — only mounted when actually visible */}
       {!hasSelection && (hovered || showTitle) && (

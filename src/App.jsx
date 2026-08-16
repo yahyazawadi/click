@@ -42,8 +42,31 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     }
   }, []);
 
+  // Clean accumulator reset & telemetry tracking on tab visibility change (instant wakeup without time-warp)
+  useEffect(() => {
+    let hiddenStartTime = 0;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenStartTime = Date.now();
+        fpsLogger.logVisibilityEvent({ state: 'hidden', durationHiddenMs: 0 });
+      } else if (document.visibilityState === 'visible') {
+        const durationHiddenMs = hiddenStartTime > 0 ? Date.now() - hiddenStartTime : 0;
+        fpsLogger.logVisibilityEvent({ state: 'visible', durationHiddenMs });
+        fpsAcc.current = 0;
+        frameCount.current = 0;
+        stableTimer.current = 0;
+        lowFpsTimer.current = 0;
+        lastSnapshotTime.current = Date.now();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   useFrame((_state, delta) => {
-    const frameMs = delta * 1000;
+    // Clamp delta to 0.1s max to prevent sudden leaps on tab blur/focus/wakeup
+    const safeDelta = Math.min(delta, 0.1);
+    const frameMs = safeDelta * 1000;
     
     // Ring buffer write — zero allocation, zero array shifting
     frameDeltas.current[ringIdx.current] = frameMs;
@@ -56,7 +79,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     } : null;
 
     // Capture STUTTER_EVENT if single frame exceeds 33.3ms (below 30 FPS)
-    if (delta > 0.0333) {
+    if (safeDelta > 0.0333 && document.visibilityState !== 'hidden') {
       fpsLogger.logStutterEvent({
         frameDurationMs: frameMs,
         selectedTarget,
@@ -74,8 +97,8 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     const thresholdDelta = isMobile ? 0.034 : 0.022;
     const requiredDuration = isMobile ? 2.0 : 0.25;
 
-    if (delta <= thresholdDelta) {
-      stableTimer.current += delta;
+    if (safeDelta <= thresholdDelta) {
+      stableTimer.current += safeDelta;
     } else {
       stableTimer.current = 0;
     }
@@ -83,8 +106,8 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s on active tab, demote GPU tier!
     // Ignore when tab is hidden or when delta > 0.25s (tab switch / background throttle)
     const isTabActive = typeof document !== 'undefined' && !document.hidden && document.visibilityState !== 'hidden';
-    if (isTabActive && delta >= 0.040 && delta < 0.250 && gpuTier !== 'low') {
-      lowFpsTimer.current += delta;
+    if (isTabActive && safeDelta >= 0.040 && gpuTier !== 'low') {
+      lowFpsTimer.current += safeDelta;
       if (lowFpsTimer.current >= 1.5) {
         lowFpsTimer.current = 0;
         if (typeof onAutoDemoteTier === 'function') {
@@ -95,7 +118,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       lowFpsTimer.current = 0;
     }
 
-    fpsAcc.current += delta;
+    fpsAcc.current += safeDelta;
     frameCount.current += 1;
 
     // Every 0.3s: calculate live FPS & 1% lows

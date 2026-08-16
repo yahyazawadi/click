@@ -195,6 +195,13 @@ const THRESH_MED  = 12.0;
  */
 export function detectGpuTier() {
   try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const cached = sessionStorage.getItem('yahya_gpu_tier');
+      if (cached === 'high' || cached === 'med' || cached === 'low') {
+        return cached;
+      }
+    }
+
     const probeCanvas = document.createElement('canvas');
     const probeGl = probeCanvas.getContext('webgl') || probeCanvas.getContext('experimental-webgl');
     if (probeGl) {
@@ -203,6 +210,9 @@ export function detectGpuTier() {
         const result = classifyByName(gpuName);
         if (result) {
           console.log(`[GpuTier] GPU: "${gpuName}" → TIER: ${result.tier.toUpperCase()} (${result.reason})`);
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            sessionStorage.setItem('yahya_gpu_tier', result.tier);
+          }
           return result.tier;
         }
         console.log(`[GpuTier] GPU: "${gpuName}" (Unrecognized name, running WebGL benchmark...)`);
@@ -215,6 +225,9 @@ export function detectGpuTier() {
     const avgMs = runBenchmark();
     const tier = avgMs < THRESH_HIGH ? 'high' : avgMs < THRESH_MED ? 'med' : 'low';
     console.log(`[GpuTier] WebGL Benchmark: ${avgMs.toFixed(2)}ms/frame → TIER: ${tier.toUpperCase()} (Thresholds: high < ${THRESH_HIGH}ms, med < ${THRESH_MED}ms)`);
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem('yahya_gpu_tier', tier);
+    }
     return tier;
   } catch (err) {
     console.warn('[GpuTier] Detection failed, defaulting to med:', err);

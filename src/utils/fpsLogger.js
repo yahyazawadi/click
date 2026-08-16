@@ -132,6 +132,21 @@ class FPSLogger {
     this.tierChangeEvents.push(evt);
   }
 
+  // Record tab visibility changes & duration spent in background
+  logVisibilityEvent({ state, durationHiddenMs = 0 }) {
+    if (!this.isRecording) return;
+    const evt = {
+      event: 'VISIBILITY_CHANGE',
+      timestamp: Date.now(),
+      timestampISO: new Date().toISOString(),
+      elapsedSeconds: Math.round((Date.now() - this.startTime) / 1000),
+      state,
+      durationHiddenMs,
+    };
+    console.log(`[Telemetry] VISIBILITY: ${state.toUpperCase()}${state === 'visible' && durationHiddenMs > 0 ? ` (resumed after ${(durationHiddenMs / 1000).toFixed(2)}s)` : ''}`);
+    this.userInteractions.push(evt);
+  }
+
   // Record a per-second telemetry snapshot
   logSnapshot({ fps, onePercentLow, avgFrameTimeMs, maxFrameTimeMs, selectedTarget, unlockedCount, batteryStatus, isMobile, gpuTier, cameraPos, renderInfo }) {
     if (!this.isRecording) return;
