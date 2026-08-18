@@ -283,7 +283,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     path: 2,
     scale: 5.4,
     warp: 5.7,
-    coverage: 0.0, // Gas expansion bias (0.0 = baseline, >0 = lifts faint wisps into broad clouds)
+    coverage: 0.21, // Gas expansion bias (0.21 = expanded majestic crimson cloud)
     brightness: 0.8,
     dustStrength: 0.92,
     pillarStrength: 0.52,
@@ -315,7 +315,7 @@ export const DEFAULT_NEBULA_CONFIG = {
     path: 2,
     scale: 3.1,
     warp: 6,
-    coverage: 0.0, // Gas expansion bias (0.0 = baseline, >0 = lifts faint wisps into broad clouds)
+    coverage: 0.35, // Gas expansion bias (0.35 = expanded lush celestial stream)
     brightness: 0.7,
     dustStrength: 0,
     pillarStrength: 0.5,
