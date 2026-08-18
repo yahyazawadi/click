@@ -57,6 +57,8 @@ export function FpsProfilerOverlay({
   // Copy / Paste / Reset / Generate notification states
   const [copiedStatus, setCopiedStatus] = useState(false);
   const [pastedStatus, setPastedStatus] = useState(false);
+  const [copiedSeedStatus, setCopiedSeedStatus] = useState(false);
+  const [pastedSeedStatus, setPastedSeedStatus] = useState(false);
   const [resetStatus, setResetStatus] = useState(false);
   const [generatedStatus, setGeneratedStatus] = useState(false);
 
@@ -537,6 +539,68 @@ export function FpsProfilerOverlay({
     } catch (err) {
       console.warn('Clipboard paste error or invalid config:', err);
       alert('Could not paste config: ' + err.message);
+    }
+  };
+
+  const handleCopySeed = async () => {
+    const current = NEBULA_CONFIG[activeNebulaTab];
+    if (!current) return;
+    const seedPayload = JSON.stringify({ seedX: current.seedX ?? 0.0, seedY: current.seedY ?? 0.0 });
+    await copyTextToClipboard(seedPayload);
+    setCopiedSeedStatus(true);
+    setTimeout(() => setCopiedSeedStatus(false), 1500);
+  };
+
+  const handlePasteSeed = async () => {
+    try {
+      let text = '';
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          text = await navigator.clipboard.readText();
+        } catch (e) {
+          console.warn('Clipboard read error:', e);
+        }
+      }
+      if (!text) {
+        text = prompt('Paste Seed JSON or "X, Y" here:');
+      }
+      if (!text) return;
+
+      text = text.trim();
+      let parsedX = null;
+      let parsedY = null;
+
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.seedX !== undefined) parsedX = parseFloat(parsed.seedX);
+          if (parsed.seedY !== undefined) parsedY = parseFloat(parsed.seedY);
+        }
+      } catch (e) {
+        // Fallback: match comma or space separated numbers e.g. "-71.4, 32.1" or "-71.4 32.1"
+        const matches = text.match(/-?\d+(?:\.\d+)?/g);
+        if (matches && matches.length >= 2) {
+          parsedX = parseFloat(matches[0]);
+          parsedY = parseFloat(matches[1]);
+        }
+      }
+
+      if (parsedX !== null && !isNaN(parsedX) && parsedY !== null && !isNaN(parsedY)) {
+        pushHistorySnapshot();
+        const current = NEBULA_CONFIG[activeNebulaTab];
+        if (current) {
+          current.seedX = +(parsedX).toFixed(1);
+          current.seedY = +(parsedY).toFixed(1);
+        }
+        saveToStorage();
+        setPastedSeedStatus(true);
+        setRerender((v) => v + 1);
+        setTimeout(() => setPastedSeedStatus(false), 1500);
+      } else {
+        alert('Could not parse seed coordinates. Format: {"seedX": -71.4, "seedY": 32.1} or -71.4, 32.1');
+      }
+    } catch (err) {
+      console.warn('Seed paste error:', err);
     }
   };
 
@@ -1688,31 +1752,71 @@ export function FpsProfilerOverlay({
                   <span style={{ fontSize: '0.62rem', color: 'var(--primary-cyan)', fontWeight: 'bold' }}>
                     PROCEDURAL SEED:
                   </span>
-                  <button
-                    onClick={() => {
-                      pushHistorySnapshot();
-                      const current = NEBULA_CONFIG[activeNebulaTab];
-                      if (!current) return;
-                      current.seedX = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
-                      current.seedY = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
-                      saveToStorage();
-                      setRerender((v) => v + 1);
-                    }}
-                    title="Reroll seed for this nebula only"
-                    style={{
-                      background: 'rgba(0, 186, 227, 0.2)',
-                      border: '1px solid var(--primary-cyan)',
-                      color: 'var(--primary-cyan)',
-                      borderRadius: '3px',
-                      padding: '1px 6px',
-                      fontSize: '0.55rem',
-                      fontFamily: 'var(--font-mono)',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    REROLL THIS
-                  </button>
+                  <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    <button
+                      onClick={handleCopySeed}
+                      title="Copy seed coordinates as JSON"
+                      style={{
+                        background: copiedSeedStatus ? 'rgba(0, 255, 170, 0.25)' : 'rgba(0, 186, 227, 0.15)',
+                        border: '1px solid ' + (copiedSeedStatus ? '#00ffaa' : 'var(--primary-cyan)'),
+                        color: copiedSeedStatus ? '#00ffaa' : 'var(--primary-cyan)',
+                        borderRadius: '3px',
+                        padding: '1px 6px',
+                        fontSize: '0.55rem',
+                        fontFamily: 'var(--font-mono)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {copiedSeedStatus ? 'COPIED!' : 'COPY'}
+                    </button>
+
+                    <button
+                      onClick={handlePasteSeed}
+                      title="Paste seed coordinates (JSON or X, Y)"
+                      style={{
+                        background: pastedSeedStatus ? 'rgba(0, 255, 170, 0.25)' : 'rgba(0, 186, 227, 0.15)',
+                        border: '1px solid ' + (pastedSeedStatus ? '#00ffaa' : 'var(--primary-cyan)'),
+                        color: pastedSeedStatus ? '#00ffaa' : 'var(--primary-cyan)',
+                        borderRadius: '3px',
+                        padding: '1px 6px',
+                        fontSize: '0.55rem',
+                        fontFamily: 'var(--font-mono)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {pastedSeedStatus ? 'PASTED!' : 'PASTE'}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        pushHistorySnapshot();
+                        const current = NEBULA_CONFIG[activeNebulaTab];
+                        if (!current) return;
+                        current.seedX = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+                        current.seedY = +(Math.floor(Math.random() * 120 + 5) * (Math.random() > 0.5 ? 1 : -1)).toFixed(1);
+                        saveToStorage();
+                        setRerender((v) => v + 1);
+                      }}
+                      title="Reroll seed for this nebula only"
+                      style={{
+                        background: 'rgba(0, 186, 227, 0.2)',
+                        border: '1px solid var(--primary-cyan)',
+                        color: 'var(--primary-cyan)',
+                        borderRadius: '3px',
+                        padding: '1px 6px',
+                        fontSize: '0.55rem',
+                        fontFamily: 'var(--font-mono)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      REROLL THIS
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
