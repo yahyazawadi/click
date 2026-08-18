@@ -4,6 +4,56 @@ import * as THREE from 'three';
 import '../shaders/NebulaShaderMaterial';
 import { NEBULA_CONFIG } from '../config';
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPER: Clean Uniform Synchronizer Bridge
+//  Synchronizes configuration to WebGL shader material safely with full fallback guards.
+// ─────────────────────────────────────────────────────────────────────────────
+function syncNebulaUniforms(mat, config, timeAcc, path, perfTierFloat) {
+  if (!mat) return;
+  mat.uTime = timeAcc;
+  mat.uPerfTier = perfTierFloat;
+  mat.uNebulaPath = path;
+  mat.uScale = config.scale;
+  mat.uWarp = config.warp;
+  mat.uCoverage = config.coverage !== undefined ? config.coverage : 0.0;
+  if (mat.uniforms?.uCoverage) {
+    mat.uniforms.uCoverage.value = mat.uCoverage;
+  }
+  mat.uBrightness = config.brightness;
+  mat.uDustStrength = config.dustStrength;
+  mat.uPillarStrength = config.pillarStrength;
+  mat.uMaskRadius = config.maskRadius;
+  mat.uMinSize = config.minSize !== undefined ? config.minSize : (config.maskRadius ? config.maskRadius * 0.05 : 0.03);
+  mat.uMaxSize = config.maxSize !== undefined ? config.maxSize : (config.maskRadius ? config.maskRadius * 1.35 : 0.32);
+  if (mat.uniforms?.uMinSize) {
+    mat.uniforms.uMinSize.value = mat.uMinSize;
+  }
+  if (mat.uniforms?.uMaxSize) {
+    mat.uniforms.uMaxSize.value = mat.uMaxSize;
+  }
+  mat.uEdgeWarp = config.edgeWarp;
+  mat.uCoreRadius = config.coreRadius;
+  mat.uAlpha = config.alpha;
+  mat.uGradientSoftness = config.gradientSoftness !== undefined ? config.gradientSoftness : 1.0;
+  if (mat.uniforms?.uGradientSoftness) {
+    mat.uniforms.uGradientSoftness.value = mat.uGradientSoftness;
+  }
+  if (mat.uSeedOffset) {
+    mat.uSeedOffset.set(config.seedX || 0.0, config.seedY || 0.0);
+  }
+  if (mat.uniforms?.uSeedOffset) {
+    mat.uniforms.uSeedOffset.value.set(config.seedX || 0.0, config.seedY || 0.0);
+  }
+  mat.uMultiCoreStrength = config.multiCoreStrength !== undefined ? config.multiCoreStrength : 0.0;
+  mat.uMultiCoreScale = config.multiCoreScale !== undefined ? config.multiCoreScale : 1.8;
+  mat.uVoidPinch = config.voidPinch !== undefined ? config.voidPinch : 0.0;
+
+  if (mat.uColorSII && config.colors?.sii) mat.uColorSII.set(config.colors.sii);
+  if (mat.uColorHa && config.colors?.ha) mat.uColorHa.set(config.colors.ha);
+  if (mat.uColorOIII && config.colors?.oiii) mat.uColorOIII.set(config.colors.oiii);
+  if (mat.uColorCore && config.colors?.core) mat.uColorCore.set(config.colors.core);
+}
+
 export function DualNebulaBackground({ 
   isMobile, 
   perfTierFloat = 0.0, 
@@ -19,88 +69,15 @@ export function DualNebulaBackground({
     // Clamp delta to 0.1s max to prevent sudden leaps on tab blur/focus/reload
     const safeDelta = Math.min(delta, 0.1);
 
-    if (matRefLayer1.current) {
-      const n1 = NEBULA_CONFIG.nebula1;
-      const speed1 = n1.speed !== undefined ? n1.speed : 0.10;
-      timeAcc1.current += safeDelta * speed1;
-      matRefLayer1.current.uTime = timeAcc1.current;
-      matRefLayer1.current.uNebulaPath = nebulaPath1;
-      matRefLayer1.current.uScale = n1.scale;
-      matRefLayer1.current.uWarp = n1.warp;
-      matRefLayer1.current.uBrightness = n1.brightness;
-      matRefLayer1.current.uDustStrength = n1.dustStrength;
-      matRefLayer1.current.uPillarStrength = n1.pillarStrength;
-      matRefLayer1.current.uMaskRadius = n1.maskRadius;
-      matRefLayer1.current.uMinSize = n1.minSize !== undefined ? n1.minSize : (n1.maskRadius ? n1.maskRadius * 0.05 : 0.03);
-      matRefLayer1.current.uMaxSize = n1.maxSize !== undefined ? n1.maxSize : (n1.maskRadius ? n1.maskRadius * 1.35 : 0.32);
-      if (matRefLayer1.current.uniforms?.uMinSize) {
-        matRefLayer1.current.uniforms.uMinSize.value = matRefLayer1.current.uMinSize;
-      }
-      if (matRefLayer1.current.uniforms?.uMaxSize) {
-        matRefLayer1.current.uniforms.uMaxSize.value = matRefLayer1.current.uMaxSize;
-      }
-      matRefLayer1.current.uEdgeWarp = n1.edgeWarp;
-      matRefLayer1.current.uCoreRadius = n1.coreRadius;
-      matRefLayer1.current.uAlpha = n1.alpha;
-      matRefLayer1.current.uGradientSoftness = n1.gradientSoftness !== undefined ? n1.gradientSoftness : 1.0;
-      if (matRefLayer1.current.uniforms?.uGradientSoftness) {
-        matRefLayer1.current.uniforms.uGradientSoftness.value = n1.gradientSoftness !== undefined ? n1.gradientSoftness : 1.0;
-      }
-      if (matRefLayer1.current.uSeedOffset) {
-        matRefLayer1.current.uSeedOffset.set(n1.seedX || 0.0, n1.seedY || 0.0);
-      }
-      if (matRefLayer1.current.uniforms?.uSeedOffset) {
-        matRefLayer1.current.uniforms.uSeedOffset.value.set(n1.seedX || 0.0, n1.seedY || 0.0);
-      }
-      matRefLayer1.current.uMultiCoreStrength = n1.multiCoreStrength !== undefined ? n1.multiCoreStrength : 0.0;
-      matRefLayer1.current.uMultiCoreScale = n1.multiCoreScale !== undefined ? n1.multiCoreScale : 1.8;
-      matRefLayer1.current.uVoidPinch = n1.voidPinch !== undefined ? n1.voidPinch : 0.0;
-      matRefLayer1.current.uColorSII.set(n1.colors.sii);
-      matRefLayer1.current.uColorHa.set(n1.colors.ha);
-      matRefLayer1.current.uColorOIII.set(n1.colors.oiii);
-      matRefLayer1.current.uColorCore.set(n1.colors.core);
-    }
-    if (matRefLayer2.current) {
-      const n2 = NEBULA_CONFIG.nebula2;
-      const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
-      timeAcc2.current += safeDelta * speed2;
-      matRefLayer2.current.uTime = timeAcc2.current;
-      matRefLayer2.current.uNebulaPath = nebulaPath2;
-      matRefLayer2.current.uScale = n2.scale;
-      matRefLayer2.current.uWarp = n2.warp;
-      matRefLayer2.current.uBrightness = n2.brightness;
-      matRefLayer2.current.uDustStrength = n2.dustStrength;
-      matRefLayer2.current.uPillarStrength = n2.pillarStrength;
-      matRefLayer2.current.uMaskRadius = n2.maskRadius;
-      matRefLayer2.current.uMinSize = n2.minSize !== undefined ? n2.minSize : (n2.maskRadius ? n2.maskRadius * 0.05 : 0.02);
-      matRefLayer2.current.uMaxSize = n2.maxSize !== undefined ? n2.maxSize : (n2.maskRadius ? n2.maskRadius * 1.35 : 0.20);
-      if (matRefLayer2.current.uniforms?.uMinSize) {
-        matRefLayer2.current.uniforms.uMinSize.value = matRefLayer2.current.uMinSize;
-      }
-      if (matRefLayer2.current.uniforms?.uMaxSize) {
-        matRefLayer2.current.uniforms.uMaxSize.value = matRefLayer2.current.uMaxSize;
-      }
-      matRefLayer2.current.uEdgeWarp = n2.edgeWarp;
-      matRefLayer2.current.uCoreRadius = n2.coreRadius;
-      matRefLayer2.current.uAlpha = n2.alpha;
-      matRefLayer2.current.uGradientSoftness = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
-      if (matRefLayer2.current.uniforms?.uGradientSoftness) {
-        matRefLayer2.current.uniforms.uGradientSoftness.value = n2.gradientSoftness !== undefined ? n2.gradientSoftness : 1.0;
-      }
-      if (matRefLayer2.current.uSeedOffset) {
-        matRefLayer2.current.uSeedOffset.set(n2.seedX || 0.0, n2.seedY || 0.0);
-      }
-      if (matRefLayer2.current.uniforms?.uSeedOffset) {
-        matRefLayer2.current.uniforms.uSeedOffset.value.set(n2.seedX || 0.0, n2.seedY || 0.0);
-      }
-      matRefLayer2.current.uMultiCoreStrength = n2.multiCoreStrength !== undefined ? n2.multiCoreStrength : 0.0;
-      matRefLayer2.current.uMultiCoreScale = n2.multiCoreScale !== undefined ? n2.multiCoreScale : 1.8;
-      matRefLayer2.current.uVoidPinch = n2.voidPinch !== undefined ? n2.voidPinch : 0.0;
-      matRefLayer2.current.uColorSII.set(n2.colors.sii);
-      matRefLayer2.current.uColorHa.set(n2.colors.ha);
-      matRefLayer2.current.uColorOIII.set(n2.colors.oiii);
-      matRefLayer2.current.uColorCore.set(n2.colors.core);
-    }
+    const n1 = NEBULA_CONFIG.nebula1;
+    const speed1 = n1.speed !== undefined ? n1.speed : 0.10;
+    timeAcc1.current += safeDelta * speed1;
+    syncNebulaUniforms(matRefLayer1.current, n1, timeAcc1.current, nebulaPath1, perfTierFloat);
+
+    const n2 = NEBULA_CONFIG.nebula2;
+    const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
+    timeAcc2.current += safeDelta * speed2;
+    syncNebulaUniforms(matRefLayer2.current, n2, timeAcc2.current, nebulaPath2, perfTierFloat);
   });
 
   // Memoize colors ONCE — sourced from config.js for easy experimentation!
@@ -135,6 +112,7 @@ export function DualNebulaBackground({
           uColorCore={nebula1Colors.core}
           uScale={n1.scale}
           uWarp={n1.warp}
+          uCoverage={n1.coverage || 0.0}
           uMaskRadius={n1.maskRadius}
           uEdgeWarp={n1.edgeWarp}
           uAlpha={n1.alpha}
@@ -164,6 +142,7 @@ export function DualNebulaBackground({
           uColorCore={nebula2Colors.core}
           uScale={n2.scale}
           uWarp={n2.warp}
+          uCoverage={n2.coverage || 0.0}
           uMaskRadius={n2.maskRadius}
           uEdgeWarp={n2.edgeWarp}
           uAlpha={n2.alpha}

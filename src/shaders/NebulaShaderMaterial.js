@@ -43,6 +43,7 @@ export const NebulaMaterial = shaderMaterial(
     uGlowRadius: 0.32,   // volumetric halo radius (0..0.5)
     uNebulaPath: 0,      // DEV: 0=Silky Wisps  1=Deep Ocean  2=Orion Ribbon  3=Bioluminescent Veins
     uGradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
+    uCoverage: 0.0,      // Gas expansion bias: lifts faint peripheral wisps to increase coverage
     // Multi-Core & Cellular Convection Parameters
     uMultiCoreStrength: 0.0,
     uMultiCoreScale: 1.8,
@@ -82,6 +83,7 @@ export const NebulaMaterial = shaderMaterial(
     uniform float uStarCount;
     uniform float uGlowRadius;
     uniform float uGradientSoftness;
+    uniform float uCoverage;
     uniform float uMultiCoreStrength;
     uniform float uMultiCoreScale;
     uniform float uVoidPinch;
@@ -318,7 +320,7 @@ export const NebulaMaterial = shaderMaterial(
         pathScatter = 0.25;
       }
 
-      float gasDensity = smoothstep(0.0, 0.5, density);
+      float gasDensity = smoothstep(0.0 - uCoverage, 0.5, density);
 
       // 4. Dark dust absorption lanes — soft gas shadows
       vec2 dustUv = centeredUv * uScale * 0.72 + uParallaxOffset + uSeedOffset + vec2(17.3, 8.1);
