@@ -1,7 +1,7 @@
 import React from 'react';
 import { SYSTEM_CONFIG } from '../config';
 
-export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false, onToggleProfiler }) {
+export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false, onToggleProfiler, isBottomHintEnabled = true }) {
   const isCore = selectedTarget === 'core';
   const isProject = Boolean(selectedProject);
   const isOpen = isCore || isProject;
@@ -35,8 +35,8 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
           </div>
         </header>
 
-        {/* Bottom Hint (only when in macro overview mode) */}
-        {!selectedTarget && (
+        {/* Bottom Hint (only when in macro overview mode and enabled) */}
+        {!selectedTarget && isBottomHintEnabled && (
           <div className="bottom-hint">
             [ CLICK CORE OR PLANET TO FOCUS ]
           </div>

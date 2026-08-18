@@ -196,6 +196,23 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
   const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
   const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
+  const [isBottomHintEnabled, setIsBottomHintEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('yahya_bottom_hint_enabled');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
+
+  const handleToggleBottomHint = () => {
+    setIsBottomHintEnabled((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yahya_bottom_hint_enabled', String(next));
+      }
+      return next;
+    });
+  };
   // Centralized Nebula Configuration System — Independent per-nebula config from src/config.js!
   const [nebulaPath1, setNebulaPath1] = useState(NEBULA_CONFIG.nebula1.path);
   const [nebulaPath2, setNebulaPath2] = useState(NEBULA_CONFIG.nebula2.path);
@@ -583,6 +600,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           currentFps={currentFps}
           isMobile={isMobile}
           onToggleProfiler={handleToggleProfiler}
+          isBottomHintEnabled={isBottomHintEnabled}
         />
 
         {/* Dynamic Canvas Favicon Animator (Brave / Chromium compatible) */}
@@ -598,8 +616,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           unlockedCount={unlockedCount}
           isFaviconEnabled={isFaviconEnabled}
           isNebulaEnabled={isNebulaEnabled}
+          isBottomHintEnabled={isBottomHintEnabled}
           onToggleFavicon={() => setIsFaviconEnabled((prev) => !prev)}
           onToggleNebula={() => setIsNebulaEnabled((prev) => !prev)}
+          onToggleBottomHint={handleToggleBottomHint}
           gpuTier={gpuTier}
           onSetTier={handleSetTier}
           isOpen={isProfilerOpen}

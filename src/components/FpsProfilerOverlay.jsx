@@ -26,6 +26,8 @@ export function FpsProfilerOverlay({
   onToggleNebula,
   isFaviconEnabled = true,
   isNebulaEnabled = true,
+  isBottomHintEnabled = true,
+  onToggleBottomHint,
   // GPU tier props
   gpuTier = 'high',
   onSetTier,
@@ -723,6 +725,23 @@ export function FpsProfilerOverlay({
             }}
           >
             NEBULA: {isNebulaEnabled ? 'ON' : 'OFF'}
+          </button>
+
+          <button 
+            onClick={onToggleBottomHint}
+            style={{
+              flex: 1,
+              padding: '0.35rem',
+              fontSize: '0.63rem',
+              fontFamily: 'var(--font-mono)',
+              border: '1px solid ' + (isBottomHintEnabled ? '#00BAE3' : '#555'),
+              background: isBottomHintEnabled ? 'rgba(0, 186, 227, 0.15)' : 'transparent',
+              color: isBottomHintEnabled ? '#00BAE3' : '#888',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            HINT: {isBottomHintEnabled ? 'ON' : 'OFF'}
           </button>
         </div>
       </div>
