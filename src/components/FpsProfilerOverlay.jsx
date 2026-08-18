@@ -1614,6 +1614,7 @@ export function FpsProfilerOverlay({
               {[
                 { label: 'SCALE', key: 'scale', min: 1.0, max: 10.0, step: 0.1 },
                 { label: 'WARP', key: 'warp', min: 0.0, max: 10.0, step: 0.1 },
+                { label: 'COVERAGE (EXPANSION)', key: 'coverage', min: -0.4, max: 0.6, step: 0.01 },
                 { label: 'BRIGHTNESS', key: 'brightness', min: 0.1, max: 6.0, step: 0.1 },
                 { label: 'DUST STRENGTH', key: 'dustStrength', min: 0.0, max: 1.0, step: 0.02 },
                 { label: 'PILLAR STRENGTH', key: 'pillarStrength', min: 0.0, max: 1.0, step: 0.02 },
@@ -1627,6 +1628,7 @@ export function FpsProfilerOverlay({
                 { label: 'ALPHA', key: 'alpha', min: 0.0, max: 1.0, step: 0.02 },
               ].map(({ label, key, min, max, step }) => {
                 const val = currentNebula[key] ?? (
+                  key === 'coverage' ? 0.0 :
                   key === 'gradientSoftness' ? 1.0 :
                   key === 'speed' ? 0.0 :
                   key === 'minSize' ? (activeNebulaTab === 'nebula1' ? 0.03 : 0.02) :
