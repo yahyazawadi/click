@@ -13,8 +13,24 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 186, 227, 0.4) rgba(7, 17, 36, 0.6);
+}
+
+/* Kill all focus rings and selection highlights globally */
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none !important;
 }
 
 /* Global Custom Webkit Scrollbar (Matching Telemetry Profiler HUD) */
