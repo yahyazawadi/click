@@ -171,7 +171,15 @@ export function PresentationDock({
             {currentGallery.length > 0 && (
               <button
                 className={`dock-gallery-toggle-btn ${showGallery ? 'active' : ''}`}
-                onClick={() => setShowGallery((v) => !v)}
+                onClick={() => {
+                  if (showGallery) {
+                    // closing: dismiss lifted photo too so dock expands back
+                    closeLifted();
+                    setShowGallery(false);
+                  } else {
+                    setShowGallery(true);
+                  }
+                }}
                 title="Toggle photo strip"
               >
                 🖼️ {showGallery ? 'HIDE' : 'PHOTOS'} ({currentGallery.length})
