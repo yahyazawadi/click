@@ -145,25 +145,24 @@ export function UIOverlay({
             </div>
 
             <div className="dock-actions-row">
-              <span className="dock-shortcut-hint">Use ◀ ▶ arrows to navigate</span>
               <button
-                className="dock-nav-btn"
+                className="dock-nav-btn icon-only"
                 onClick={handlePrev}
                 disabled={currentStageIndex === 0}
                 title="Previous Phase (Arrow Left)"
               >
-                ◀ PREV
+                ◀
               </button>
               <button
-                className="dock-nav-btn"
+                className="dock-nav-btn icon-only"
                 onClick={handleNext}
                 disabled={currentStageIndex === stages.length - 1}
                 title="Next Phase (Arrow Right)"
               >
-                NEXT ▶
+                ▶
               </button>
-              <button className="dock-close-btn" onClick={onReturn} title="Return to Orbit (ESC)">
-                ✕ ORBIT
+              <button className="dock-close-btn icon-only" onClick={onReturn} title="Close (ESC)">
+                ✕
               </button>
             </div>
           </div>
