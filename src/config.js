@@ -173,6 +173,26 @@ export const SYSTEM_CONFIG = {
         'LMS Hub: Drag-and-Drop Course Builder & Auto Quizzes',
         'Storage: Secure Cloudflare R2 Multipart Asset Uploads',
         'Database: Supabase PostgreSQL & Live Schema Visualizer'
+      ],
+      gallery: [
+        {
+          title: 'Geospatial Health Intelligence Map',
+          caption: 'Mapbox GL JS integration visualizing epidemiological contagion spread & environmental metrics.',
+          url: '/gallery/climamedix-map.png',
+          tag: 'MAPBOX GL'
+        },
+        {
+          title: 'Interactive Learning Management System (LMS)',
+          caption: 'Course creation engine with custom audio/video players and automated quiz evaluation.',
+          url: '/gallery/climamedix-lms.png',
+          tag: 'LMS MODULE'
+        },
+        {
+          title: 'Live Database Schema Visualizer',
+          caption: 'Live PostgreSQL schema debugger deployed at climamedix-sql.pages.dev/debug.',
+          url: '/gallery/climamedix-debug.png',
+          tag: 'SUPABASE'
+        }
       ]
     },
     {
@@ -192,6 +212,26 @@ export const SYSTEM_CONFIG = {
         'Design System: Figma Auto-Layout & Micro-Interactions',
         'PWA Architecture: Service Workers & Offline Caching',
         'Notifications: Web Push API & Custom Permission Flows'
+      ],
+      gallery: [
+        {
+          title: 'Google UX Design Certificate Module',
+          caption: 'Completed Foundations of User Experience (UX) Design curriculum on Coursera.',
+          url: '/gallery/google-ux-cert.png',
+          tag: 'GOOGLE UX'
+        },
+        {
+          title: 'Figma Design System & Mobile Frames',
+          caption: 'Responsive frames (iPhone 16 / Desktop), Auto-Layout constraints, and Smart Animate flows.',
+          url: '/gallery/figma-design.png',
+          tag: 'FIGMA BYOL'
+        },
+        {
+          title: 'Progressive Web App Architecture',
+          caption: 'Service Workers caching strategies (Cache-First vs Network-First) and Web Push notifications.',
+          url: '/gallery/pwa-architecture.png',
+          tag: 'PWA & SW'
+        }
       ]
     },
     {
@@ -211,6 +251,26 @@ export const SYSTEM_CONFIG = {
         'Security: Database-Enforced 20-Key RBAC & Row-Level Security',
         'Automation: WhatsApp Bot Edge Functions with wamid Lookup',
         'Testing & QA: Super Admin Live Device Lab & Playwright E2E'
+      ],
+      gallery: [
+        {
+          title: 'Super Admin Live Device Lab Simulator',
+          caption: 'Embedded real-time mobile simulator previewing dynamic RBAC permissions across staff roles.',
+          url: '/gallery/barber-device-lab.png',
+          tag: 'DEVICE LAB'
+        },
+        {
+          title: 'PostgreSQL Advisory Lock Concurrency Queue',
+          caption: 'Transaction-scoped atomic locking SQL migrations eliminating double-booking collisions.',
+          url: '/gallery/barber-concurrency.png',
+          tag: 'ADVISORY LOCK'
+        },
+        {
+          title: 'Automated WhatsApp Bot Edge Functions',
+          caption: 'Supabase Edge Functions handling webhook confirmations and automatic abandoned draft pruning.',
+          url: '/gallery/barber-whatsapp.png',
+          tag: 'EDGE FUNCTIONS'
+        }
       ]
     },
     {
@@ -230,6 +290,26 @@ export const SYSTEM_CONFIG = {
         'Shaders: Procedural fBM & Simplex Noise GLSL Nebulae',
         'Optimization: Zero-Allocation Frustum Culling (No GC Stutter)',
         'Telemetry: Real-Time Frametime HUD & Dynamic SVG Favicon'
+      ],
+      gallery: [
+        {
+          title: 'Hardware-Accelerated 120 FPS WebGL Engine',
+          caption: 'Interactive Three.js cosmic orbit with Zero-Allocation Frustum Culling preventing GC stutter.',
+          url: '/gallery/spatial-3d-cosmos.png',
+          tag: 'THREE.JS 120FPS'
+        },
+        {
+          title: 'Procedural Volumetric GLSL Noise Nebulae',
+          caption: 'Dual-layer fBM and Simplex noise shaders running real-time additive blending.',
+          url: '/gallery/glsl-nebula.png',
+          tag: 'GLSL SHADERS'
+        },
+        {
+          title: 'Real-Time Telemetry Profiler & Frametime HUD',
+          caption: 'Interactive diagnostics HUD calculating live FPS, 1% lows, and micro-frametime graphs.',
+          url: '/gallery/telemetry-hud.png',
+          tag: 'TELEMETRY'
+        }
       ]
     }
   ]
