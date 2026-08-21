@@ -596,7 +596,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         <UIOverlay
           selectedTarget={selectedTarget}
           selectedProject={selectedProject}
+          activeProjects={activeProjects}
           onReturn={handleReturn}
+          onSelectTarget={handleSelect}
           currentFps={currentFps}
           isMobile={isMobile}
           onToggleProfiler={handleToggleProfiler}
