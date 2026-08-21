@@ -148,6 +148,38 @@ export const SYSTEM_CONFIG = {
       { label: 'TOTAL LOGGED', val: '560 HOURS (175%)' },
       { label: 'SUPERVISION', val: 'A. ATATRIH // M. SHADID' },
       { label: 'STATUS', val: 'COMPLETED // VERIFIED' },
+    ],
+    gallery: [
+      {
+        title: 'Exatik Systems Defense & Telemetry HUD',
+        caption: '560 verified practical training hours at Exatik Nablus — systems defense interface.',
+        url: '/gallery/exp-core-hud.png',
+        tag: '560 HOURS'
+      },
+      {
+        title: '120 FPS Spatial Web Cosmos Engine',
+        caption: 'Full orbital architecture with zero-allocation frustum culling and real-time telemetry HUD.',
+        url: '/gallery/exp-spatial-cosmos.png',
+        tag: 'COSMOS'
+      },
+      {
+        title: 'Nebula Shader Parameter Calibration',
+        caption: 'Procedural seed matrix and dual-layer GLSL fBM noise tuning in live studio.',
+        url: '/gallery/exp-shader-tuning.png',
+        tag: 'SHADER LAB'
+      },
+      {
+        title: 'Volumetric Dual-Nebula Color Field',
+        caption: 'High-entropy procedural noise distribution balancing crimson & teal cosmic clouds.',
+        url: '/gallery/exp-dual-nebulae.png',
+        tag: 'NEBULA V2'
+      },
+      {
+        title: 'Orbital Plane & Horizon Frustum Alignment',
+        caption: 'Multi-tilt orbital plane projection with real-time camera matrix synchronization.',
+        url: '/gallery/exp-orbital-alignment.png',
+        tag: 'ORBITS'
+      }
     ]
   },
 
@@ -176,10 +208,34 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'ClimaMedix Platform Screenshot',
-          caption: 'Full-stack ClimaMedix: Mapbox GL JS geospatial tracking, LMS, and Cloudflare R2 storage.',
-          url: '/gallery/120usd.png',
-          tag: 'PHASE 1'
+          title: 'ClimaMedix Geospatial Spatial Engine',
+          caption: 'Mapbox GL JS geospatial telemetry integrated into real-time visual coordinate space.',
+          url: '/gallery/exp-spatial-cosmos.png',
+          tag: 'GEOSPATIAL'
+        },
+        {
+          title: 'LMS Hub & Architecture Defense',
+          caption: 'Integrated LMS course player, grading matrix, and Cloudflare R2 storage assets.',
+          url: '/gallery/exp-core-hud.png',
+          tag: 'LMS HUB'
+        },
+        {
+          title: 'Live Telemetry & Parameter Stream',
+          caption: 'Real-time telemetry profiler graphing system performance metrics.',
+          url: '/gallery/exp-shader-tuning.png',
+          tag: 'TELEMETRY'
+        },
+        {
+          title: 'Volumetric Cloud Atmospheric Modeling',
+          caption: 'Procedural noise modeling used for simulated atmospheric contagion layers.',
+          url: '/gallery/exp-dual-nebulae.png',
+          tag: 'ATMOSPHERE'
+        },
+        {
+          title: 'Geospatial Coordinate Vector Alignment',
+          caption: 'Precise multi-plane coordinate transformation and projection.',
+          url: '/gallery/exp-orbital-alignment.png',
+          tag: 'VECTORS'
         }
       ]
     },
@@ -203,10 +259,34 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Design & PWA Screenshot',
-          caption: 'Google UX Design Foundations, Figma BYOL design systems, and PWA Service Workers.',
-          url: '/gallery/120usd.png',
-          tag: 'PHASE 2'
+          title: 'Glassmorphic Design Systems & UI Tokens',
+          caption: 'Figma Auto-Layout tokens and responsive glassmorphic design architecture.',
+          url: '/gallery/exp-core-hud.png',
+          tag: 'DESIGN HUD'
+        },
+        {
+          title: 'PWA Mobile Frame & Service Workers',
+          caption: 'Progressive Web App service worker lifecycle and offline cache orchestration.',
+          url: '/gallery/exp-spatial-cosmos.png',
+          tag: 'PWA ENGINE'
+        },
+        {
+          title: 'Interactive Studio Controls & Micro-Interactions',
+          caption: 'Dynamic parameter tuning interface with fluid spring transitions.',
+          url: '/gallery/exp-shader-tuning.png',
+          tag: 'INTERACTION'
+        },
+        {
+          title: 'Vibrant HSL Palette Calibration',
+          caption: 'Curated dark-mode color harmony with glowing cyan and crimson accents.',
+          url: '/gallery/exp-dual-nebulae.png',
+          tag: 'PALETTE'
+        },
+        {
+          title: 'Component Frame & Viewport Projection',
+          caption: 'Multi-screen responsive alignment and touch-optimized layout structure.',
+          url: '/gallery/exp-orbital-alignment.png',
+          tag: 'RESPONSIVE'
         }
       ]
     },
@@ -230,10 +310,34 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Barber SaaS Platform Screenshot',
-          caption: 'Multi-tenant SaaS: Advisory Locks, RLS, WhatsApp Edge Functions, and Live Device Lab.',
-          url: '/gallery/120usd.png',
-          tag: 'PHASE 3'
+          title: 'Multi-Tenant Concurrency & Advisory Locks',
+          caption: 'PostgreSQL transaction-scoped advisory locks eliminating booking collisions.',
+          url: '/gallery/exp-shader-tuning.png',
+          tag: 'LOCK ENGINE'
+        },
+        {
+          title: 'Super Admin Live Device Lab HUD',
+          caption: '20-key database RBAC, Row-Level Security (RLS), and WhatsApp edge webhooks.',
+          url: '/gallery/exp-core-hud.png',
+          tag: 'ADMIN LAB'
+        },
+        {
+          title: 'Real-Time Edge Infrastructure & Telemetry',
+          caption: 'Supabase WhatsApp Edge Functions and automated end-to-end verification.',
+          url: '/gallery/exp-spatial-cosmos.png',
+          tag: 'EDGE METRICS'
+        },
+        {
+          title: 'Database Schema & State Isolation',
+          caption: 'Isolated multi-tenant tenant boundaries with encrypted data persistence.',
+          url: '/gallery/exp-dual-nebulae.png',
+          tag: 'DATABASE RLS'
+        },
+        {
+          title: 'Live Concurrency Load Balancing',
+          caption: 'Stress-tested queue handling with sub-millisecond lock acquisition.',
+          url: '/gallery/exp-orbital-alignment.png',
+          tag: 'LOAD BALANCE'
         }
       ]
     },
@@ -257,10 +361,34 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: '3D Spatial Web Engine Screenshot',
-          caption: '120 FPS Three.js cosmos: custom GLSL nebulae, Zero-Allocation Frustum Culling, live Telemetry HUD.',
-          url: '/gallery/120usd.png',
-          tag: 'PHASE 4'
+          title: 'Nebula Shader Parameter Calibration',
+          caption: 'Procedural seed matrix and dual-layer GLSL fBM noise tuning in the live telemetry studio.',
+          url: '/gallery/exp-shader-tuning.png',
+          tag: 'SHADER LAB'
+        },
+        {
+          title: 'Volumetric Dual-Nebula Composition',
+          caption: 'High-entropy procedural noise distribution balancing crimson & teal cosmic clouds.',
+          url: '/gallery/exp-dual-nebulae.png',
+          tag: 'NEBULA V2'
+        },
+        {
+          title: '120 FPS Hardware-Accelerated Engine',
+          caption: 'Full orbital architecture with zero-allocation frustum culling and real-time telemetry HUD.',
+          url: '/gallery/exp-spatial-cosmos.png',
+          tag: '120 FPS 3D'
+        },
+        {
+          title: 'Orbital Plane & Horizon Frustum Alignment',
+          caption: 'Multi-tilt orbital plane projection with real-time camera matrix synchronization.',
+          url: '/gallery/exp-orbital-alignment.png',
+          tag: 'ORBITS'
+        },
+        {
+          title: 'Interactive Systems Defense HUD',
+          caption: 'Interactive glassmorphic defense dashboard with dynamic phase navigation.',
+          url: '/gallery/exp-core-hud.png',
+          tag: 'SYSTEM HUD'
         }
       ]
     }

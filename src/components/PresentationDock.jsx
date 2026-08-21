@@ -35,12 +35,12 @@ export function PresentationDock({
     ? stages.findIndex((s) => s.id === selectedTarget)
     : -1;
 
-  const currentGallery = selectedProject?.gallery || (isCore ? [{
+  const currentGallery = selectedProject?.gallery || (isCore ? (SYSTEM_CONFIG.core?.gallery || [{
     title: 'Exatik Training Milestone',
     caption: '560 verified hours at Exatik Nablus.',
-    url: '/gallery/exatik-profile.png',
+    url: '/gallery/exp-core-hud.png',
     tag: '560 HOURS'
-  }] : []);
+  }]) : []);
 
   // Reset when switching stages
   useEffect(() => {

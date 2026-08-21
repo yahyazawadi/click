@@ -723,8 +723,6 @@ html, body, #root {
   background: #fb7185;
   box-shadow: 0 0 8px #fb7185;
 }
-  border-radius: 4px;
-}
 
 /* 3D Planet Floating Label Styling */
 .planet-label {
