@@ -140,75 +140,96 @@ export const SYSTEM_CONFIG = {
     get radius() { return CORE_CONFIG.radius; },
     color: '#003268',
     emissive: '#00BAE3',
-    title: 'YAHYA CORE',
-    subtitle: 'SYSTEM ARCHITECT & DEVELOPER',
-    aboutText: `Welcome to yahya.click. I craft high-concurrency platforms, real-time architectures, and interactive spatial interfaces. Driven by sleek minimalism, robust system design, and effortless user experiences.`,
+    title: 'EXATIK INTERNSHIP',
+    subtitle: 'FULL-STACK & SPATIAL WEB ENGINEERING',
+    aboutText: `Official practical training defense & systems architecture showcase for Exatik (Nablus). Supervised academically by Anas Atatrih & field-supervised by Mohammad Shadid. Total verified: 560 training hours spanning 4 core engineering phases across SaaS, Geospatial data, Mobile PWAs, and 120 FPS 3D WebGL.`,
     stats: [
-      { label: 'STATUS', val: 'ONLINE // ACTIVE' },
-      { label: 'DOMAIN', val: 'YAHYA.CLICK' },
-      { label: 'FOCUS', val: 'FULLSTACK & SPATIAL' },
+      { label: 'INSTITUTION', val: 'EXATIK // NABLUS' },
+      { label: 'TOTAL LOGGED', val: '560 HOURS (175%)' },
+      { label: 'SUPERVISION', val: 'A. ATATRIH // M. SHADID' },
+      { label: 'STATUS', val: 'COMPLETED // VERIFIED' },
     ]
   },
 
   // 4. Tilted Macro Orbital Rings
   rings: RINGS_CONFIG.rings,
 
-  // 5. Planetary Projects Data
+  // 5. Planetary Projects Data (Chronological 4-Phase Internship Progression)
   projects: [
     {
-      id: 'proj-climamedix',
-      title: 'CLIMAMEDIX',
+      id: 'proj-phase1-climamedix',
+      title: 'PHASE 1: CLIMAMEDIX',
       ringIndex: 0,
       shapeIndex: 'simple-earth',
-      startAngle: 2.1,
+      startAngle: 1.0,
       size: 0.65,
       color: '#10B981',
-      category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
-      shortDesc: 'Geospatial epidemiological intelligence platform tracking climate change impacts on disease vectors.',
-      fullDesc: 'An epidemiological intelligence platform mapping climate change impacts on disease vectors, respiratory risks, and regional health dynamics. Built with Supabase PostgreSQL, geospatial data visualizers, and predictive telemetry.',
-      tags: ['FULL-STACK', 'POSTGRESQL', 'SUPABASE', 'GEOSPATIAL', 'EPIDEMIOLOGY', '3D WEBGL'],
+      category: 'WEEKS 1-2 // GEOSPATIAL & LMS',
+      shortDesc: 'Geospatial epidemiological platform with Mapbox GL JS, interactive LMS, and Cloudflare R2 storage.',
+      fullDesc: 'During Weeks 1 & 2 at Exatik, engineered the full-stack ClimaMedix platform: integrated Mapbox GL JS for geospatial contagion tracking, built an interactive LMS with custom media players & automated quiz grading, connected secure Cloudflare R2 multipart storage, and deployed a live PostgreSQL schema debugger at climamedix-sql.pages.dev/debug.',
+      tags: ['MAPBOX GL JS', 'SUPABASE', 'POSTGRESQL', 'CLOUDFLARE R2', 'LMS ENGINE', 'GEOSPATIAL'],
       specs: [
-        'Core: Geospatial Contagion & Vector Tracking',
-        'Database: Supabase PostgreSQL & Spatial Schemas',
-        'Telemetry: Real-Time Environmental Health Indices',
-        'Interface: Multi-Language Disease Intelligence'
+        'Geospatial: Mapbox GL JS Vector & Heatmap Tracking',
+        'LMS Hub: Drag-and-Drop Course Builder & Auto Quizzes',
+        'Storage: Secure Cloudflare R2 Multipart Asset Uploads',
+        'Database: Supabase PostgreSQL & Live Schema Visualizer'
       ]
     },
     {
-      id: 'proj-climamedix-terra',
-      title: 'CLIMAMEDIX // TERRA',
+      id: 'proj-phase2-design-pwa',
+      title: 'PHASE 2: DESIGN & PWAs',
+      ringIndex: 0,
+      shapeIndex: 'flower',
+      startAngle: 4.2,
+      size: 0.60,
+      color: '#06B6D4',
+      category: 'WEEKS 3-4 // UI/UX & MOBILE FOUNDATIONS',
+      shortDesc: 'Google UX Foundations, Figma BYOL Design Systems, and Mobile PWA Service Workers.',
+      fullDesc: 'Weeks 3 & 4 focused on UI/UX excellence and mobile architecture: completed Google UX Design Foundations (Coursera) and Figma BYOL Essentials (design frames, Auto-Layout, Smart Animate). Engineered Progressive Web Apps (PWAs) with manifest configurations, Service Worker lifecycles (Cache-First vs Network-First), and Web Push Notifications.',
+      tags: ['GOOGLE UX CERT', 'FIGMA BYOL', 'PWA', 'SERVICE WORKERS', 'WEB PUSH API', 'DESIGN SYSTEMS'],
+      specs: [
+        'Certification: Google UX Design Foundations (Coursera)',
+        'Design System: Figma Auto-Layout & Micro-Interactions',
+        'PWA Architecture: Service Workers & Offline Caching',
+        'Notifications: Web Push API & Custom Permission Flows'
+      ]
+    },
+    {
+      id: 'proj-phase3-barber-saas',
+      title: 'PHASE 3: BARBER SAAS',
+      ringIndex: 1,
+      shapeIndex: 10,
+      startAngle: 2.6,
+      size: 0.65,
+      color: '#3B82F6',
+      category: 'WEEKS 5-7 // ENTERPRISE SAAS & CONCURRENCY',
+      shortDesc: 'Multi-Tenant SaaS with PostgreSQL Advisory Locks, RLS, WhatsApp Edge Functions, and Live Device Lab.',
+      fullDesc: 'Weeks 5 to 7 delivered enterprise multi-tenant architecture for barber-multi-tenant: eliminated concurrent booking race conditions with PostgreSQL transaction-scoped advisory locks (pg_advisory_xact_lock), enforced 20-key database RBAC and Row-Level Security (RLS), deployed Supabase WhatsApp Edge Functions, built the Super Admin Live Device Lab, and wrote comprehensive Playwright E2E test suites.',
+      tags: ['POSTGRESQL RLS', 'ADVISORY LOCKS', 'SUPABASE EDGE', 'WHATSAPP BOT', 'PLAYWRIGHT E2E', 'LIVE DEVICE LAB'],
+      specs: [
+        'Concurrency: Transaction-Scoped Advisory Locks (No Collision)',
+        'Security: Database-Enforced 20-Key RBAC & Row-Level Security',
+        'Automation: WhatsApp Bot Edge Functions with wamid Lookup',
+        'Testing & QA: Super Admin Live Device Lab & Playwright E2E'
+      ]
+    },
+    {
+      id: 'proj-phase4-spatial-3d',
+      title: 'PHASE 4: 3D SPATIAL WEB',
       ringIndex: 2,
       shapeIndex: 'real-earth',
       startAngle: 0.8,
       size: 0.70,
       color: '#0284C7',
-      category: 'AUTHENTIC NASA CONTINENTS',
-      shortDesc: 'Photorealistic continental Earth with real-world landmasses, oceans, and parallax clouds.',
-      fullDesc: 'An authentic high-definition 3D Earth incorporating real NASA Blue Marble continental mapping, specular ocean reflections, and dynamic atmospheric cloud formations drifting in true 3D parallax.',
-      tags: ['NASA MAPS', 'REAL CONTINENTS', 'PARALLAX CLOUDS', '120 FPS', 'THREE.JS'],
+      category: 'WEEK 8 // 120 FPS WEBGL & SHADERS',
+      shortDesc: 'Hardware-accelerated 3D spatial web engine with custom GLSL shaders and real-time telemetry.',
+      fullDesc: 'Week 8 culminated in building yahya.click: an interactive 120 FPS spatial web platform using Three.js and custom GLSL procedural noise shaders (volumetric dual nebulae with additive blending). Engineered Zero-Allocation Frustum Culling to eliminate GC stutter, built a real-time Telemetry Profiler HUD with live frametime graphing, and integrated dynamic SVG favicon performance sync.',
+      tags: ['THREE.JS', 'CUSTOM GLSL', '120 FPS', 'ZERO-ALLOCATION', 'TELEMETRY PROFILER', 'REACT THREE FIBER'],
       specs: [
-        'Mapping: Authentic NASA Continental Geography',
-        'Atmosphere: Real-Time Parallax Cloud Drift',
-        'Oceans: High-Definition Specular Glint Mapping',
-        'Performance: Hardware-Accelerated 120 FPS'
-      ]
-    },
-    {
-      id: 'proj-10',
-      title: 'SCISSOR WORLD',
-      ringIndex: 1,
-      shapeIndex: 10,
-      startAngle: 4.2,
-      size: 0.55,
-      color: '#00BAE3',
-      category: 'PRECISION TOOLS',
-      shortDesc: 'Compact orbital world crowned with a pair of precision cutting scissors.',
-      fullDesc: 'A smaller rogue planet defined by the iconic scissors mounted on its north pole — snapping open and closed as it orbits the system, a testament to craftsmanship at cosmic scale.',
-      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL', 'REACT THREE FIBER'],
-      specs: [
-        'Crown: Animated Snapping Scissors',
-        'Body: Glowing Icosahedral Planet',
-        'Orbit: Inner Ring Trajectory'
+        'Performance: 120 FPS Hardware-Accelerated Rendering',
+        'Shaders: Procedural fBM & Simplex Noise GLSL Nebulae',
+        'Optimization: Zero-Allocation Frustum Culling (No GC Stutter)',
+        'Telemetry: Real-Time Frametime HUD & Dynamic SVG Favicon'
       ]
     }
   ]
