@@ -126,7 +126,7 @@ export function PresentationDock({
             />
             {/* Blueprint fallback */}
             <div className="lifted-blueprint-fallback" style={{ display: 'none' }}>
-              <span className="blueprint-icon">📸</span>
+              <span className="blueprint-icon"></span>
               <span className="blueprint-title">{liftedImage.title}</span>
               <code className="blueprint-path">public{liftedImage.url}</code>
               <span className="blueprint-hint">Drop your screenshot here to show it live</span>
@@ -182,7 +182,7 @@ export function PresentationDock({
                 }}
                 title="Toggle photo strip"
               >
-                🖼️ {showGallery ? 'HIDE' : 'PHOTOS'} ({currentGallery.length})
+                {showGallery ? 'HIDE' : 'PHOTOS'} ({currentGallery.length})
               </button>
             )}
             <button className="dock-nav-btn icon-only" onClick={handlePrev}
@@ -260,8 +260,7 @@ export function PresentationDock({
                           onClick={() => openLifted(item, idx)}
                           title={`View: ${item.title}`}
                         >
-                          <div className="thumb-icon">🖼️</div>
-                          <span className="thumb-tag">{item.tag || `P0${idx + 1}`}</span>
+                          <span className="thumb-tag">{item.tag || `PHOTO ${idx + 1}`}</span>
                         </div>
                       ))}
                     </div>
@@ -290,7 +289,7 @@ export function PresentationDock({
                       }}
                     />
                     <div className="inline-blueprint-fallback" style={{ display: 'none' }}>
-                      <span className="blueprint-icon">📸</span>
+                      <span className="blueprint-icon"></span>
                       <span className="blueprint-title">{currentImage.title}</span>
                       <code className="blueprint-path">public{currentImage.url}</code>
                       <span className="blueprint-hint">Drop your screenshot here to display live</span>

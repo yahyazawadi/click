@@ -50,7 +50,7 @@ class FPSLogger {
                 gpuTier: (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('yahya_gpu_tier')) || 'unknown'
               }
             });
-            console.log(`[Telemetry] ⚡ TAB RESUMED: was inactive for ${(inactiveDurationMs / 1000).toFixed(1)}s, frame 1 rendered in ${resumeLatencyMs}ms!`);
+            console.log(`[Telemetry] TAB RESUMED: was inactive for ${(inactiveDurationMs / 1000).toFixed(1)}s, frame 1 rendered in ${resumeLatencyMs}ms!`);
           });
         }
       });
