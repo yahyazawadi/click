@@ -52,14 +52,15 @@ let isVerbose = false;
 const targetPaths: string[] = [];
 
 for (const arg of args) {
-  if (arg === '-d' || arg === '--dry-run') {
+  const lower = arg.toLowerCase();
+  if (lower === '-d' || lower === '--dry-run') {
     isDryRun = true;
-  } else if (arg === '-v' || arg === '--verbose') {
+  } else if (lower === '-v' || lower === '--verbose') {
     isVerbose = true;
-  } else if (arg === '-h' || arg === '--help') {
+  } else if (lower === '-h' || lower === '--help' || lower === 'h' || lower === 'help') {
     printHelp();
     process.exit(0);
-  } else if (arg === '--version') {
+  } else if (lower === '--version' || lower === 'version') {
     console.log('er (Emoji Remover) v1.0.0');
     process.exit(0);
   } else if (!arg.startsWith('-')) {
