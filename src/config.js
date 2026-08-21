@@ -176,22 +176,10 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Geospatial Health Intelligence Map',
-          caption: 'Mapbox GL JS integration visualizing epidemiological contagion spread & environmental metrics.',
-          url: '/gallery/climamedix-map.png',
-          tag: 'MAPBOX GL'
-        },
-        {
-          title: 'Interactive Learning Management System (LMS)',
-          caption: 'Course creation engine with custom audio/video players and automated quiz evaluation.',
-          url: '/gallery/climamedix-lms.png',
-          tag: 'LMS MODULE'
-        },
-        {
-          title: 'Live Database Schema Visualizer',
-          caption: 'Live PostgreSQL schema debugger deployed at climamedix-sql.pages.dev/debug.',
-          url: '/gallery/climamedix-debug.png',
-          tag: 'SUPABASE'
+          title: 'ClimaMedix Platform Screenshot',
+          caption: 'Full-stack ClimaMedix: Mapbox GL JS geospatial tracking, LMS, and Cloudflare R2 storage.',
+          url: '/gallery/120usd.png',
+          tag: 'PHASE 1'
         }
       ]
     },
@@ -215,22 +203,10 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Google UX Design Certificate Module',
-          caption: 'Completed Foundations of User Experience (UX) Design curriculum on Coursera.',
-          url: '/gallery/google-ux-cert.png',
-          tag: 'GOOGLE UX'
-        },
-        {
-          title: 'Figma Design System & Mobile Frames',
-          caption: 'Responsive frames (iPhone 16 / Desktop), Auto-Layout constraints, and Smart Animate flows.',
-          url: '/gallery/figma-design.png',
-          tag: 'FIGMA BYOL'
-        },
-        {
-          title: 'Progressive Web App Architecture',
-          caption: 'Service Workers caching strategies (Cache-First vs Network-First) and Web Push notifications.',
-          url: '/gallery/pwa-architecture.png',
-          tag: 'PWA & SW'
+          title: 'Design & PWA Screenshot',
+          caption: 'Google UX Design Foundations, Figma BYOL design systems, and PWA Service Workers.',
+          url: '/gallery/120usd.png',
+          tag: 'PHASE 2'
         }
       ]
     },
@@ -254,22 +230,10 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Super Admin Live Device Lab Simulator',
-          caption: 'Embedded real-time mobile simulator previewing dynamic RBAC permissions across staff roles.',
-          url: '/gallery/barber-device-lab.png',
-          tag: 'DEVICE LAB'
-        },
-        {
-          title: 'PostgreSQL Advisory Lock Concurrency Queue',
-          caption: 'Transaction-scoped atomic locking SQL migrations eliminating double-booking collisions.',
-          url: '/gallery/barber-concurrency.png',
-          tag: 'ADVISORY LOCK'
-        },
-        {
-          title: 'Automated WhatsApp Bot Edge Functions',
-          caption: 'Supabase Edge Functions handling webhook confirmations and automatic abandoned draft pruning.',
-          url: '/gallery/barber-whatsapp.png',
-          tag: 'EDGE FUNCTIONS'
+          title: 'Barber SaaS Platform Screenshot',
+          caption: 'Multi-tenant SaaS: Advisory Locks, RLS, WhatsApp Edge Functions, and Live Device Lab.',
+          url: '/gallery/120usd.png',
+          tag: 'PHASE 3'
         }
       ]
     },
@@ -293,22 +257,10 @@ export const SYSTEM_CONFIG = {
       ],
       gallery: [
         {
-          title: 'Hardware-Accelerated 120 FPS WebGL Engine',
-          caption: 'Interactive Three.js cosmic orbit with Zero-Allocation Frustum Culling preventing GC stutter.',
-          url: '/gallery/spatial-3d-cosmos.png',
-          tag: 'THREE.JS 120FPS'
-        },
-        {
-          title: 'Procedural Volumetric GLSL Noise Nebulae',
-          caption: 'Dual-layer fBM and Simplex noise shaders running real-time additive blending.',
-          url: '/gallery/glsl-nebula.png',
-          tag: 'GLSL SHADERS'
-        },
-        {
-          title: 'Real-Time Telemetry Profiler & Frametime HUD',
-          caption: 'Interactive diagnostics HUD calculating live FPS, 1% lows, and micro-frametime graphs.',
-          url: '/gallery/telemetry-hud.png',
-          tag: 'TELEMETRY'
+          title: '3D Spatial Web Engine Screenshot',
+          caption: '120 FPS Three.js cosmos: custom GLSL nebulae, Zero-Allocation Frustum Culling, live Telemetry HUD.',
+          url: '/gallery/120usd.png',
+          tag: 'PHASE 4'
         }
       ]
     }
