@@ -1088,3 +1088,173 @@ html, body, #root {
   width: 24px;
   border-radius: 999px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   INLINE GALLERY COLUMN — replaces specs column inside the dock, no new window
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Gallery toggle button active state */
+.dock-gallery-toggle-btn.active {
+  background: var(--primary-cyan);
+  color: #000;
+  box-shadow: 0 0 16px var(--primary-cyan);
+}
+
+/* Gallery column — same width as specs col */
+.dock-col-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  animation: slideInGallery 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInGallery {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Main photo stage inside the dock */
+.inline-gallery-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 15, 0.7);
+  border: 1px solid rgba(0, 186, 227, 0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.inline-gallery-img-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 3rem;
+}
+
+.inline-gallery-img {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  display: block;
+}
+
+/* Blueprint fallback card inside dock */
+.inline-blueprint-fallback {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  text-align: center;
+  background: radial-gradient(circle at center, rgba(0,50,104,0.4) 0%, transparent 100%);
+  border-radius: 8px;
+  border: 1px dashed rgba(0,186,227,0.3);
+}
+
+.inline-blueprint-fallback .blueprint-icon {
+  font-size: 1.6rem;
+}
+
+.inline-blueprint-fallback .blueprint-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-pure);
+  letter-spacing: 0.03em;
+}
+
+.inline-blueprint-fallback .blueprint-path {
+  font-size: 0.65rem;
+  color: var(--primary-cyan);
+  background: rgba(0,186,227,0.12);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.inline-blueprint-fallback .blueprint-hint {
+  font-size: 0.65rem;
+  color: rgba(252,252,252,0.55);
+}
+
+/* Left / Right arrows inside the dock */
+.inline-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(7, 17, 36, 0.85);
+  border: 1px solid rgba(0, 186, 227, 0.35);
+  color: var(--primary-cyan);
+  font-size: 0.85rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.18s ease;
+}
+
+.inline-gallery-arrow.left  { left: 0.4rem; }
+.inline-gallery-arrow.right { right: 0.4rem; }
+
+.inline-gallery-arrow:hover {
+  background: var(--primary-cyan);
+  color: #000;
+  box-shadow: 0 0 12px var(--primary-cyan);
+}
+
+/* Caption bar under the photo */
+.inline-gallery-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.inline-gallery-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-gallery-tag {
+  font-size: 0.6rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0,186,227,0.15);
+  border: 1px solid rgba(0,186,227,0.3);
+  color: var(--secondary-blue);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.inline-gallery-counter {
+  font-size: 0.63rem;
+  color: rgba(252,252,252,0.45);
+  font-family: var(--font-mono);
+}
+
+.inline-gallery-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-pure);
+  line-height: 1.3;
+}
+
+.inline-gallery-desc {
+  font-size: 0.7rem;
+  color: rgba(252,252,252,0.7);
+  line-height: 1.45;
+}
+
