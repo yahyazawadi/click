@@ -74,22 +74,24 @@ if (targetPaths.length === 0) {
 
 function printHelp() {
   console.log(`
-\x1b[1m\x1b[36mER — Universal Emoji Remover CLI\x1b[0m
-\x1b[90mDetect and delete all emojis from any file or codebase.\x1b[0m
+\x1b[1m\x1b[36mER (Emoji Remover)\x1b[0m — \x1b[90mUniversal Emoji Detector & Purger CLI\x1b[0m
+\x1b[90mScans, detects, and safely deletes Unicode emojis while preserving code & UI syntax.\x1b[0m
 
 \x1b[1mUSAGE:\x1b[0m
   er [options] <files-or-directories...>
 
 \x1b[1mEXAMPLES:\x1b[0m
-  er index.html                  Process a single file
-  er src/                        Process all text files in 'src/' recursively
-  er .                           Process entire workspace
-  er src/ -d                     Dry-run: list emojis found without modifying
+  \x1b[32mer index.html\x1b[0m                  # Process a single file
+  \x1b[32mer src/\x1b[0m                        # Process entire folder recursively
+  \x1b[32mer .\x1b[0m                           # Process current workspace / all project files
+  \x1b[32mer src/ -d\x1b[0m                     # Dry-run: preview detected emojis without editing
+  \x1b[32mer . -v\x1b[0m                        # Verbose: show matched emojis line-by-line
+  \x1b[32mer file1.md file2.js\x1b[0m          # Process multiple specific files
 
 \x1b[1mOPTIONS:\x1b[0m
-  -d, --dry-run                  Preview matches without writing changes
-  -v, --verbose                  Show detailed emoji previews
-  -h, --help                     Show this help menu
+  -d, --dry-run                  Preview matches without writing any changes to disk
+  -v, --verbose                  Show detailed sample of matched emojis per file
+  -h, --help                     Display this help menu
   --version                      Display tool version
 `);
 }
