@@ -13,6 +13,30 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 186, 227, 0.4) rgba(7, 17, 36, 0.6);
+}
+
+/* Global Custom Webkit Scrollbar (Matching Telemetry Profiler HUD) */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(7, 17, 36, 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 186, 227, 0.45);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-cyan);
+  box-shadow: 0 0 8px var(--primary-cyan);
 }
 
 html, body, #root {
