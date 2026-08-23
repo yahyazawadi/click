@@ -170,15 +170,12 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       col = mix(col, col * 0.72, landH * smoothstep(0.38, 0.90, terr) * 0.38);
       col = mix(col, col * 1.22, landH * smoothstep(-0.5, -0.1, terr) * 0.28);
 
-      // ── 3. Small, Crisp Crystalline Polar Ice Caps ─────────────────────────
-      float iceN   = fbm(p * 5.2 + vec3(99.0, 42.0, 17.0)) * 0.08;
-      float northI = smoothstep(0.76, 0.89, lat + iceN);
-      float southI = smoothstep(-0.80, -0.93, -(lat + iceN));
-      float ice    = clamp(northI + southI, 0.0, 1.0);
-
-      // Luminous crystalline glacial ice blend
-      vec3 glacialIce = mix(uPolarIce, vec3(0.94, 0.98, 1.0), 0.75);
-      col = mix(col, glacialIce, ice * 0.98);
+      // ── 3. Dual Polar Ice Caps (North & South Poles) ─────────────────────
+      float iceN    = fbm(p * 4.2 + vec3(99.0)) * 0.08;
+      float poleLat = abs(lat);
+      // Small, crisp, realistic ice caps on both North (+Y) and South (-Y) poles
+      float ice     = smoothstep(0.79, 0.92, poleLat + iceN);
+      col = mix(col, uPolarIce, ice);
 
       // ── 4. Cloud Layer (skipped on LOW tier to save 2 FBM calls) ─────────
       if (uPerfTier < 0.8) {
@@ -186,7 +183,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
         float cl1   = fbm(clP * 3.6 + vec3(21.0, 5.0, 11.0));
         float cl2   = uPerfTier < 0.3 ? fbm(clP * 2.3 + vec3(3.0, 17.0, 8.0)) : cl1 * 0.8;
         float cloud = smoothstep(0.08, 0.52, cl1 * 0.60 + cl2 * 0.40);
-        cloud      *= (1.0 - ice * 0.65);
+        cloud      *= (1.0 - ice * 0.55);
         col = mix(col, uCloud, cloud * 0.80);
       }
 
@@ -195,15 +192,11 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       float diffuse  = max(0.0, dot(N, lightDir));
       col *= (0.22 + diffuse * 0.88);
 
-      // Ocean & Glacial Ice specularity
+      // Ocean specularity
       vec3  viewDir  = normalize(cameraPosition - vWorldPosition);
       vec3  halfDir  = normalize(lightDir + viewDir);
       float spec     = pow(max(0.0, dot(N, halfDir)), 52.0);
       col += uStorm * spec * (1.0 - landH) * (1.0 - ice) * 0.48;
-
-      // Crystalline polar ice gleam
-      float iceSpec = pow(max(0.0, dot(N, halfDir)), 32.0) * ice * 0.60;
-      col += vec3(0.85, 0.96, 1.0) * iceSpec;
 
       // ── 6. Fresnel Atmosphere Limb Glow ──────────────────────────────────
       float fresnel = pow(1.0 - max(0.0, dot(N, viewDir)), 3.0);

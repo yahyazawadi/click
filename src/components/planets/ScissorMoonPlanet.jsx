@@ -113,16 +113,7 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
           <scissorMoonShaderMaterial
             ref={shaderMatRef}
             uPerfTier={perfTierFloat}
-            uPolarIce={new THREE.Color('#e0f6ff')}
-            uDeepSea={new THREE.Color('#031224')}
-            uMidSea={new THREE.Color('#07304d')}
-            uShallowSea={new THREE.Color('#0f5d75')}
-            uCoast={new THREE.Color('#1a7b94')}
-            uLand={new THREE.Color('#254859')}
-            uForest={new THREE.Color('#163242')}
-            uCloud={new THREE.Color('#f2f8ff')}
-            uAtmosphere={new THREE.Color('#4a90c8')}
-            uStorm={new THREE.Color('#00d4f0')}
+            uPolarIce={new THREE.Color('#eaf5ff')}
           />
         </mesh>
 
