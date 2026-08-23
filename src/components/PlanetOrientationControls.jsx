@@ -209,14 +209,14 @@ export function PlanetOrientationControls({
           ◄
         </span>
 
-        {/* Horizontal Track (Rounded Rectangle) */}
+        {/* Horizontal Track (Wide Rounded Rectangle) */}
         <div
           ref={horizontalTrackRef}
           onPointerDown={handleYawPointerDown}
           onDoubleClick={handleResetYaw}
           title="Rotate Yaw (Drag to orient, Double-click to reset)"
           style={{
-            width: isMobile ? '130px' : '170px',
+            width: isMobile ? '220px' : 'clamp(320px, 32vw, 480px)',
             height: '6px',
             borderRadius: '9999px',
             background: 'rgba(6, 18, 34, 0.75)',
