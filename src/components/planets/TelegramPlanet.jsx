@@ -236,8 +236,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         </mesh>
       </group>
 
-      {/* ── Inclined Orbital Plane Container ── */}
-      <group rotation={[Math.PI * 0.15, Math.PI * 0.08, -Math.PI * 0.12]}>
+      {/* ── Equatorial Orbital Plane Container (Aligned with Planet North Pole) ── */}
+      <group rotation={[0.35, 0, 0]}>
         {/* Glowing Cyan Orbital Slipstream Ribbon */}
         <mesh ref={trailRingRef} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[orbitRadius, size * 0.008, 16, 80]} />
