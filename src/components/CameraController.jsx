@@ -65,12 +65,12 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current
         .copy(targetPlanetPosRef.current)
         .add(normal.current.multiplyScalar(distOffset))
-        .add(new THREE.Vector3(0, (isMobile ? 0.6 : 1.1) * zoomFactor, 0));
+        .add(new THREE.Vector3(0, (isMobile ? 0.7 : 1.28) * zoomFactor, 0));
 
-      // LookAt target: shifted slightly downward in 3D so the planet floats proudly in the upper clear viewport area
+      // LookAt target: shifted downward in 3D to center the planet in the upper open viewport
       targetLookAt.current
         .copy(targetPlanetPosRef.current)
-        .add(new THREE.Vector3(0, isMobile ? -1.2 : -0.55, 0));
+        .add(new THREE.Vector3(0, isMobile ? -1.5 : -0.85, 0));
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);
