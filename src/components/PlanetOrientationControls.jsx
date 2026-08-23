@@ -20,10 +20,10 @@ export function PlanetOrientationControls({
   const [isDraggingPitch, setIsDraggingPitch] = useState(false);
   const [isDraggingYaw, setIsDraggingYaw] = useState(false);
 
-  // Pitch range: 4 full rotations ([-4π, +4π]) for multiple full spins
-  const MAX_PITCH = Math.PI * 4;
-  // Yaw range: 4 full rotations ([-4π, +4π])
-  const MAX_YAW = Math.PI * 4;
+  // Pitch range: 6 full rotations ([-6π, +6π]) for extended multi-spin control
+  const MAX_PITCH = Math.PI * 6;
+  // Yaw range: 6 full rotations ([-6π, +6π])
+  const MAX_YAW = Math.PI * 6;
 
   // Normalized percentages [0..1] with center at 0.5 (0 rad)
   const pitchPercent = (orientation.pitch / (MAX_PITCH * 2)) + 0.5;
@@ -138,7 +138,7 @@ export function PlanetOrientationControls({
           title="Tilt Pitch (Drag to spin multiple times, Double-click to reset)"
           style={{
             width: '6px',
-            height: isMobile ? '180px' : 'clamp(260px, 38vh, 380px)',
+            height: isMobile ? '220px' : 'clamp(340px, 50vh, 500px)',
             borderRadius: '9999px',
             background: 'rgba(6, 18, 34, 0.75)',
             border: '1px solid rgba(0, 186, 227, 0.35)',
