@@ -70,20 +70,20 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
       logoMatRef.current.emissiveIntensity = breath;
     }
 
-    // 2. Outward expanding holographic pulse wave 1
+    // 2. Outward expanding holographic pulse wave 1 (Expanded final diameter)
     if (pulse1Ref.current) {
-      const p1 = (t * 1.4) % 1.0;
-      pulse1Ref.current.scale.setScalar(0.70 + p1 * 0.55);
-      pulse1Ref.current.position.z = size * 0.015 + p1 * (size * 0.04);
-      pulse1Ref.current.material.opacity = (1.0 - p1) * 0.65;
+      const p1 = (t * 1.1) % 1.0;
+      pulse1Ref.current.scale.setScalar(0.55 + p1 * 1.75);
+      pulse1Ref.current.position.z = size * 0.015 + p1 * (size * 0.06);
+      pulse1Ref.current.material.opacity = Math.pow(1.0 - p1, 1.2) * 0.85;
     }
 
     // 3. Offset outward expanding holographic pulse wave 2
     if (pulse2Ref.current) {
-      const p2 = (t * 1.4 + 0.5) % 1.0;
-      pulse2Ref.current.scale.setScalar(0.70 + p2 * 0.55);
-      pulse2Ref.current.position.z = size * 0.015 + p2 * (size * 0.04);
-      pulse2Ref.current.material.opacity = (1.0 - p2) * 0.65;
+      const p2 = (t * 1.1 + 0.5) % 1.0;
+      pulse2Ref.current.scale.setScalar(0.55 + p2 * 1.75);
+      pulse2Ref.current.position.z = size * 0.015 + p2 * (size * 0.06);
+      pulse2Ref.current.material.opacity = Math.pow(1.0 - p2, 1.2) * 0.85;
     }
   });
 
@@ -199,7 +199,7 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const segments = perfTierFloat >= 0.8 ? 24 : 48;
 
   return (
-    <group>
+    <group rotation={[-0.38, 0, 0]}>
       {/* ── Rotating Planet Body ── */}
       <group ref={planetRef}>
         {/* Sphere with top sliced off via GLSL discard */}
