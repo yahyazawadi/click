@@ -155,50 +155,24 @@ export const SYSTEM_CONFIG = {
 
   // 5. Planetary Projects Data
   projects: [
-    {
-      id: 'proj-climamedix',
-      title: 'CLIMAMEDIX',
-      ringIndex: 0,
-      shapeIndex: 'simple-earth',
-      startAngle: 2.1,
-      size: 0.65,
-      color: '#10B981',
-      category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
-      shortDesc: 'Geospatial health platform tracking climate impacts on disease vectors.',
-      fullDesc: 'Maps climate change impacts on disease vectors and regional health dynamics. Supabase PostgreSQL backend, Mapbox GL JS geospatial visualizers, and an interactive LMS with automated quizzes.',
-      tags: ['SUPABASE', 'MAPBOX GL JS', 'POSTGRESQL', 'LMS', 'GEOSPATIAL'],
-      specs: [
-        'Geospatial contagion & vector tracking',
-        'Interactive LMS with auto-graded quizzes',
-        'Cloudflare R2 multipart storage',
-        'Live PostgreSQL schema visualizer'
-      ],
-      gallery: [
-        {
-          title: 'ClimaMedix Live Platform',
-          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
-          url: '/gallery/climamedix-home.png',
-          tag: 'LIVE SITE'
-        }
-      ]
-    },
+    // COMMENTED OUT: proj-climamedix simple-earth (replaced by Terra real-earth)
     // {
-    //   id: 'proj-climamedix-terra',
-    //   title: 'CLIMAMEDIX // TERRA',
-    //   ringIndex: 2,
-    //   shapeIndex: 'real-earth',
-    //   startAngle: 0.8,
-    //   size: 0.70,
-    //   color: '#0284C7',
-    //   category: 'AUTHENTIC NASA CONTINENTS',
-    //   shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
-    //   fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
-    //   tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
+    //   id: 'proj-climamedix',
+    //   title: 'CLIMAMEDIX',
+    //   ringIndex: 0,
+    //   shapeIndex: 'simple-earth',
+    //   startAngle: 2.1,
+    //   size: 0.65,
+    //   color: '#10B981',
+    //   category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
+    //   shortDesc: 'Geospatial health platform tracking climate impacts on disease vectors.',
+    //   fullDesc: 'Maps climate change impacts on disease vectors and regional health dynamics. Supabase PostgreSQL backend, Mapbox GL JS geospatial visualizers, and an interactive LMS with automated quizzes.',
+    //   tags: ['SUPABASE', 'MAPBOX GL JS', 'POSTGRESQL', 'LMS', 'GEOSPATIAL'],
     //   specs: [
-    //     'Real NASA continental geography',
-    //     'Specular ocean glint mapping',
-    //     'True 3D parallax cloud drift',
-    //     '120 FPS hardware-accelerated'
+    //     'Geospatial contagion & vector tracking',
+    //     'Interactive LMS with auto-graded quizzes',
+    //     'Cloudflare R2 multipart storage',
+    //     'Live PostgreSQL schema visualizer'
     //   ],
     //   gallery: [
     //     {
@@ -209,6 +183,33 @@ export const SYSTEM_CONFIG = {
     //     }
     //   ]
     // },
+    {
+      id: 'proj-climamedix-terra',
+      title: 'CLIMAMEDIX // TERRA',
+      ringIndex: 2,
+      shapeIndex: 'real-earth',
+      startAngle: 0.8,
+      size: 0.70,
+      color: '#0284C7',
+      category: 'AUTHENTIC NASA CONTINENTS',
+      shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
+      fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
+      tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
+      specs: [
+        'Real NASA continental geography',
+        'Specular ocean glint mapping',
+        'True 3D parallax cloud drift',
+        '120 FPS hardware-accelerated'
+      ],
+      gallery: [
+        {
+          title: 'ClimaMedix Live Platform',
+          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+          url: '/gallery/climamedix-home.png',
+          tag: 'LIVE SITE'
+        }
+      ]
+    },
     {
       id: 'proj-10',
       title: 'BARBER SAAS',
