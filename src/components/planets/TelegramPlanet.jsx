@@ -3,16 +3,19 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import '../../shaders/ScissorMoonShaderMaterial';
 
-// ── Slender, Aerodynamic 3D Origami Glider Geometries ─────────────────────────
+// ── Slender, Aerodynamic 3D Origami Glider Geometries (+Z is Forward Nose) ─
 function createOrigamiGliderGeometries() {
-  // Vertices for a long-nosed aerodynamic paper airplane dart
-  const N   = [  0.00,  1.30,  0.15 ];  // 0: Long tapered nose apex
-  const WL  = [ -0.75, -0.75,  0.30 ];  // 1: Left Wingtip (Swept back & raised dihedral)
-  const WR  = [  0.75, -0.75,  0.30 ];  // 2: Right Wingtip (Swept back & raised dihedral)
-  const NL  = [ -0.20, -0.62,  0.05 ];  // 3: Left Inner Notch
-  const NR  = [  0.20, -0.62,  0.05 ];  // 4: Right Inner Notch
-  const T   = [  0.00, -0.58,  0.12 ];  // 5: Central Dorsal Tail
-  const K   = [  0.00, -0.35, -0.25 ];  // 6: Underbody Keel Fuselage (Folded belly)
+  // Standard Aeronautical Coordinates:
+  // +Z = Forward (Nose)
+  // +Y = Up (Spine / Dihedral)
+  // ±X = Wings (Left / Right)
+  const N   = [  0.00,  0.06,  1.35 ];  // 0: Nose Tip (Forward +Z)
+  const WL  = [ -0.80,  0.25, -0.75 ];  // 1: Left Wingtip (-X, dihedral up +Y, back -Z)
+  const WR  = [  0.80,  0.25, -0.75 ];  // 2: Right Wingtip (+X, dihedral up +Y, back -Z)
+  const NL  = [ -0.22,  0.02, -0.60 ];  // 3: Left Inner Notch
+  const NR  = [  0.22,  0.02, -0.60 ];  // 4: Right Inner Notch
+  const T   = [  0.00,  0.08, -0.65 ];  // 5: Dorsal Tail Spine
+  const K   = [  0.00, -0.28, -0.35 ];  // 6: Underbody Keel Fuselage (Down -Y)
 
   // 1. Upper Main Wings & Spine (Bright Facets)
   const wingPositions = [
@@ -145,38 +148,41 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
       logoMatRef.current.emissiveIntensity = Math.sin(t * 3.5) * 0.40 + 1.40;
     }
 
-    // ── Orbital Flight Kinematics for 3 Gliders ──
+    // ── Orbital Flight Kinematics for 3 Gliders (Forward-Facing lookAt) ──
     const speed = 0.85;
 
-    // Helper to position and bank a glider along the orbit
+    // Helper to position and point glider directly forward along the flight trajectory
     const updateGlider = (ref, angleOffset, radius, bankAngle) => {
       if (!ref.current) return;
       const angle = t * speed + angleOffset;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
-      const y = Math.sin(angle * 2.0) * (size * 0.12); // Subtle harmonic undulation
+      const y = Math.sin(angle * 2.0) * (size * 0.10);
 
       ref.current.position.set(x, y, z);
 
-      // Tangent flight heading: look in the forward orbital velocity direction
-      const forwardX = -Math.sin(angle);
-      const forwardZ =  Math.cos(angle);
-      const targetAngle = Math.atan2(forwardX, forwardZ);
+      // Next position in the trajectory
+      const dt = 0.06;
+      const nextAngle = angle + dt;
+      const nextX = Math.cos(nextAngle) * radius;
+      const nextZ = Math.sin(nextAngle) * radius;
+      const nextY = Math.sin(nextAngle * 2.0) * (size * 0.10);
 
-      // Apply yaw heading + inward banking roll
-      ref.current.rotation.set(0, targetAngle + Math.PI / 2, 0);
+      // Point the nose (+Z) directly at the forward path point
+      ref.current.lookAt(nextX, nextY, nextZ);
+
+      // Bank into the curve (roll around local forward axis)
       ref.current.rotateZ(bankAngle);
-      ref.current.rotateX(Math.sin(angle * 2.0) * 0.15); // subtle pitch
     };
 
     // Glider 1: Lead flagship glider
-    updateGlider(glider1Ref, 0.0, orbitRadius, -Math.PI * 0.18);
+    updateGlider(glider1Ref, 0.0, orbitRadius, -Math.PI * 0.16);
 
     // Glider 2: Trailing wingman (close formation)
-    updateGlider(glider2Ref, -0.42, orbitRadius * 0.94, -Math.PI * 0.22);
+    updateGlider(glider2Ref, -0.40, orbitRadius * 0.93, -Math.PI * 0.20);
 
-    // Glider 3: Opposing celestial scout (180° opposite so a plane is ALWAYS in view from every side!)
-    updateGlider(glider3Ref, Math.PI, orbitRadius * 1.05, -Math.PI * 0.18);
+    // Glider 3: Opposing celestial scout (180° opposite for 360° all-around visibility)
+    updateGlider(glider3Ref, Math.PI, orbitRadius * 1.05, -Math.PI * 0.16);
 
     // Slipstream pulse animation
     if (trailRingRef.current) {
