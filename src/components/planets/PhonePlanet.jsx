@@ -18,8 +18,7 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
   const PURE_BLACK = '#000000';
 
   const logoMatRef  = useRef();
-  const pulse1Ref   = useRef();
-  const pulse2Ref   = useRef();
+  const pulseRef    = useRef();
 
   // Parse SVG paths into 3D Extruded Geometries with rich sculpted bevels
   const { phoneGeo, bubbleGeo } = useMemo(() => {
@@ -66,24 +65,16 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
 
     // 1. Rhythmic breathing glow on the carved logo
     if (logoMatRef.current) {
-      const breath = Math.sin(t * 3.5) * 0.45 + 1.45;
+      const breath = Math.sin(t * 2.8) * 0.35 + 1.35;
       logoMatRef.current.emissiveIntensity = breath;
     }
 
-    // 2. Outward expanding holographic pulse wave 1 (Expanded final diameter)
-    if (pulse1Ref.current) {
-      const p1 = (t * 1.1) % 1.0;
-      pulse1Ref.current.scale.setScalar(0.55 + p1 * 1.75);
-      pulse1Ref.current.position.z = size * 0.015 + p1 * (size * 0.06);
-      pulse1Ref.current.material.opacity = Math.pow(1.0 - p1, 1.2) * 0.85;
-    }
-
-    // 3. Offset outward expanding holographic pulse wave 2
-    if (pulse2Ref.current) {
-      const p2 = (t * 1.1 + 0.5) % 1.0;
-      pulse2Ref.current.scale.setScalar(0.55 + p2 * 1.75);
-      pulse2Ref.current.position.z = size * 0.015 + p2 * (size * 0.06);
-      pulse2Ref.current.material.opacity = Math.pow(1.0 - p2, 1.2) * 0.85;
+    // 2. Single, calm, outward-expanding holographic pulse wave from phone center
+    if (pulseRef.current) {
+      const p = (t * 0.45) % 1.0;
+      pulseRef.current.scale.setScalar(0.40 + p * 1.90);
+      pulseRef.current.position.z = size * 0.015 + p * (size * 0.05);
+      pulseRef.current.material.opacity = Math.pow(1.0 - p, 1.4) * 0.65;
     }
   });
 
@@ -145,21 +136,11 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 5. Holographic Pulse Wave Rings emitting from the carved logo ── */}
-      <mesh ref={pulse1Ref} position={[0, 0, size * 0.015]}>
-        <ringGeometry args={[diskRadius * 0.42, diskRadius * 0.48, 48]} />
+      {/* ── 5. Single Holographic Pulse Wave Ring emitting calmly from the phone center ── */}
+      <mesh ref={pulseRef} position={[0, 0, size * 0.015]}>
+        <ringGeometry args={[diskRadius * 0.35, diskRadius * 0.42, 48]} />
         <meshBasicMaterial
           color="#1aff7a"
-          transparent
-          opacity={0.6}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      <mesh ref={pulse2Ref} position={[0, 0, size * 0.015]}>
-        <ringGeometry args={[diskRadius * 0.42, diskRadius * 0.48, 48]} />
-        <meshBasicMaterial
-          color="#25D366"
           transparent
           opacity={0.6}
           side={THREE.DoubleSide}
