@@ -57,19 +57,20 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Fly camera directly to front of selected planet
-      const distOffset = (isMobile ? 5.2 : 3.2) * zoomFactor;
+      // PLANET FOCUS: Elevated, cinematic framing positioned cleanly above the presentation dock
+      const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       normal.current.copy(targetPlanetPosRef.current).normalize();
+
+      // Camera position: offset outwards radially and elevated upward
       targetCamPos.current
         .copy(targetPlanetPosRef.current)
         .add(normal.current.multiplyScalar(distOffset))
-        .add(upOffset.current);
-      targetLookAt.current.copy(targetPlanetPosRef.current);
+        .add(new THREE.Vector3(0, (isMobile ? 0.6 : 1.1) * zoomFactor, 0));
 
-      if (isMobile) {
-        targetCamPos.current.y -= 1.5;
-        targetLookAt.current.y -= 1.5;
-      }
+      // LookAt target: shifted slightly downward in 3D so the planet floats proudly in the upper clear viewport area
+      targetLookAt.current
+        .copy(targetPlanetPosRef.current)
+        .add(new THREE.Vector3(0, isMobile ? -1.2 : -0.55, 0));
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);
