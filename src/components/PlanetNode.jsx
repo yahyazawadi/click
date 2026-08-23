@@ -9,6 +9,7 @@ import {
   FlowerPlanet,
   RealEarthPlanet,
   SimpleEarthPlanet,
+  PhonePlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -24,6 +25,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'heart-sculpted' || type === 100) {
     return <SculptedHeartPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'phone' || type === 'whatsapp') {
+    return <PhonePlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }

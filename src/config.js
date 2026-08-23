@@ -227,6 +227,25 @@ export const SYSTEM_CONFIG = {
         'WhatsApp bot Edge Functions (wamid lookup)',
         'Supabase Realtime WebSocket live dashboard'
       ]
+    },
+    {
+      id: 'proj-whatsapp',
+      title: 'WHATSAPP BOT',
+      ringIndex: 1,
+      shapeIndex: 'phone',
+      startAngle: 5.8,
+      size: 0.45,
+      color: '#25D366',
+      category: 'MESSAGING & AUTOMATION',
+      shortDesc: 'Supabase Edge Function bot sending booking confirmations via WhatsApp Business API.',
+      fullDesc: 'Serverless WhatsApp bot deployed as a Supabase Edge Function. Receives webhook events from the WhatsApp Business API, performs wamid lookups against the appointments table, and dispatches automated booking confirmation messages to customers.',
+      tags: ['WHATSAPP API', 'SUPABASE EDGE', 'TYPESCRIPT', 'WEBHOOKS'],
+      specs: [
+        'Serverless Edge Function deployment',
+        'wamid lookup & message status tracking',
+        'WhatsApp Business API webhook handler',
+        'Automated booking confirmations'
+      ]
     }
   ]
 };
