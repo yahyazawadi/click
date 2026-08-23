@@ -10,6 +10,7 @@ import {
   RealEarthPlanet,
   SimpleEarthPlanet,
   PhonePlanet,
+  TelegramPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -28,6 +29,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'phone' || type === 'whatsapp') {
     return <PhonePlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'telegram' || type === 'telegram-bot') {
+    return <TelegramPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }

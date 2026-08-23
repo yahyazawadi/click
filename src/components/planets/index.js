@@ -7,6 +7,7 @@ import { ClimamedixPlanet } from './ClimamedixPlanet';
 import { RealEarthPlanet } from './RealEarthPlanet';
 import { SimpleEarthPlanet } from './SimpleEarthPlanet';
 import { PhonePlanet } from './PhonePlanet';
+import { TelegramPlanet } from './TelegramPlanet';
 
 export {
   ScissorPlanet,
@@ -18,6 +19,7 @@ export {
   RealEarthPlanet,
   SimpleEarthPlanet,
   PhonePlanet,
+  TelegramPlanet,
 };
 
 

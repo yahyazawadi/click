@@ -246,6 +246,25 @@ export const SYSTEM_CONFIG = {
         'Dual automated reminder dispatch (24h & 2h)',
         'wamid status tracking & webhook ingress'
       ]
+    },
+    {
+      id: 'proj-telegram',
+      title: 'TELEGRAM BOT',
+      ringIndex: 1,
+      shapeIndex: 'telegram',
+      startAngle: 1.8,
+      size: 0.45,
+      color: '#229ED9',
+      category: 'SERVERLESS TELEGRAM BOT & WEBHOOKS',
+      shortDesc: 'High-speed Telegram Bot on serverless Edge Functions with real-time webhook routing.',
+      fullDesc: 'Serverless Telegram automation bot designed for high-throughput messaging, interactive inline keyboards, automated broadcast dispatches, and real-time webhook payload handling with end-to-end type safety.',
+      tags: ['TELEGRAM API', 'EDGE FUNCTIONS', 'TYPESCRIPT', 'WEBHOOKS', 'INLINE BOT'],
+      specs: [
+        'Serverless webhook routing architecture',
+        'Interactive inline keyboard workflows',
+        'Automated real-time notification dispatch',
+        'Low-latency global edge execution'
+      ]
     }
   ]
 };
