@@ -182,33 +182,33 @@ export const SYSTEM_CONFIG = {
         }
       ]
     },
-    {
-      id: 'proj-climamedix-terra',
-      title: 'CLIMAMEDIX // TERRA',
-      ringIndex: 2,
-      shapeIndex: 'real-earth',
-      startAngle: 0.8,
-      size: 0.70,
-      color: '#0284C7',
-      category: 'AUTHENTIC NASA CONTINENTS',
-      shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
-      fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
-      tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
-      specs: [
-        'Real NASA continental geography',
-        'Specular ocean glint mapping',
-        'True 3D parallax cloud drift',
-        '120 FPS hardware-accelerated'
-      ],
-      gallery: [
-        {
-          title: 'ClimaMedix Live Platform',
-          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
-          url: '/gallery/climamedix-home.png',
-          tag: 'LIVE SITE'
-        }
-      ]
-    },
+    // {
+    //   id: 'proj-climamedix-terra',
+    //   title: 'CLIMAMEDIX // TERRA',
+    //   ringIndex: 2,
+    //   shapeIndex: 'real-earth',
+    //   startAngle: 0.8,
+    //   size: 0.70,
+    //   color: '#0284C7',
+    //   category: 'AUTHENTIC NASA CONTINENTS',
+    //   shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
+    //   fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
+    //   tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
+    //   specs: [
+    //     'Real NASA continental geography',
+    //     'Specular ocean glint mapping',
+    //     'True 3D parallax cloud drift',
+    //     '120 FPS hardware-accelerated'
+    //   ],
+    //   gallery: [
+    //     {
+    //       title: 'ClimaMedix Live Platform',
+    //       caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+    //       url: '/gallery/climamedix-home.png',
+    //       tag: 'LIVE SITE'
+    //     }
+    //   ]
+    // },
     {
       id: 'proj-10',
       title: 'BARBER SAAS',
