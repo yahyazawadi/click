@@ -142,7 +142,7 @@ export const SYSTEM_CONFIG = {
     emissive: '#00BAE3',
     title: 'YAHYA CORE',
     subtitle: 'SYSTEM ARCHITECT & DEVELOPER',
-    aboutText: `Welcome to yahya.click. I craft high-concurrency platforms, real-time architectures, and interactive spatial interfaces. Driven by sleek minimalism, robust system design, and effortless user experiences.`,
+    aboutText: `Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.`,
     stats: [
       { label: 'STATUS', val: 'ONLINE // ACTIVE' },
       { label: 'DOMAIN', val: 'YAHYA.CLICK' },
@@ -164,14 +164,14 @@ export const SYSTEM_CONFIG = {
       size: 0.65,
       color: '#10B981',
       category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
-      shortDesc: 'Geospatial epidemiological intelligence platform tracking climate change impacts on disease vectors.',
-      fullDesc: 'An epidemiological intelligence platform mapping climate change impacts on disease vectors, respiratory risks, and regional health dynamics. Built with Supabase PostgreSQL, geospatial data visualizers, and predictive telemetry.',
-      tags: ['FULL-STACK', 'POSTGRESQL', 'SUPABASE', 'GEOSPATIAL', 'EPIDEMIOLOGY', '3D WEBGL'],
+      shortDesc: 'Geospatial health platform tracking climate impacts on disease vectors.',
+      fullDesc: 'Maps climate change impacts on disease vectors and regional health dynamics. Supabase PostgreSQL backend, Mapbox GL JS geospatial visualizers, and an interactive LMS with automated quizzes.',
+      tags: ['SUPABASE', 'MAPBOX GL JS', 'POSTGRESQL', 'LMS', 'GEOSPATIAL'],
       specs: [
-        'Core: Geospatial Contagion & Vector Tracking',
-        'Database: Supabase PostgreSQL & Spatial Schemas',
-        'Telemetry: Real-Time Environmental Health Indices',
-        'Interface: Multi-Language Disease Intelligence'
+        'Geospatial contagion & vector tracking',
+        'Interactive LMS with auto-graded quizzes',
+        'Cloudflare R2 multipart storage',
+        'Live PostgreSQL schema visualizer'
       ],
       gallery: [
         {
@@ -191,14 +191,14 @@ export const SYSTEM_CONFIG = {
       size: 0.70,
       color: '#0284C7',
       category: 'AUTHENTIC NASA CONTINENTS',
-      shortDesc: 'Photorealistic continental Earth with real-world landmasses, oceans, and parallax clouds.',
-      fullDesc: 'An authentic high-definition 3D Earth incorporating real NASA Blue Marble continental mapping, specular ocean reflections, and dynamic atmospheric cloud formations drifting in true 3D parallax.',
-      tags: ['NASA MAPS', 'REAL CONTINENTS', 'PARALLAX CLOUDS', '120 FPS', 'THREE.JS'],
+      shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
+      fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
+      tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
       specs: [
-        'Mapping: Authentic NASA Continental Geography',
-        'Atmosphere: Real-Time Parallax Cloud Drift',
-        'Oceans: High-Definition Specular Glint Mapping',
-        'Performance: Hardware-Accelerated 120 FPS'
+        'Real NASA continental geography',
+        'Specular ocean glint mapping',
+        'True 3D parallax cloud drift',
+        '120 FPS hardware-accelerated'
       ],
       gallery: [
         {
@@ -218,13 +218,13 @@ export const SYSTEM_CONFIG = {
       size: 0.55,
       color: '#00BAE3',
       category: 'PRECISION TOOLS',
-      shortDesc: 'Compact orbital world crowned with a pair of precision cutting scissors.',
-      fullDesc: 'A smaller rogue planet defined by the iconic scissors mounted on its north pole — snapping open and closed as it orbits the system, a testament to craftsmanship at cosmic scale.',
-      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL', 'REACT THREE FIBER'],
+      shortDesc: 'Orbital world with animated scissors snapping at its north pole.',
+      fullDesc: 'A rogue planet with precision scissors mounted on its north pole — snapping open and closed as it orbits.',
+      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL'],
       specs: [
-        'Crown: Animated Snapping Scissors',
-        'Body: Glowing Icosahedral Planet',
-        'Orbit: Inner Ring Trajectory'
+        'Animated snapping scissors crown',
+        'Glowing icosahedral body',
+        'Inner ring orbit'
       ]
     }
   ]
