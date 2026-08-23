@@ -25,29 +25,29 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
   const { phoneGeo, bubbleGeo } = useMemo(() => {
     const loader = new SVGLoader();
 
-    // 1. Official Phone Handset Shape with deep 3D carved relief
+    // 1. Official Phone Handset Shape (Tall prominent 3D relief)
     const phonePathData = loader.parse(`<svg><path d="${SVG_PHONE_PATH}"/></svg>`);
     const phoneShapesList = phonePathData.paths[0].toShapes(true);
     
     const pGeo = new THREE.ExtrudeGeometry(phoneShapesList, {
-      depth: 2.4,
+      depth: 2.8,
       bevelEnabled: true,
-      bevelThickness: 0.45,
-      bevelSize: 0.25,
+      bevelThickness: 0.50,
+      bevelSize: 0.28,
       bevelSegments: 5,
     });
     pGeo.center();
 
-    // 2. Speech Bubble Ring Shape with deep 3D carved relief
+    // 2. Speech Bubble Ring Shape (Slightly less height than the phone)
     const bubblePathData = loader.parse(`<svg><path d="${SVG_BUBBLE_PATH}"/></svg>`);
     const bubbleShapesList = bubblePathData.paths[0].toShapes(true);
     
     const bGeo = new THREE.ExtrudeGeometry(bubbleShapesList, {
-      depth: 2.0,
+      depth: 1.3,
       bevelEnabled: true,
-      bevelThickness: 0.40,
-      bevelSize: 0.22,
-      bevelSegments: 5,
+      bevelThickness: 0.25,
+      bevelSize: 0.16,
+      bevelSegments: 4,
     });
     bGeo.center();
 
@@ -114,11 +114,11 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 3. Outer Speech Bubble Outline (Deep 3D Sculpted Mesh) ── */}
+      {/* ── 3. Outer Speech Bubble Outline (Tiered Lower Height) ── */}
       <mesh
         geometry={bubbleGeo}
         scale={[emblemScale, emblemScale, emblemScale]}
-        position={[0, 0, size * 0.035]}
+        position={[0, 0, size * 0.020]}
       >
         <meshStandardMaterial
           ref={logoMatRef}
@@ -130,11 +130,11 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 4. Official Phone Handset Silhouette (Deep 3D Sculpted Mesh) ── */}
+      {/* ── 4. Official Phone Handset Silhouette (Tiered Higher Height) ── */}
       <mesh
         geometry={phoneGeo}
         scale={[emblemScale * 1.05, emblemScale * 1.05, emblemScale * 1.05]}
-        position={[0, 0, size * 0.042]}
+        position={[0, 0, size * 0.045]}
       >
         <meshStandardMaterial
           color={GREEN}

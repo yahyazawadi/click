@@ -236,15 +236,15 @@ export const SYSTEM_CONFIG = {
       startAngle: 5.8,
       size: 0.45,
       color: '#25D366',
-      category: 'MESSAGING & AUTOMATION',
-      shortDesc: 'Supabase Edge Function bot sending booking confirmations via WhatsApp Business API.',
-      fullDesc: 'Serverless WhatsApp bot deployed as a Supabase Edge Function. Receives webhook events from the WhatsApp Business API, performs wamid lookups against the appointments table, and dispatches automated booking confirmation messages to customers.',
-      tags: ['WHATSAPP API', 'SUPABASE EDGE', 'TYPESCRIPT', 'WEBHOOKS'],
+      category: 'WHATSAPP CLOUD API & EDGE FUNCTIONS',
+      shortDesc: 'Meta Business Cloud API bot with interactive quick-replies, automated 2-tier reminders, and webhook ingress.',
+      fullDesc: 'Production messaging automation pipeline integrated directly with Meta WhatsApp Business Cloud API. Powered by Supabase Edge Functions with 6 verified utility message templates, interactive quick-reply booking confirmations, dual automated reminder cron workers (24h & 2h prior), wamid status tracking, and passwordless login verifications.',
+      tags: ['META CLOUD API', 'EDGE FUNCTIONS', 'SUPABASE', 'CRON WORKERS', 'WEBHOOKS', 'DENO'],
       specs: [
-        'Serverless Edge Function deployment',
-        'wamid lookup & message status tracking',
-        'WhatsApp Business API webhook handler',
-        'Automated booking confirmations'
+        '6 Meta utility message templates integrated',
+        'Interactive quick-replies (15-min timeout)',
+        'Dual automated reminder dispatch (24h & 2h)',
+        'wamid status tracking & webhook ingress'
       ]
     }
   ]
