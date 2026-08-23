@@ -57,26 +57,26 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Elevated, cinematic framing positioned cleanly with Glowing Nebulae as Backdrop
+      // PLANET FOCUS: Aligns camera directly along meridian so the North Pole faces UP with a natural ~15° tilt
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
 
-      // Calculate camera position with positive +Z offset so line-of-sight always looks into -Z (Nebulae plane)
-      // Slight gentle tilt following planet's X position for organic parallax
-      const camOffsetX = targetPos.x * 0.22;
-      const camOffsetY = (isMobile ? 0.7 : 1.28) * zoomFactor;
-      const camOffsetZ = Math.sqrt(Math.max(0.1, distOffset * distOffset - camOffsetX * camOffsetX));
+      // Square X alignment ensures zero camera roll, keeping +Y (North Pole) pointing upright
+      const camOffsetY = (isMobile ? 0.6 : 1.0) * zoomFactor;
+      const camOffsetZ = distOffset;
 
       targetCamPos.current.set(
-        targetPos.x + camOffsetX,
+        targetPos.x,
         targetPos.y + camOffsetY,
         targetPos.z + camOffsetZ
       );
 
-      // LookAt target: shifted downward in 3D to center the planet in the upper open viewport
-      targetLookAt.current
-        .copy(targetPos)
-        .add(new THREE.Vector3(0, isMobile ? -1.5 : -0.85, 0));
+      // LookAt target: centered in X and shifted downward in Y to frame the planet in the upper open space
+      targetLookAt.current.set(
+        targetPos.x,
+        targetPos.y - (isMobile ? 1.5 : 0.85),
+        targetPos.z
+      );
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);
