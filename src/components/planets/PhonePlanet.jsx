@@ -11,39 +11,43 @@ const SVG_PHONE_PATH =
 const SVG_BUBBLE_PATH =
   "M13.29 2.68A7.36 7.36 0 0 0 8 .5a7.44 7.44 0 0 0-6.41 11.15l-1 3.85 3.94-1a7.4 7.4 0 0 0 3.55.9H8a7.44 7.44 0 0 0 5.29-12.72zM8 14.12a6.12 6.12 0 0 1-3.15-.87l-.22-.13-2.34.61.62-2.28-.14-.23a6.18 6.18 0 0 1 9.6-7.65 6.12 6.12 0 0 1 1.81 4.37A6.19 6.19 0 0 1 8 14.12z";
 
-// ── 3D Official WhatsApp Inlaid Emblem on a 2D Carved Flat Facet ───────────
+// ── 3D Official WhatsApp Carved Emblem with Live Pulse Waves ─────────────────
 function WhatsAppEmbossedEmblem({ size, diskRadius }) {
   const GREEN      = '#25D366';
   const GREEN_GLOW = '#1aff7a';
   const PURE_BLACK = '#000000';
 
-  // Parse SVG paths into 3D Extruded Geometries
+  const logoMatRef  = useRef();
+  const pulse1Ref   = useRef();
+  const pulse2Ref   = useRef();
+
+  // Parse SVG paths into 3D Extruded Geometries with rich sculpted bevels
   const { phoneGeo, bubbleGeo } = useMemo(() => {
     const loader = new SVGLoader();
 
-    // 1. Official Phone Handset Shape
+    // 1. Official Phone Handset Shape with carved 3D bevel
     const phonePathData = loader.parse(`<svg><path d="${SVG_PHONE_PATH}"/></svg>`);
     const phoneShapesList = phonePathData.paths[0].toShapes(true);
     
     const pGeo = new THREE.ExtrudeGeometry(phoneShapesList, {
-      depth: 0.12,
+      depth: 0.45,
       bevelEnabled: true,
-      bevelThickness: 0.04,
-      bevelSize: 0.03,
-      bevelSegments: 2,
+      bevelThickness: 0.12,
+      bevelSize: 0.08,
+      bevelSegments: 4,
     });
     pGeo.center();
 
-    // 2. Speech Bubble Ring Shape
+    // 2. Speech Bubble Ring Shape with carved 3D bevel
     const bubblePathData = loader.parse(`<svg><path d="${SVG_BUBBLE_PATH}"/></svg>`);
     const bubbleShapesList = bubblePathData.paths[0].toShapes(true);
     
     const bGeo = new THREE.ExtrudeGeometry(bubbleShapesList, {
-      depth: 0.12,
+      depth: 0.40,
       bevelEnabled: true,
-      bevelThickness: 0.04,
-      bevelSize: 0.03,
-      bevelSegments: 2,
+      bevelThickness: 0.10,
+      bevelSize: 0.07,
+      bevelSegments: 4,
     });
     bGeo.center();
 
@@ -57,12 +61,38 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
     };
   }, [phoneGeo, bubbleGeo]);
 
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+
+    // 1. Rhythmic breathing glow on the carved logo
+    if (logoMatRef.current) {
+      const breath = Math.sin(t * 3.5) * 0.45 + 1.45;
+      logoMatRef.current.emissiveIntensity = breath;
+    }
+
+    // 2. Outward expanding holographic pulse wave 1
+    if (pulse1Ref.current) {
+      const p1 = (t * 1.4) % 1.0;
+      pulse1Ref.current.scale.setScalar(0.70 + p1 * 0.55);
+      pulse1Ref.current.position.z = size * 0.015 + p1 * (size * 0.04);
+      pulse1Ref.current.material.opacity = (1.0 - p1) * 0.65;
+    }
+
+    // 3. Offset outward expanding holographic pulse wave 2
+    if (pulse2Ref.current) {
+      const p2 = (t * 1.4 + 0.5) % 1.0;
+      pulse2Ref.current.scale.setScalar(0.70 + p2 * 0.55);
+      pulse2Ref.current.position.z = size * 0.015 + p2 * (size * 0.04);
+      pulse2Ref.current.material.opacity = (1.0 - p2) * 0.65;
+    }
+  });
+
   // Scale factor to map 16x16 SVG units cleanly inside the flat disk facet
-  const emblemScale = diskRadius * 0.088;
+  const emblemScale = diskRadius * 0.082;
 
   return (
     <group rotation={[-Math.PI / 2, 0, 0]}>
-      {/* ── 1. Pure 2D Flat Black Slicing Disk (Covers the sliced dome cleanly) ── */}
+      {/* ── 1. Pure 2D Flat Black Slicing Disk (Seals the sliced dome cleanly) ── */}
       <mesh position={[0, 0, 0]}>
         <circleGeometry args={[diskRadius * 1.015, 64]} />
         <meshBasicMaterial
@@ -71,33 +101,68 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 2. Outer Speech Bubble Outline (Light Vibrant Green) ── */}
-      <mesh
-        geometry={bubbleGeo}
-        scale={[emblemScale, emblemScale, emblemScale]}
-        position={[0, 0, size * 0.010]}
-      >
+      {/* ── 2. Carved Outer Metallic Rim with Beveled Trench ── */}
+      <mesh position={[0, 0, size * 0.005]}>
+        <ringGeometry args={[diskRadius * 0.94, diskRadius * 1.01, 64]} />
         <meshStandardMaterial
-          color={GREEN}
-          emissive={GREEN_GLOW}
-          emissiveIntensity={1.4}
-          roughness={0.2}
-          metalness={0.3}
+          color="#04200e"
+          emissive={GREEN}
+          emissiveIntensity={0.6}
+          roughness={0.25}
+          metalness={0.9}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* ── 3. Official Phone Handset Silhouette (Matched Light Green Color) ── */}
+      {/* ── 3. Outer Speech Bubble Outline (Sculpted 3D Carved Mesh) ── */}
+      <mesh
+        geometry={bubbleGeo}
+        scale={[emblemScale, emblemScale, emblemScale]}
+        position={[0, 0, size * 0.012]}
+      >
+        <meshStandardMaterial
+          ref={logoMatRef}
+          color={GREEN}
+          emissive={GREEN_GLOW}
+          emissiveIntensity={1.4}
+          roughness={0.15}
+          metalness={0.65}
+        />
+      </mesh>
+
+      {/* ── 4. Official Phone Handset Silhouette (Sculpted 3D Carved Mesh) ── */}
       <mesh
         geometry={phoneGeo}
         scale={[emblemScale * 1.05, emblemScale * 1.05, emblemScale * 1.05]}
-        position={[0, 0, size * 0.012]}
+        position={[0, 0, size * 0.015]}
       >
         <meshStandardMaterial
           color={GREEN}
           emissive={GREEN_GLOW}
           emissiveIntensity={1.4}
-          roughness={0.2}
-          metalness={0.3}
+          roughness={0.15}
+          metalness={0.65}
+        />
+      </mesh>
+
+      {/* ── 5. Holographic Pulse Wave Rings emitting from the carved logo ── */}
+      <mesh ref={pulse1Ref} position={[0, 0, size * 0.015]}>
+        <ringGeometry args={[diskRadius * 0.42, diskRadius * 0.48, 48]} />
+        <meshBasicMaterial
+          color="#1aff7a"
+          transparent
+          opacity={0.6}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      <mesh ref={pulse2Ref} position={[0, 0, size * 0.015]}>
+        <ringGeometry args={[diskRadius * 0.42, diskRadius * 0.48, 48]} />
+        <meshBasicMaterial
+          color="#25D366"
+          transparent
+          opacity={0.6}
+          side={THREE.DoubleSide}
         />
       </mesh>
     </group>
