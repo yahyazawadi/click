@@ -188,6 +188,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
 export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: initialPerfTierFloat = 0.0 }) {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const targetPlanetPosRef = useRef(new THREE.Vector3());
+  const targetPlanetQuatRef = useRef(new THREE.Quaternion());
   const [activeTitles, setActiveTitles] = useState([]);
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
@@ -585,6 +586,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                       hasSelection={!!selectedTarget}
                       showTitle={activeTitles.includes(proj.id)}
                       targetPlanetPosRef={targetPlanetPosRef}
+                      targetPlanetQuatRef={targetPlanetQuatRef}
                       perfTierFloat={perfTierFloat}
                       planetOrientation={planetOrientation}
                     />
@@ -593,7 +595,13 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
               </SceneRotator>
 
               {/* Camera Zoom & Motion Controller */}
-              <CameraController selectedTarget={selectedTarget} targetPlanetPosRef={targetPlanetPosRef} zoomFactor={zoomFactor} isMobile={isMobile} />
+              <CameraController
+                selectedTarget={selectedTarget}
+                targetPlanetPosRef={targetPlanetPosRef}
+                targetPlanetQuatRef={targetPlanetQuatRef}
+                zoomFactor={zoomFactor}
+                isMobile={isMobile}
+              />
             </Suspense>
           </Canvas>
         </div>

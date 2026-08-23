@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFactor = 1.0, isMobile = false }) {
+export function CameraController({ selectedTarget, targetPlanetPosRef, targetPlanetQuatRef, zoomFactor = 1.0, isMobile = false }) {
   const { camera, pointer } = useThree();
   const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
   
@@ -57,26 +57,28 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Aligns camera directly along meridian so the North Pole faces UP with a natural ~15° tilt
+      // PLANET FOCUS: Rotates camera orientation with the scene so the Nebulae are ALWAYS in the background
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
+      const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
-      // Square X alignment ensures zero camera roll, keeping +Y (North Pole) pointing upright
+      // Forward vector in world space pointing outward from the planet toward the camera (+Z in scene space)
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(targetQuat).normalize();
+      // Upward vector in world space along the planet's North Pole (+Y in scene space)
+      const upDir = new THREE.Vector3(0, 1, 0).applyQuaternion(targetQuat).normalize();
+
       const camOffsetY = (isMobile ? 0.6 : 1.0) * zoomFactor;
-      const camOffsetZ = distOffset;
 
-      targetCamPos.current.set(
-        targetPos.x,
-        targetPos.y + camOffsetY,
-        targetPos.z + camOffsetZ
-      );
+      // Position camera along the rotated forward vector so it looks straight into the Nebulae
+      targetCamPos.current
+        .copy(targetPos)
+        .addScaledVector(forwardDir, distOffset)
+        .addScaledVector(upDir, camOffsetY);
 
-      // LookAt target: centered in X and shifted downward in Y to frame the planet in the upper open space
-      targetLookAt.current.set(
-        targetPos.x,
-        targetPos.y - (isMobile ? 1.5 : 0.85),
-        targetPos.z
-      );
+      // Frame the planet in the upper open space along the local up axis
+      targetLookAt.current
+        .copy(targetPos)
+        .addScaledVector(upDir, -(isMobile ? 1.5 : 0.85));
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);

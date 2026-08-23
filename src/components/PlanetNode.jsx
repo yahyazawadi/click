@@ -61,6 +61,7 @@ export function PlanetNode({
   hasSelection,
   showTitle,
   targetPlanetPosRef,
+  targetPlanetQuatRef,
   isMobile,
   isUnlocked = true,
   perfTierFloat = 0.0,
@@ -77,6 +78,7 @@ export function PlanetNode({
   const localPos = useRef(new THREE.Vector3());
   const euler = useRef(new THREE.Euler());
   const worldPos = useRef(new THREE.Vector3());
+  const worldQuat = useRef(new THREE.Quaternion());
   const projScreenMatrix = useRef(new THREE.Matrix4());
   const frustum = useRef(new THREE.Frustum());
   const boundingSphereRef = useRef(new THREE.Sphere());
@@ -102,9 +104,15 @@ export function PlanetNode({
       groupRef.current.position.copy(localPos.current);
       groupRef.current.scale.setScalar(currentScaleRef.current);
 
-      if (isSelected && targetPlanetPosRef) {
-        groupRef.current.getWorldPosition(worldPos.current);
-        targetPlanetPosRef.current.copy(worldPos.current);
+      if (isSelected) {
+        if (targetPlanetPosRef) {
+          groupRef.current.getWorldPosition(worldPos.current);
+          targetPlanetPosRef.current.copy(worldPos.current);
+        }
+        if (targetPlanetQuatRef) {
+          groupRef.current.getWorldQuaternion(worldQuat.current);
+          targetPlanetQuatRef.current.copy(worldQuat.current);
+        }
       }
 
       // Frustum Culling / Viewport Check: Skip rendering when planet is offscreen
