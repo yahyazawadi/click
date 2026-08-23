@@ -67,10 +67,10 @@ function createOrigamiGliderGeometries() {
 
 // ── 3D Official Telegram Carved Emblem with Live Pulse Waves ─────────────────
 function TelegramEmbossedEmblem({ size, diskRadius }) {
-  const CYAN_BRIGHT = '#30b8ff';
-  const CYAN_GLOW   = '#60d4ff';
-  const DARK_CYAN   = '#0a3a60';
-  const DARK_GLOW   = '#0e558c';
+  const CYAN_BRIGHT = '#38c0ff';
+  const CYAN_GLOW   = '#70dcff';
+  const SHADED_CYAN = '#1a72ab';
+  const SHADED_GLOW = '#228ac8';
   const PURE_BLACK  = '#000000';
 
   const logoMatRef = useRef();
@@ -114,7 +114,7 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
   });
 
   // Scale of the 3D glider enlarged to fill the circular facet prominently
-  const gliderScale = diskRadius * 0.68;
+  const gliderScale = diskRadius * 0.84;
 
   return (
     <group rotation={[-Math.PI / 2, 0, 0]}>
@@ -142,7 +142,7 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
 
       {/* ── 3. Telegram Circular Border Ring (Tiered Lower Height) ── */}
       <mesh position={[0, 0, size * 0.018]}>
-        <ringGeometry args={[diskRadius * 0.78, diskRadius * 0.86, 64]} />
+        <ringGeometry args={[diskRadius * 0.80, diskRadius * 0.88, 64]} />
         <meshStandardMaterial
           color="#229ED9"
           emissive={CYAN_GLOW}
@@ -155,7 +155,7 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
 
       {/* ── 4. Symmetrical 3D Origami Glider with High-Contrast Shaded Keel ── */}
       <group
-        position={[-diskRadius * 0.03, diskRadius * 0.03, size * 0.045]}
+        position={[-diskRadius * 0.03, diskRadius * 0.03, size * 0.048]}
         rotation={[Math.PI * 0.06, Math.PI * 0.04, -Math.PI * 0.22]}
         scale={[gliderScale, gliderScale, gliderScale * 1.18]}
       >
@@ -167,20 +167,20 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
             emissive={CYAN_GLOW}
             emissiveIntensity={1.4}
             roughness={0.16}
-            metalness={0.50}
+            metalness={0.45}
             flatShading={true}
             side={THREE.DoubleSide}
           />
         </mesh>
 
-        {/* Lower Keel Under-fold (Darker Shadow Cyan for Crisp Distinction) */}
+        {/* Lower Keel Under-fold (Medium-Shaded Azure for Natural Origami Fold Contrast) */}
         <mesh geometry={keelGeo}>
           <meshStandardMaterial
-            color={DARK_CYAN}
-            emissive={DARK_GLOW}
-            emissiveIntensity={0.45}
-            roughness={0.35}
-            metalness={0.70}
+            color={SHADED_CYAN}
+            emissive={SHADED_GLOW}
+            emissiveIntensity={0.75}
+            roughness={0.28}
+            metalness={0.55}
             flatShading={true}
             side={THREE.DoubleSide}
           />
