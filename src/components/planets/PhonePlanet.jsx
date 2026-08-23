@@ -56,8 +56,8 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
 
   useEffect(() => {
     return () => {
-      phoneGeo.dispose();
-      bubbleGeo.dispose();
+      phoneGeo?.dispose?.();
+      bubbleGeo?.dispose?.();
     };
   }, [phoneGeo, bubbleGeo]);
 

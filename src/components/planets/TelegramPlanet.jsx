@@ -125,9 +125,9 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
   useEffect(() => {
     return () => {
-      leftWingGeo.dispose();
-      rightWingGeo.dispose();
-      keelGeo.dispose();
+      leftWingGeo?.dispose?.();
+      rightWingGeo?.dispose?.();
+      keelGeo?.dispose?.();
     };
   }, [leftWingGeo, rightWingGeo, keelGeo]);
 
