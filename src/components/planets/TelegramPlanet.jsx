@@ -65,35 +65,35 @@ function createOrigamiGliderGeometries() {
 
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
 function OrigamiGlider({ wingsGeo, keelGeo, scale = 1.0, logoMatRef }) {
-  const CYAN_BRIGHT = '#38c0ff';
-  const CYAN_GLOW   = '#80e4ff';
-  const SHADED_CYAN = '#1a72ab';
-  const SHADED_GLOW = '#228ac8';
+  const ICE_WHITE   = '#ffffff';
+  const WHITE_GLOW  = '#e0f4ff';
+  const TELE_AZURE  = '#229ED9';
+  const AZURE_GLOW  = '#1278ad';
 
   return (
     <group scale={[scale, scale, scale]}>
-      {/* Upper Main Wings (Bright Electric Cyan) */}
+      {/* Upper Main Wings (Crisp Ice-White Paper like official Telegram icon) */}
       <mesh geometry={wingsGeo}>
         <meshStandardMaterial
           ref={logoMatRef}
-          color={CYAN_BRIGHT}
-          emissive={CYAN_GLOW}
-          emissiveIntensity={1.4}
-          roughness={0.16}
-          metalness={0.45}
+          color={ICE_WHITE}
+          emissive={WHITE_GLOW}
+          emissiveIntensity={0.65}
+          roughness={0.15}
+          metalness={0.20}
           flatShading={true}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Lower Keel Under-fold (Medium-Shaded Azure) */}
+      {/* Lower Keel Under-fold (Authentic Telegram Azure Blue) */}
       <mesh geometry={keelGeo}>
         <meshStandardMaterial
-          color={SHADED_CYAN}
-          emissive={SHADED_GLOW}
-          emissiveIntensity={0.75}
-          roughness={0.28}
-          metalness={0.55}
+          color={TELE_AZURE}
+          emissive={AZURE_GLOW}
+          emissiveIntensity={0.50}
+          roughness={0.25}
+          metalness={0.45}
           flatShading={true}
           side={THREE.DoubleSide}
         />
@@ -145,7 +145,7 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
     // Rhythmic breathing emissive glow on gliders
     if (logoMatRef.current) {
-      logoMatRef.current.emissiveIntensity = Math.sin(t * 3.5) * 0.40 + 1.40;
+      logoMatRef.current.emissiveIntensity = Math.sin(t * 3.5) * 0.18 + 0.65;
     }
 
     // ── Orbital Flight Kinematics for 3 Gliders (Forward-Facing lookAt) ──
