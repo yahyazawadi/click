@@ -9,13 +9,13 @@ function createOrigamiGliderGeometries() {
   // +Z = Forward (Nose)
   // +Y = Up (Spine / Dihedral)
   // ±X = Wings (Left / Right)
-  const N   = [  0.00,  0.06,  1.35 ];  // 0: Nose Tip (Forward +Z)
-  const WL  = [ -0.80,  0.25, -0.75 ];  // 1: Left Wingtip (-X, dihedral up +Y, back -Z)
-  const WR  = [  0.80,  0.25, -0.75 ];  // 2: Right Wingtip (+X, dihedral up +Y, back -Z)
-  const NL  = [ -0.22,  0.02, -0.60 ];  // 3: Left Inner Notch
-  const NR  = [  0.22,  0.02, -0.60 ];  // 4: Right Inner Notch
-  const T   = [  0.00,  0.08, -0.65 ];  // 5: Dorsal Tail Spine
-  const K   = [  0.00, -0.28, -0.35 ];  // 6: Underbody Keel Fuselage (Down -Y)
+  const N = [0.00, 0.06, 1.35];  // 0: Nose Tip (Forward +Z)
+  const WL = [-0.80, 0.25, -0.75];  // 1: Left Wingtip (-X, dihedral up +Y, back -Z)
+  const WR = [0.80, 0.25, -0.75];  // 2: Right Wingtip (+X, dihedral up +Y, back -Z)
+  const NL = [-0.22, 0.02, -0.60];  // 3: Left Inner Notch
+  const NR = [0.22, 0.02, -0.60];  // 4: Right Inner Notch
+  const T = [0.00, 0.08, -0.65];  // 5: Dorsal Tail Spine
+  const K = [0.00, -0.28, -0.35];  // 6: Underbody Keel Fuselage (Down -Y)
 
   // 1. Outer Main Wings (Pure Crisp White Facets)
   const outerWingPositions = [
@@ -73,20 +73,18 @@ function createOrigamiGliderGeometries() {
   return { outerWingsGeo, innerFoldGeo, keelGeo };
 }
 
+// ── Glider Color Palette (Tune hex codes here) ──────────────────────────────
+let outerWingsColor     = '#ffffff';
+let outerWingsGlow      = '#e0f4ff';
+
+let centerCreaseColor   = '#1a7ab5';
+let centerCreaseGlow    = '#10527c';
+
+let underbellyKeelColor = '#9cc6d9';
+let underbellyKeelGlow  = '#1278ad';
+
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
 function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logoMatRef }) {
-  // 1. Top outer wings (White)
-  const outerWingsColor     = '#ffffff';
-  const outerWingsGlow      = '#e0f4ff';
-
-  // 2. Center spine fold visible from above (Darker crease)
-  const centerCreaseColor   = '#1a7ab5';
-  const centerCreaseGlow    = '#10527c';
-
-  // 3. Underbelly keel fold on the bottom (Azure blue)
-  const underbellyKeelColor = '#229ED9';
-  const underbellyKeelGlow  = '#1278ad';
-
   return (
     <group scale={[scale, scale, scale]}>
       {/* 1. Outer Main Wings (Pure Crisp Ice-White) */}
@@ -134,18 +132,18 @@ function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logo
 
 // ── Main TelegramPlanet with Active Orbital Glider Squadron ───────────────────
 export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
-  const planetRef      = useRef();
-  const shaderMatRef   = useRef();
-  const logoMatRef     = useRef();
+  const planetRef = useRef();
+  const shaderMatRef = useRef();
+  const logoMatRef = useRef();
 
   // Glider references for dynamic orbital flight paths
-  const glider1Ref     = useRef();
-  const glider2Ref     = useRef();
-  const glider3Ref     = useRef();
-  const trailRingRef   = useRef();
+  const glider1Ref = useRef();
+  const glider2Ref = useRef();
+  const glider3Ref = useRef();
+  const trailRingRef = useRef();
 
-  const planetRadius   = size * 0.85;
-  const orbitRadius    = planetRadius * 1.48;
+  const planetRadius = size * 0.85;
+  const orbitRadius = planetRadius * 1.48;
 
   // Build high-definition 3D origami geometries
   const { outerWingsGeo, innerFoldGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
@@ -164,9 +162,9 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
     // Planet terrain shader update
     if (shaderMatRef.current) {
-      shaderMatRef.current.uTime     = t;
+      shaderMatRef.current.uTime = t;
       shaderMatRef.current.uPerfTier = perfTierFloat;
-      shaderMatRef.current.uCutY     = 9999.0; // Render full celestial sphere
+      shaderMatRef.current.uCutY = 9999.0; // Render full celestial sphere
     }
 
     // Steady planet rotation
@@ -194,7 +192,7 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
       // Exact tangent flight heading in orbital plane (Nose is local +Z)
       const forwardX = -Math.sin(angle);
-      const forwardZ =  Math.cos(angle);
+      const forwardZ = Math.cos(angle);
       const heading = Math.atan2(forwardX, forwardZ);
 
       // Lock heading around Y axis
