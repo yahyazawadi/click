@@ -72,7 +72,7 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
         targetPos.z - nebulaCenter.z
       ).normalize();
 
-      const camOffsetY = (isMobile ? 0.7 : 1.1) * zoomFactor;
+      const camOffsetY = (isMobile ? 0.6 : 0.88) * zoomFactor;
 
       // Position camera along horizontal sightline with clean elevation
       targetCamPos.current.set(
@@ -81,10 +81,10 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
         targetPos.z + viewDir.z * distOffset
       );
 
-      // Shift lookAt downward by 1.35 units so the planet floats high in the upper open viewport with full clearance above the dock card
+      // Balanced vertical look-at offset (-0.78): keeps planet centered in open viewport with ample clearance from both top header and bottom dock
       targetLookAt.current.set(
         targetPos.x,
-        targetPos.y - (isMobile ? 1.8 : 1.35),
+        targetPos.y - (isMobile ? 1.3 : 0.78),
         targetPos.z
       );
     } else {
