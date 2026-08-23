@@ -1,162 +1,103 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import '../../shaders/ScissorMoonShaderMaterial';
 
-// ── 3D Phone Handset Geometry ──────────────────────────────────────────────
-function PhoneHandset({ size }) {
+// ── Exact SVG Paths from official WhatsApp icon (viewBox 0 0 16 16) ─────────
+const SVG_PHONE_PATH =
+  "M11.42 9.49c-.19-.09-1.1-.54-1.27-.61s-.29-.09-.42.1-.48.6-.59.73-.21.14-.4 0a5.13 5.13 0 0 1-1.49-.92 5.25 5.25 0 0 1-1-1.29c-.11-.18 0-.28.08-.38s.18-.21.28-.32a1.39 1.39 0 0 0 .18-.31.38.38 0 0 0 0-.33c0-.09-.42-1-.58-1.37s-.3-.32-.41-.32h-.4a.72.72 0 0 0-.5.23 2.1 2.1 0 0 0-.65 1.55A3.59 3.59 0 0 0 5 8.2 8.32 8.32 0 0 0 8.19 11c.44.19.78.3 1.05.39a2.53 2.53 0 0 0 1.17.07 1.93 1.93 0 0 0 1.26-.88 1.67 1.67 0 0 0 .11-.88c-.05-.07-.17-.12-.36-.21z";
+
+const SVG_BUBBLE_PATH =
+  "M13.29 2.68A7.36 7.36 0 0 0 8 .5a7.44 7.44 0 0 0-6.41 11.15l-1 3.85 3.94-1a7.4 7.4 0 0 0 3.55.9H8a7.44 7.44 0 0 0 5.29-12.72zM8 14.12a6.12 6.12 0 0 1-3.15-.87l-.22-.13-2.34.61.62-2.28-.14-.23a6.18 6.18 0 0 1 9.6-7.65 6.12 6.12 0 0 1 1.81 4.37A6.19 6.19 0 0 1 8 14.12z";
+
+// ── 3D Official WhatsApp Inlaid Emblem on a 2D Carved Flat Facet ───────────
+function WhatsAppEmbossedEmblem({ size }) {
   const GREEN      = '#25D366';
   const GREEN_GLOW = '#1aff7a';
-  const DARK_SLATE = '#05180f';
+  const PURE_BLACK = '#000000';
 
-  const hs = size * 0.50;
+  // Parse SVG paths into 3D Extruded Geometries
+  const { phoneGeo, bubbleGeo } = useMemo(() => {
+    const loader = new SVGLoader();
 
-  // Arc body of the handset
-  const arcGeo = useMemo(() =>
-    new THREE.TorusGeometry(hs * 0.55, hs * 0.13, 16, 48, Math.PI),
-  [hs]);
+    // 1. Official Phone Handset Shape
+    const phonePathData = loader.parse(`<svg><path d="${SVG_PHONE_PATH}"/></svg>`);
+    const phoneShapesList = phonePathData.paths[0].toShapes(true);
+    
+    const pGeo = new THREE.ExtrudeGeometry(phoneShapesList, {
+      depth: 0.15,
+      bevelEnabled: true,
+      bevelThickness: 0.05,
+      bevelSize: 0.04,
+      bevelSegments: 2,
+    });
+    pGeo.center();
 
-  const earGeo   = useMemo(() => new THREE.CylinderGeometry(hs * 0.18, hs * 0.22, hs * 0.25, 24), [hs]);
-  const mouthGeo = useMemo(() => new THREE.CylinderGeometry(hs * 0.18, hs * 0.22, hs * 0.25, 24), [hs]);
+    // 2. Speech Bubble Ring Shape
+    const bubblePathData = loader.parse(`<svg><path d="${SVG_BUBBLE_PATH}"/></svg>`);
+    const bubbleShapesList = bubblePathData.paths[0].toShapes(true);
+    
+    const bGeo = new THREE.ExtrudeGeometry(bubbleShapesList, {
+      depth: 0.15,
+      bevelEnabled: true,
+      bevelThickness: 0.05,
+      bevelSize: 0.04,
+      bevelSegments: 2,
+    });
+    bGeo.center();
 
-  const handsetMat = (
-    <meshStandardMaterial
-      color="#072b15"
-      emissive={GREEN}
-      emissiveIntensity={0.65}
-      roughness={0.15}
-      metalness={0.85}
-    />
-  );
+    return { phoneGeo: pGeo, bubbleGeo: bGeo };
+  }, []);
 
-  const glowingCapMat = (
-    <meshStandardMaterial
-      color={GREEN}
-      emissive={GREEN_GLOW}
-      emissiveIntensity={1.2}
-      roughness={0.1}
-      metalness={0.4}
-    />
-  );
+  useEffect(() => {
+    return () => {
+      phoneGeo.dispose();
+      bubbleGeo.dispose();
+    };
+  }, [phoneGeo, bubbleGeo]);
 
-  const darkAccentMat = (
-    <meshStandardMaterial
-      color={DARK_SLATE}
-      emissive={GREEN}
-      emissiveIntensity={0.2}
-      roughness={0.3}
-      metalness={0.9}
-    />
-  );
-
-  return (
-    <group rotation={[Math.PI / 12, 0, Math.PI / 4]}>
-      {/* Curved main handle bar */}
-      <mesh geometry={arcGeo} rotation={[Math.PI / 2, 0, 0]}>
-        {handsetMat}
-      </mesh>
-
-      {/* Handle center grip ring */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[hs * 0.55, hs * 0.04, 12, 32, Math.PI * 0.4]} />
-        {glowingCapMat}
-      </mesh>
-
-      {/* Earpiece assembly */}
-      <group position={[-hs * 0.55, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <mesh geometry={earGeo}>{handsetMat}</mesh>
-        {/* Glowing acoustic rim */}
-        <mesh position={[0, hs * 0.13, 0]}>
-          <cylinderGeometry args={[hs * 0.23, hs * 0.23, hs * 0.04, 24]} />
-          {glowingCapMat}
-        </mesh>
-        {/* Inner receiver recess */}
-        <mesh position={[0, hs * 0.15, 0]}>
-          <cylinderGeometry args={[hs * 0.14, hs * 0.14, hs * 0.02, 16]} />
-          {darkAccentMat}
-        </mesh>
-      </group>
-
-      {/* Mouthpiece assembly */}
-      <group position={[hs * 0.55, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <mesh geometry={mouthGeo}>{handsetMat}</mesh>
-        {/* Glowing transmitter rim */}
-        <mesh position={[0, hs * 0.13, 0]}>
-          <cylinderGeometry args={[hs * 0.23, hs * 0.23, hs * 0.04, 24]} />
-          {glowingCapMat}
-        </mesh>
-        {/* Inner mic grille */}
-        <mesh position={[0, hs * 0.15, 0]}>
-          <cylinderGeometry args={[hs * 0.14, hs * 0.14, hs * 0.02, 16]} />
-          {darkAccentMat}
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-// ── Physical Indented Plateau / Transmitter Station on Planet Crust ────────
-function TransmitterStationMount({ size }) {
-  const GREEN      = '#25D366';
-  const GREEN_GLOW = '#1aff7a';
-
-  const baseRadius = size * 0.42;
+  // Scale factor to map 16x16 SVG units nicely onto the carved flat facet
+  const emblemScale = size * 0.044;
 
   return (
-    <group position={[0, 0, 0]}>
-      {/* 1. Raised Mountain / Plateau Collar emerging from planet mantle */}
-      <mesh position={[0, -size * 0.06, 0]}>
-        <cylinderGeometry args={[baseRadius * 0.95, baseRadius * 1.35, size * 0.18, 32]} />
-        <meshStandardMaterial
-          color="#041f0f"
-          emissive="#0a3d1d"
-          emissiveIntensity={0.4}
-          roughness={0.4}
-          metalness={0.7}
-        />
-      </mesh>
-
-      {/* 2. Metallic Outer Bevel Ring with Tech Ridges */}
-      <mesh position={[0, size * 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[baseRadius * 0.92, size * 0.035, 16, 36]} />
-        <meshStandardMaterial
-          color="#073b1c"
-          emissive={GREEN}
-          emissiveIntensity={0.8}
-          roughness={0.1}
-          metalness={0.9}
-        />
-      </mesh>
-
-      {/* 3. Sunken Receiver Basin / Indented Well */}
+    <group rotation={[-Math.PI / 2, 0, 0]}>
+      {/* ── 1. Pure 2D Flat Black Slicing Disk (Cuts clean flat facet through the sphere) ── */}
       <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[baseRadius * 0.78, baseRadius * 0.85, size * 0.08, 32]} />
-        <meshStandardMaterial
-          color="#021208"
-          roughness={0.6}
-          metalness={0.8}
+        <circleGeometry args={[size * 0.44, 64]} />
+        <meshBasicMaterial
+          color={PURE_BLACK}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* 4. Glowing Plasma Core Energy Disc (at the floor of the indentation) */}
-      <mesh position={[0, size * 0.02, 0]}>
-        <cylinderGeometry args={[baseRadius * 0.65, baseRadius * 0.65, size * 0.015, 32]} />
+      {/* ── 2. Outer Speech Bubble Outline (Light Vibrant Green) ── */}
+      <mesh
+        geometry={bubbleGeo}
+        scale={[emblemScale, emblemScale, emblemScale]}
+        position={[0, 0, size * 0.012]}
+      >
         <meshStandardMaterial
           color={GREEN}
           emissive={GREEN_GLOW}
           emissiveIntensity={1.4}
-          roughness={0.1}
+          roughness={0.2}
+          metalness={0.3}
         />
       </mesh>
 
-      {/* 5. Concentric Runic Tech Circuit Rings on the plateau */}
-      <mesh position={[0, size * 0.025, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[baseRadius * 0.40, baseRadius * 0.44, 32]} />
+      {/* ── 3. Official Phone Handset Silhouette (Matched Light Green Color) ── */}
+      <mesh
+        geometry={phoneGeo}
+        scale={[emblemScale * 1.05, emblemScale * 1.05, emblemScale * 1.05]}
+        position={[0, 0, size * 0.014]}
+      >
         <meshStandardMaterial
-          color="#FCFCFC"
+          color={GREEN}
           emissive={GREEN_GLOW}
-          emissiveIntensity={1.8}
-          side={THREE.DoubleSide}
+          emissiveIntensity={1.4}
+          roughness={0.2}
+          metalness={0.3}
         />
       </mesh>
     </group>
@@ -167,9 +108,13 @@ function TransmitterStationMount({ size }) {
 export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const planetRef    = useRef();
   const shaderMatRef = useRef();
-  const pulseRingRef = useRef();
 
   const planetRadius = size * 0.85;
+  // Y level where the cut happens — logo disk sits here
+  const cutY = planetRadius * 0.88;
+
+  // Clipping plane: hide everything ABOVE y = cutY (normal points down = -Y cuts above)
+  const clipPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, -1, 0), cutY), [cutY]);
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
@@ -180,17 +125,9 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
       shaderMatRef.current.uPerfTier = perfTierFloat;
     }
 
-    // Steady planet rotation — the phone & plateau rotate seamlessly with the surface!
+    // Steady planet rotation — logo disk and clip are children so they rotate together
     if (planetRef.current) {
       planetRef.current.rotation.y += safeDelta * 0.18;
-    }
-
-    // Holographic Signal Wave pulsing upward from the indentation
-    if (pulseRingRef.current) {
-      const pulse = (t * 1.5) % 1.0;
-      pulseRingRef.current.position.y = size * 0.12 + pulse * (size * 0.35);
-      pulseRingRef.current.scale.setScalar(0.7 + pulse * 0.6);
-      pulseRingRef.current.material.opacity = (1.0 - pulse) * 0.7;
     }
   });
 
@@ -198,9 +135,9 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
   return (
     <group>
-      {/* ── Rotating Planet Body (Everything attached rotates with the crust) ── */}
+      {/* ── Rotating Planet Body ── */}
       <group ref={planetRef}>
-        {/* Base Noisy Organic Crust */}
+        {/* Sphere clipped to only render BELOW the cut level */}
         <mesh>
           <sphereGeometry args={[planetRadius, segments, segments]} />
           <scissorMoonShaderMaterial
@@ -216,44 +153,19 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
             uCloud={new THREE.Color('#c2ffd6')}
             uAtmosphere={new THREE.Color('#25D366')}
             uStorm={new THREE.Color('#1aff7a')}
+            clippingPlanes={[clipPlane]}
+            clipShadows={true}
           />
         </mesh>
 
-        {/* Emerald Atmospheric Halo */}
-        <mesh>
-          <sphereGeometry args={[planetRadius * 1.045, 32, 32]} />
-          <meshStandardMaterial
-            color="#25D366"
-            emissive="#25D366"
-            emissiveIntensity={0.22}
-            transparent
-            opacity={0.09}
-            side={THREE.BackSide}
-          />
-        </mesh>
-
-        {/* ── Physical Plateau & Indented Cradle at North Pole ── */}
-        <group position={[0, planetRadius * 0.94, 0]}>
-          <TransmitterStationMount size={size} />
-
-          {/* Phone Handset docked securely in the sunken indentation */}
-          <group position={[0, size * 0.16, 0]}>
-            <PhoneHandset size={size} />
-          </group>
-
-          {/* Holographic Signal Pulse emitting from the indentation */}
-          <mesh ref={pulseRingRef} rotation={[Math.PI / 2, 0, 0]} position={[0, size * 0.12, 0]}>
-            <ringGeometry args={[size * 0.18, size * 0.22, 32]} />
-            <meshBasicMaterial
-              color="#1aff7a"
-              transparent
-              opacity={0.6}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
+        {/* ── WhatsApp Logo Disk: flat black cap sitting exactly at the cut ── */}
+        <group position={[0, cutY, 0]}>
+          <WhatsAppEmbossedEmblem size={size} />
         </group>
       </group>
     </group>
   );
 }
+
+
 

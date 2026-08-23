@@ -521,7 +521,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           <Canvas
             dpr={gpuTier === 'low' ? [0.75, 0.85] : [1, 1.25]}
             camera={{ position: [0, 120, 300], fov: 45 }}
-            gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance' }}
+            gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance', localClippingEnabled: true }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >
