@@ -9,6 +9,8 @@ import {
   FlowerPlanet,
   RealEarthPlanet,
   SimpleEarthPlanet,
+  PhonePlanet,
+  TelegramPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -24,6 +26,12 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'heart-sculpted' || type === 100) {
     return <SculptedHeartPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'phone' || type === 'whatsapp') {
+    return <PhonePlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'telegram' || type === 'telegram-bot') {
+    return <TelegramPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
@@ -45,7 +53,20 @@ function PlanetFallbackMesh({ color, size }) {
   );
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true, perfTierFloat = 0.0 }) {
+export function PlanetNode({
+  project,
+  ring,
+  onSelect,
+  isSelected,
+  hasSelection,
+  showTitle,
+  targetPlanetPosRef,
+  targetPlanetQuatRef,
+  isMobile,
+  isUnlocked = true,
+  perfTierFloat = 0.0,
+  planetOrientation = { pitch: 0, yaw: 0 },
+}) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
   const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
@@ -57,6 +78,7 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
   const localPos = useRef(new THREE.Vector3());
   const euler = useRef(new THREE.Euler());
   const worldPos = useRef(new THREE.Vector3());
+  const worldQuat = useRef(new THREE.Quaternion());
   const projScreenMatrix = useRef(new THREE.Matrix4());
   const frustum = useRef(new THREE.Frustum());
   const boundingSphereRef = useRef(new THREE.Sphere());
@@ -82,9 +104,15 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
       groupRef.current.position.copy(localPos.current);
       groupRef.current.scale.setScalar(currentScaleRef.current);
 
-      if (isSelected && targetPlanetPosRef) {
-        groupRef.current.getWorldPosition(worldPos.current);
-        targetPlanetPosRef.current.copy(worldPos.current);
+      if (isSelected) {
+        if (targetPlanetPosRef) {
+          groupRef.current.getWorldPosition(worldPos.current);
+          targetPlanetPosRef.current.copy(worldPos.current);
+        }
+        if (targetPlanetQuatRef) {
+          groupRef.current.getWorldQuaternion(worldQuat.current);
+          targetPlanetQuatRef.current.copy(worldQuat.current);
+        }
       }
 
       // Frustum Culling / Viewport Check: Skip rendering when planet is offscreen
@@ -128,14 +156,16 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
     >
       {shouldRenderMesh && (
         <React.Suspense fallback={<PlanetFallbackMesh color={planetColor} size={project.size || 0.5} />}>
-          <ProceduralPlanetMesh
-            type={shapeIndex}
-            color={planetColor}
-            size={project.size || 0.5}
-            isSelected={isSelected}
-            isMobile={isMobile}
-            perfTierFloat={perfTierFloat}
-          />
+          <group rotation={[isSelected ? planetOrientation.pitch : 0, isSelected ? planetOrientation.yaw : 0, 0]}>
+            <ProceduralPlanetMesh
+              type={shapeIndex}
+              color={planetColor}
+              size={project.size || 0.5}
+              isSelected={isSelected}
+              isMobile={isMobile}
+              perfTierFloat={perfTierFloat}
+            />
+          </group>
         </React.Suspense>
       )}
       {/* Floating HTML Title Label — only mounted when actually visible */}

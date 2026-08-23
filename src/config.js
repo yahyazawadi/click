@@ -142,7 +142,7 @@ export const SYSTEM_CONFIG = {
     emissive: '#00BAE3',
     title: 'YAHYA CORE',
     subtitle: 'SYSTEM ARCHITECT & DEVELOPER',
-    aboutText: `Welcome to yahya.click. I craft high-concurrency platforms, real-time architectures, and interactive spatial interfaces. Driven by sleek minimalism, robust system design, and effortless user experiences.`,
+    aboutText: `Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.`,
     stats: [
       { label: 'STATUS', val: 'ONLINE // ACTIVE' },
       { label: 'DOMAIN', val: 'YAHYA.CLICK' },
@@ -164,14 +164,22 @@ export const SYSTEM_CONFIG = {
       size: 0.65,
       color: '#10B981',
       category: 'MEDICAL & CLIMATE EPIDEMIOLOGY',
-      shortDesc: 'Geospatial epidemiological intelligence platform tracking climate change impacts on disease vectors.',
-      fullDesc: 'An epidemiological intelligence platform mapping climate change impacts on disease vectors, respiratory risks, and regional health dynamics. Built with Supabase PostgreSQL, geospatial data visualizers, and predictive telemetry.',
-      tags: ['FULL-STACK', 'POSTGRESQL', 'SUPABASE', 'GEOSPATIAL', 'EPIDEMIOLOGY', '3D WEBGL'],
+      shortDesc: 'Geospatial health platform tracking climate impacts on disease vectors.',
+      fullDesc: 'Maps climate change impacts on disease vectors and regional health dynamics. Supabase PostgreSQL backend, Mapbox GL JS geospatial visualizers, and an interactive LMS with automated quizzes.',
+      tags: ['SUPABASE', 'MAPBOX GL JS', 'POSTGRESQL', 'LMS', 'GEOSPATIAL'],
       specs: [
-        'Core: Geospatial Contagion & Vector Tracking',
-        'Database: Supabase PostgreSQL & Spatial Schemas',
-        'Telemetry: Real-Time Environmental Health Indices',
-        'Interface: Multi-Language Disease Intelligence'
+        'Geospatial contagion & vector tracking',
+        'Interactive LMS with auto-graded quizzes',
+        'Cloudflare R2 multipart storage',
+        'Live PostgreSQL schema visualizer'
+      ],
+      gallery: [
+        {
+          title: 'ClimaMedix Live Platform',
+          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+          url: '/gallery/climamedix-home.png',
+          tag: 'LIVE SITE'
+        }
       ]
     },
     {
@@ -183,32 +191,79 @@ export const SYSTEM_CONFIG = {
       size: 0.70,
       color: '#0284C7',
       category: 'AUTHENTIC NASA CONTINENTS',
-      shortDesc: 'Photorealistic continental Earth with real-world landmasses, oceans, and parallax clouds.',
-      fullDesc: 'An authentic high-definition 3D Earth incorporating real NASA Blue Marble continental mapping, specular ocean reflections, and dynamic atmospheric cloud formations drifting in true 3D parallax.',
-      tags: ['NASA MAPS', 'REAL CONTINENTS', 'PARALLAX CLOUDS', '120 FPS', 'THREE.JS'],
+      shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
+      fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
+      tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
       specs: [
-        'Mapping: Authentic NASA Continental Geography',
-        'Atmosphere: Real-Time Parallax Cloud Drift',
-        'Oceans: High-Definition Specular Glint Mapping',
-        'Performance: Hardware-Accelerated 120 FPS'
+        'Real NASA continental geography',
+        'Specular ocean glint mapping',
+        'True 3D parallax cloud drift',
+        '120 FPS hardware-accelerated'
+      ],
+      gallery: [
+        {
+          title: 'ClimaMedix Live Platform',
+          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+          url: '/gallery/climamedix-home.png',
+          tag: 'LIVE SITE'
+        }
       ]
     },
     {
       id: 'proj-10',
-      title: 'SCISSOR WORLD',
+      title: 'BARBER SAAS',
       ringIndex: 1,
       shapeIndex: 10,
       startAngle: 4.2,
       size: 0.55,
       color: '#00BAE3',
-      category: 'PRECISION TOOLS',
-      shortDesc: 'Compact orbital world crowned with a pair of precision cutting scissors.',
-      fullDesc: 'A smaller rogue planet defined by the iconic scissors mounted on its north pole — snapping open and closed as it orbits the system, a testament to craftsmanship at cosmic scale.',
-      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL', 'REACT THREE FIBER'],
+      category: 'MULTI-TENANT SAAS PLATFORM',
+      shortDesc: 'Enterprise barber shop SaaS — multi-tenant bookings, RBAC, WhatsApp bot, and real-time concurrency.',
+      fullDesc: 'Full-stack multi-tenant platform for barbershops. Feature-based React + Supabase architecture with PostgreSQL RLS, 20-key granular RBAC, transaction-scoped advisory locks for concurrent bookings, WhatsApp Edge Functions for automated confirmations, and a Super Admin live device lab.',
+      tags: ['SUPABASE', 'POSTGRESQL RLS', 'RBAC', 'WHATSAPP BOT', 'REACT', 'TYPESCRIPT'],
       specs: [
-        'Crown: Animated Snapping Scissors',
-        'Body: Glowing Icosahedral Planet',
-        'Orbit: Inner Ring Trajectory'
+        'Advisory locks: zero concurrent booking collisions',
+        '20-key granular RBAC with per-user overrides',
+        'WhatsApp bot Edge Functions (wamid lookup)',
+        'Supabase Realtime WebSocket live dashboard'
+      ]
+    },
+    {
+      id: 'proj-whatsapp',
+      title: 'WHATSAPP BOT',
+      ringIndex: 1,
+      shapeIndex: 'phone',
+      startAngle: 5.8,
+      size: 0.45,
+      color: '#25D366',
+      category: 'WHATSAPP CLOUD API & EDGE FUNCTIONS',
+      shortDesc: 'Meta Business Cloud API bot with interactive quick-replies, automated 2-tier reminders, and webhook ingress.',
+      fullDesc: 'Production messaging automation pipeline integrated directly with Meta WhatsApp Business Cloud API. Powered by Supabase Edge Functions with 6 verified utility message templates, interactive quick-reply booking confirmations, dual automated reminder cron workers (24h & 2h prior), wamid status tracking, and passwordless login verifications.',
+      tags: ['META CLOUD API', 'EDGE FUNCTIONS', 'SUPABASE', 'CRON WORKERS', 'WEBHOOKS', 'DENO'],
+      specs: [
+        '6 Meta utility message templates integrated',
+        'Interactive quick-replies (15-min timeout)',
+        'Dual automated reminder dispatch (24h & 2h)',
+        'wamid status tracking & webhook ingress'
+      ]
+    },
+    {
+      id: 'proj-telegram',
+      title: 'TELEGRAM BOT',
+      ringIndex: 1,
+      shapeIndex: 'telegram',
+      startAngle: 1.8,
+      size: 0.45,
+      color: '#229ED9',
+      category: 'SERVERLESS TELEGRAM BOT & WEBHOOKS',
+      shortDesc: 'High-speed Telegram Bot on serverless Edge Functions with real-time webhook routing.',
+      fullDesc: 'Serverless Telegram automation bot designed for high-throughput messaging, interactive inline keyboards, automated broadcast dispatches, and real-time webhook payload handling with end-to-end type safety.',
+      tags: ['TELEGRAM API', 'EDGE FUNCTIONS', 'TYPESCRIPT', 'WEBHOOKS', 'INLINE BOT'],
+      specs: [
+        'Serverless webhook routing architecture',
+        'Interactive inline keyboard workflows',
+        'Automated real-time notification dispatch',
+        'Low-latency global edge execution'
       ]
     }
   ]
@@ -295,8 +350,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 0.72,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.0, // Static freeze baseline
-    seedX: generateTimeBasedSeed(1),
-    seedY: generateTimeBasedSeed(2),
+    seedX: -100.1,
+    seedY: 56.0,
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -327,8 +382,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 1,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.0, // Static freeze baseline
-    seedX: generateTimeBasedSeed(3),
-    seedY: generateTimeBasedSeed(4),
+    seedX: 107.7,
+    seedY: -10.0,
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -373,12 +428,6 @@ if (typeof window !== 'undefined') {
       if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
       if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
     }
-    
-    // Always generate unique timestamp seeds on session startup for both nebulae
-    NEBULA_CONFIG.nebula1.seedX = generateTimeBasedSeed(1);
-    NEBULA_CONFIG.nebula1.seedY = generateTimeBasedSeed(2);
-    NEBULA_CONFIG.nebula2.seedX = generateTimeBasedSeed(3);
-    NEBULA_CONFIG.nebula2.seedY = generateTimeBasedSeed(4);
   } catch (e) {
     console.warn('LocalStorage config load error:', e);
   }

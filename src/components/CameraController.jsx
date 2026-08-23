@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFactor = 1.0, isMobile = false }) {
+export function CameraController({ selectedTarget, targetPlanetPosRef, targetPlanetQuatRef, zoomFactor = 1.0, isMobile = false }) {
   const { camera, pointer } = useThree();
   const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
   
@@ -57,19 +57,36 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Fly camera directly to front of selected planet
-      const distOffset = (isMobile ? 5.2 : 3.2) * zoomFactor;
-      normal.current.copy(targetPlanetPosRef.current).normalize();
-      targetCamPos.current
-        .copy(targetPlanetPosRef.current)
-        .add(normal.current.multiplyScalar(distOffset))
-        .add(upOffset.current);
-      targetLookAt.current.copy(targetPlanetPosRef.current);
+      // PLANET FOCUS: Horizontal sightline through planet into Nebulae, with planet framed high in upper sky above dock
+      const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
+      const targetPos = targetPlanetPosRef.current;
+      const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
-      if (isMobile) {
-        targetCamPos.current.y -= 1.5;
-        targetLookAt.current.y -= 1.5;
-      }
+      // Center of background Nebulae in scene space
+      const nebulaCenter = new THREE.Vector3(0, 0, -55).applyQuaternion(targetQuat);
+
+      // Strictly horizontal sightline in X-Z plane (Y=0 eliminates vertical camera drift/tipping)
+      const viewDir = new THREE.Vector3(
+        targetPos.x - nebulaCenter.x,
+        0,
+        targetPos.z - nebulaCenter.z
+      ).normalize();
+
+      const camOffsetY = (isMobile ? 0.6 : 0.88) * zoomFactor;
+
+      // Position camera along horizontal sightline with clean elevation
+      targetCamPos.current.set(
+        targetPos.x + viewDir.x * distOffset,
+        targetPos.y + camOffsetY,
+        targetPos.z + viewDir.z * distOffset
+      );
+
+      // Balanced vertical look-at offset (-0.78): keeps planet centered in open viewport with ample clearance from both top header and bottom dock
+      targetLookAt.current.set(
+        targetPos.x,
+        targetPos.y - (isMobile ? 1.3 : 0.78),
+        targetPos.z
+      );
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);

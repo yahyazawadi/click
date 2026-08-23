@@ -6,6 +6,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   {
     uTime:       0,
     uPerfTier:   0.0,  // 0.0=high, 0.5=med, 1.0=low
+    uCutY:       9999.0, // Geometric height clipping (discards above this Y in local space)
     uDeepSea:    new THREE.Color('#031224'),
     uMidSea:     new THREE.Color('#07304d'),
     uShallowSea: new THREE.Color('#0f5d75'),
@@ -39,6 +40,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
+    uniform float uCutY;
     uniform vec3  uDeepSea;
     uniform vec3  uMidSea;
     uniform vec3  uShallowSea;
@@ -100,6 +102,10 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
     }
 
     void main() {
+      if (vPosition.y > uCutY) {
+        discard;
+      }
+
       vec3 N  = normalize(vWorldNormal);
       vec3 p  = normalize(vPosition);  // seamless sphere coords
 
@@ -164,11 +170,11 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
       col = mix(col, col * 0.72, landH * smoothstep(0.38, 0.90, terr) * 0.38);
       col = mix(col, col * 1.22, landH * smoothstep(-0.5, -0.1, terr) * 0.28);
 
-      // ── 3. Polar Ice Caps ─────────────────────────────────────────────────
-      float iceN   = fbm(p * 4.2 + vec3(99.0)) * 0.11;
-      float northI = smoothstep(0.70, 0.88, lat);
-      float southI = smoothstep(-0.70, -0.88, -lat);
-      float ice    = smoothstep(0.0, 0.5, max(northI, southI) + iceN);
+      // ── 3. Dual Polar Ice Caps (North & South Poles) ─────────────────────
+      float iceN    = fbm(p * 4.2 + vec3(99.0)) * 0.08;
+      float poleLat = abs(lat);
+      // Small, crisp, realistic ice caps on both North (+Y) and South (-Y) poles
+      float ice     = smoothstep(0.79, 0.92, poleLat + iceN);
       col = mix(col, uPolarIce, ice);
 
       // ── 4. Cloud Layer (skipped on LOW tier to save 2 FBM calls) ─────────

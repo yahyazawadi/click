@@ -6,7 +6,7 @@ Built with **React 19**, **Three.js**, **React Three Fiber (@react-three/fiber)*
 
 ---
 
-## 🌌 System Architecture Overview
+## System Architecture Overview
 
 ```
                           ┌───────────────────────────┐
@@ -28,7 +28,7 @@ The portfolio is structured around a central **Quantum Sphere Core** with three 
 
 ---
 
-## 🚀 Key Technical Features
+## Key Technical Features
 
 ### 1. Procedural GLSL Hubble SHO Nebula Background (`NebulaShaderMaterial.js`)
 - **Hubble Palette Colors**: Sulfur-II (Orange-Red), H-alpha (Crimson), OIII (Teal/Violet), and Ionization Core (Cyan-White).
@@ -57,7 +57,7 @@ The portfolio is structured around a central **Quantum Sphere Core** with three 
 
 ---
 
-## 🛠️ Development & Build Commands
+## Development & Build Commands
 
 ### Prerequisites
 - Node.js (v18+ recommended)
@@ -88,7 +88,7 @@ npm run preview
 
 ---
 
-## 🎮 Laptop GPU Setup (NVIDIA Optimus / Dual-GPU Laptops)
+## Laptop GPU Setup (NVIDIA Optimus / Dual-GPU Laptops)
 
 On laptops with dual GPUs (e.g. **NVIDIA RTX 3050 + Intel/AMD Integrated GPU**), Windows often assigns web browsers to the Integrated GPU by default to save battery life.
 
@@ -101,7 +101,7 @@ To ensure your browser uses the high-performance discrete GPU:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 yahya-click/
@@ -142,6 +142,6 @@ yahya-click/
 
 ---
 
-## 📜 License
+## License
 
 MIT License — Copyright (c) 2026 Yahya

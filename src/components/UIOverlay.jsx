@@ -1,28 +1,43 @@
 import React from 'react';
-import { SYSTEM_CONFIG } from '../config';
+import { PresentationDock } from './PresentationDock';
 
-export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFps = 60, isMobile = false, onToggleProfiler, isBottomHintEnabled = true }) {
-  const isCore = selectedTarget === 'core';
-  const isProject = Boolean(selectedProject);
-  const isOpen = isCore || isProject;
+export function UIOverlay({
+  selectedTarget,
+  selectedProject,
+  activeProjects = [],
+  onReturn,
+  onSelectTarget,
+  currentFps = 60,
+  isMobile = false,
+  onToggleProfiler,
+  isBottomHintEnabled = true,
+}) {
   const isSecretLove = Boolean(selectedProject?.id?.includes('heart'));
-
   const targetFps = isMobile ? 30 : 45;
   const isFpsStable = currentFps >= targetFps;
+
+  // Build overview stages sequence for the macro timeline
+  const stages = [
+    { id: 'core', title: 'CORE // OVERVIEW', category: 'EXATIK 560H' },
+    ...activeProjects.map((p, i) => ({
+      id: p.id,
+      title: p.title,
+      category: p.category || `PHASE ${i + 1}`,
+    })),
+  ];
 
   return (
     <>
       {/* Top Navbar Layer */}
       <div className="ui-overlay">
         <header className="top-header">
-          <div className="brand-box" onClick={onReturn}>
+          <div className="brand-box" onClick={onReturn} title="Return to Orbit Overview">
             <div className="brand-dot"></div>
-            <h1 className="brand-title">YAHYA.CLICK</h1>
+            <h1 className="brand-title">EXATIK INTERNSHIP // YAHYA.CLICK</h1>
           </div>
 
           <div className="top-right-hud">
-
-            <div 
+            <div
               className="fps-hud-counter"
               onClick={onToggleProfiler}
               style={{ cursor: 'pointer' }}
@@ -35,66 +50,39 @@ export function UIOverlay({ selectedTarget, selectedProject, onReturn, currentFp
           </div>
         </header>
 
-        {/* Bottom Hint (only when in macro overview mode and enabled) */}
-        {!selectedTarget && isBottomHintEnabled && (
-          <div className="bottom-hint">
-            [ CLICK CORE OR PLANET TO FOCUS ]
+        {/* Overview Timeline Bar (Visible when in macro overview orbit) */}
+        {!selectedTarget && (
+          <div className="overview-presentation-bar">
+            {isBottomHintEnabled && (
+              <div className="bottom-hint-tag">
+                [ CLICK ANY PHASE TO START PRESENTATION OR USE KEYBOARD ARROWS ◀ ▶ ]
+              </div>
+            )}
+            <div className="timeline-pills-row">
+              {stages.map((stage, idx) => (
+                <button
+                  key={stage.id}
+                  className="timeline-pill"
+                  onClick={() => onSelectTarget(stage.id)}
+                >
+                  <span className="pill-num">0{idx}</span>
+                  <span className="pill-label">{stage.title}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Floating Return Button */}
-      {selectedTarget && (
-        <button className="return-btn" onClick={onReturn}>
-          [ RETURN TO ORBIT ]
-        </button>
-      )}
-
-      {/* Slide-over Detail Drawer */}
-      <div className={`detail-drawer ${isOpen ? 'open' : ''} ${isSecretLove ? 'secret-love-theme' : ''}`}>
-        {isCore && (
-          <>
-            <span className="drawer-tag">[ SYSTEM CORE // ABOUT ]</span>
-            <h2 className="drawer-title">{SYSTEM_CONFIG.core.title}</h2>
-            <p className="drawer-desc">{SYSTEM_CONFIG.core.aboutText}</p>
-
-            <div className="specs-box">
-              <span className="specs-header">// SYSTEM TELEMETRY</span>
-              <div className="specs-list">
-                {SYSTEM_CONFIG.core.stats.map((stat, idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--secondary-blue)' }}>{stat.label}</span>
-                    <span style={{ color: 'var(--primary-cyan)', fontWeight: 600 }}>{stat.val}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {isProject && selectedProject && (
-          <>
-            <span className="drawer-tag">{selectedProject.category || '[ PROJECT TRANSMISSION ]'}</span>
-            <h2 className="drawer-title">{selectedProject.title}</h2>
-            <p className="drawer-desc" dangerouslySetInnerHTML={{ __html: selectedProject.fullDesc || selectedProject.shortDesc }} />
-
-            <div className="specs-box">
-              <span className="specs-header">// SPECIFICATIONS & ARCHITECTURE</span>
-              <ul className="specs-list">
-                {selectedProject.specs?.map((spec, idx) => (
-                  <li key={idx}>• {spec}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="tags-row">
-              {selectedProject.tags?.map((tag, idx) => (
-                <span key={idx} className="tag-badge">{tag}</span>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+      {/* Standalone Reusable Floating Presentation Command Dock */}
+      <PresentationDock
+        selectedTarget={selectedTarget}
+        selectedProject={selectedProject}
+        activeProjects={activeProjects}
+        onSelectTarget={onSelectTarget}
+        onReturn={onReturn}
+        isSecretLove={isSecretLove}
+      />
     </>
   );
 }

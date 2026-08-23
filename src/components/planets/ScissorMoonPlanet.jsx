@@ -105,12 +105,16 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
   });
 
   return (
-    <group>
+    <group rotation={[-0.38, 0, 0]}>
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
           <sphereGeometry args={[planetRadius, perfTierFloat >= 0.8 ? 24 : 48, perfTierFloat >= 0.8 ? 24 : 48]} />
-          <scissorMoonShaderMaterial ref={shaderMatRef} uPerfTier={perfTierFloat} />
+          <scissorMoonShaderMaterial
+            ref={shaderMatRef}
+            uPerfTier={perfTierFloat}
+            uPolarIce={new THREE.Color('#eaf5ff')}
+          />
         </mesh>
 
         {/* ── 11 tiny scissors anchored directly to the rotating planet surface ── */}

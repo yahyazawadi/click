@@ -6,6 +6,7 @@ import { CosmicBackground } from './components/CosmicBackground';
 import { SystemCore } from './components/SystemCore';
 import { OrbitalPath } from './components/OrbitalPath';
 import { PlanetNode } from './components/PlanetNode';
+import { PlanetOrientationControls } from './components/PlanetOrientationControls';
 import { CameraController } from './components/CameraController';
 import { SceneRotator } from './components/SceneRotator';
 import { UIOverlay } from './components/UIOverlay';
@@ -187,6 +188,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
 export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: initialPerfTierFloat = 0.0 }) {
   const [selectedTarget, setSelectedTarget] = useState(null);
   const targetPlanetPosRef = useRef(new THREE.Vector3());
+  const targetPlanetQuatRef = useRef(new THREE.Quaternion());
   const [activeTitles, setActiveTitles] = useState([]);
   const [zoomFactor, setZoomFactor] = useState(1.0);
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
@@ -221,6 +223,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
   // Manual override lock — once user clicks a tier manually, NEVER auto-demote!
   const [isTierManuallyLocked, setIsTierManuallyLocked] = useState(false);
+  // Real-time 3D Planet Pitch/Yaw Orientation (controlled via slim HUD sliders)
+  const [planetOrientation, setPlanetOrientation] = useState({ pitch: 0, yaw: 0 });
 
   // Secret URL trigger detection (?love or #love or /love)
   const [isLoveMode, setIsLoveMode] = useState(() => {
@@ -487,6 +491,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   }, [selectedTarget]);
 
   const handleSelect = (id) => {
+    setPlanetOrientation({ pitch: 0, yaw: 0 });
     if (selectedTarget === id) {
       fpsLogger.logInteraction({ type: 'DESELECT_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: id } });
       setSelectedTarget(null);
@@ -506,6 +511,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   };
 
   const handleReturn = () => {
+    setPlanetOrientation({ pitch: 0, yaw: 0 });
     fpsLogger.logInteraction({ type: 'CLICK_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: selectedTarget } });
     setSelectedTarget(null);
     scrollToPlanetIndex(0);
@@ -521,7 +527,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           <Canvas
             dpr={gpuTier === 'low' ? [0.75, 0.85] : [1, 1.25]}
             camera={{ position: [0, 120, 300], fov: 45 }}
-            gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance' }}
+            gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance', localClippingEnabled: true }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >
@@ -580,23 +586,41 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                       hasSelection={!!selectedTarget}
                       showTitle={activeTitles.includes(proj.id)}
                       targetPlanetPosRef={targetPlanetPosRef}
+                      targetPlanetQuatRef={targetPlanetQuatRef}
                       perfTierFloat={perfTierFloat}
+                      planetOrientation={planetOrientation}
                     />
                   );
                 })}
               </SceneRotator>
 
               {/* Camera Zoom & Motion Controller */}
-              <CameraController selectedTarget={selectedTarget} targetPlanetPosRef={targetPlanetPosRef} zoomFactor={zoomFactor} isMobile={isMobile} />
+              <CameraController
+                selectedTarget={selectedTarget}
+                targetPlanetPosRef={targetPlanetPosRef}
+                targetPlanetQuatRef={targetPlanetQuatRef}
+                zoomFactor={zoomFactor}
+                isMobile={isMobile}
+              />
             </Suspense>
           </Canvas>
         </div>
+
+        {/* Minimalist Dual Planet Orientation Sliders (Left: Pitch, Bottom: Yaw) */}
+        <PlanetOrientationControls
+          visible={!!selectedTarget && selectedTarget !== 'core'}
+          orientation={planetOrientation}
+          onChange={setPlanetOrientation}
+          isMobile={isMobile}
+        />
 
         {/* HTML Foreground UI Overlay Layer */}
         <UIOverlay
           selectedTarget={selectedTarget}
           selectedProject={selectedProject}
+          activeProjects={activeProjects}
           onReturn={handleReturn}
+          onSelectTarget={handleSelect}
           currentFps={currentFps}
           isMobile={isMobile}
           onToggleProfiler={handleToggleProfiler}

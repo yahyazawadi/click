@@ -59,7 +59,7 @@ export function RealEarthPlanet({ size = 0.65, isMobile = false, perfTierFloat =
   });
 
   return (
-    <group rotation={[0.38, 0, 0.12]}>
+    <group rotation={[-0.38, 0, 0.12]}>
       {/* ── 1. Authentic Real Earth (Africa, Europe, Americas, Asia, Australia, Antarctica) ── */}
       <mesh ref={earthRef} geometry={earthGeo}>
         <meshStandardMaterial
