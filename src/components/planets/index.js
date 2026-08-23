@@ -8,6 +8,7 @@ import { RealEarthPlanet } from './RealEarthPlanet';
 import { SimpleEarthPlanet } from './SimpleEarthPlanet';
 import { PhonePlanet } from './PhonePlanet';
 import { TelegramPlanet } from './TelegramPlanet';
+import { SupabasePlanet } from './SupabasePlanet';
 
 export {
   ScissorPlanet,
@@ -20,6 +21,7 @@ export {
   SimpleEarthPlanet,
   PhonePlanet,
   TelegramPlanet,
+  SupabasePlanet,
 };
 
 

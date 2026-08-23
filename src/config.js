@@ -266,6 +266,25 @@ export const SYSTEM_CONFIG = {
         'Automated real-time notification dispatch',
         'Low-latency global edge execution'
       ]
+    },
+    {
+      id: 'proj-supabase',
+      title: 'SUPABASE PLATFORM',
+      ringIndex: 0,
+      shapeIndex: 'supabase',
+      startAngle: 3.5,
+      size: 0.50,
+      color: '#3ECF8E',
+      category: 'POSTGRESQL DATABASE & BACKEND PLATFORM',
+      shortDesc: 'Production Supabase backend — RLS policies, Auth, Storage, Edge Functions, and Realtime subscriptions.',
+      fullDesc: 'Core backend infrastructure powering multiple production projects. Supabase PostgreSQL with row-level security policies per tenant, granular Auth flows, Cloudflare R2 + Supabase Storage, serverless Edge Functions in Deno, and Realtime WebSocket channels for live dashboards.',
+      tags: ['SUPABASE', 'POSTGRESQL', 'RLS', 'EDGE FUNCTIONS', 'REALTIME', 'AUTH', 'STORAGE'],
+      specs: [
+        'Row-level security with per-tenant policy isolation',
+        'Supabase Auth — passwordless & social providers',
+        'Realtime WebSocket live dashboard subscriptions',
+        'Deno Edge Functions + Supabase Storage (R2)'
+      ]
     }
   ]
 };

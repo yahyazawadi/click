@@ -11,6 +11,7 @@ import {
   SimpleEarthPlanet,
   PhonePlanet,
   TelegramPlanet,
+  SupabasePlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -32,6 +33,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'telegram' || type === 'telegram-bot') {
     return <TelegramPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'supabase') {
+    return <SupabasePlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
