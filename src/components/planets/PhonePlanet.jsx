@@ -25,29 +25,29 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
   const { phoneGeo, bubbleGeo } = useMemo(() => {
     const loader = new SVGLoader();
 
-    // 1. Official Phone Handset Shape with carved 3D bevel
+    // 1. Official Phone Handset Shape with deep 3D carved relief
     const phonePathData = loader.parse(`<svg><path d="${SVG_PHONE_PATH}"/></svg>`);
     const phoneShapesList = phonePathData.paths[0].toShapes(true);
     
     const pGeo = new THREE.ExtrudeGeometry(phoneShapesList, {
-      depth: 0.45,
+      depth: 2.4,
       bevelEnabled: true,
-      bevelThickness: 0.12,
-      bevelSize: 0.08,
-      bevelSegments: 4,
+      bevelThickness: 0.45,
+      bevelSize: 0.25,
+      bevelSegments: 5,
     });
     pGeo.center();
 
-    // 2. Speech Bubble Ring Shape with carved 3D bevel
+    // 2. Speech Bubble Ring Shape with deep 3D carved relief
     const bubblePathData = loader.parse(`<svg><path d="${SVG_BUBBLE_PATH}"/></svg>`);
     const bubbleShapesList = bubblePathData.paths[0].toShapes(true);
     
     const bGeo = new THREE.ExtrudeGeometry(bubbleShapesList, {
-      depth: 0.40,
+      depth: 2.0,
       bevelEnabled: true,
-      bevelThickness: 0.10,
-      bevelSize: 0.07,
-      bevelSegments: 4,
+      bevelThickness: 0.40,
+      bevelSize: 0.22,
+      bevelSegments: 5,
     });
     bGeo.center();
 
@@ -114,11 +114,11 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 3. Outer Speech Bubble Outline (Sculpted 3D Carved Mesh) ── */}
+      {/* ── 3. Outer Speech Bubble Outline (Deep 3D Sculpted Mesh) ── */}
       <mesh
         geometry={bubbleGeo}
         scale={[emblemScale, emblemScale, emblemScale]}
-        position={[0, 0, size * 0.012]}
+        position={[0, 0, size * 0.035]}
       >
         <meshStandardMaterial
           ref={logoMatRef}
@@ -130,11 +130,11 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 4. Official Phone Handset Silhouette (Sculpted 3D Carved Mesh) ── */}
+      {/* ── 4. Official Phone Handset Silhouette (Deep 3D Sculpted Mesh) ── */}
       <mesh
         geometry={phoneGeo}
         scale={[emblemScale * 1.05, emblemScale * 1.05, emblemScale * 1.05]}
-        position={[0, 0, size * 0.015]}
+        position={[0, 0, size * 0.042]}
       >
         <meshStandardMaterial
           color={GREEN}
