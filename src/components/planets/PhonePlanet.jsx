@@ -200,31 +200,34 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
 
   return (
     <group rotation={[-0.38, 0, 0]}>
-      {/* ── Rotating Planet Body ── */}
+      {/* ── Rotating Planet Body around True Planetary Spin Axis ── */}
       <group ref={planetRef}>
-        {/* Sphere with top sliced off via GLSL discard */}
-        <mesh>
-          <sphereGeometry args={[planetRadius, segments, segments]} />
-          <scissorMoonShaderMaterial
-            ref={shaderMatRef}
-            uPerfTier={perfTierFloat}
-            uCutY={cutY}
-            uDeepSea={new THREE.Color('#021408')}
-            uMidSea={new THREE.Color('#053315')}
-            uShallowSea={new THREE.Color('#0a5c24')}
-            uCoast={new THREE.Color('#138f3a')}
-            uLand={new THREE.Color('#1b6e32')}
-            uForest={new THREE.Color('#0e421e')}
-            uPolarIce={new THREE.Color('#98f2b5')}
-            uCloud={new THREE.Color('#c2ffd6')}
-            uAtmosphere={new THREE.Color('#25D366')}
-            uStorm={new THREE.Color('#1aff7a')}
-          />
-        </mesh>
+        {/* Carved logo & slice offset ~16° from the rotation pole for dynamic orbiting spin */}
+        <group rotation={[0.26, 0, 0.14]}>
+          {/* Sphere with top sliced off via GLSL discard */}
+          <mesh>
+            <sphereGeometry args={[planetRadius, segments, segments]} />
+            <scissorMoonShaderMaterial
+              ref={shaderMatRef}
+              uPerfTier={perfTierFloat}
+              uCutY={cutY}
+              uDeepSea={new THREE.Color('#021408')}
+              uMidSea={new THREE.Color('#053315')}
+              uShallowSea={new THREE.Color('#0a5c24')}
+              uCoast={new THREE.Color('#138f3a')}
+              uLand={new THREE.Color('#1b6e32')}
+              uForest={new THREE.Color('#0e421e')}
+              uPolarIce={new THREE.Color('#98f2b5')}
+              uCloud={new THREE.Color('#c2ffd6')}
+              uAtmosphere={new THREE.Color('#25D366')}
+              uStorm={new THREE.Color('#1aff7a')}
+            />
+          </mesh>
 
-        {/* ── WhatsApp Logo Disk: flat black cap sealing the cut top ── */}
-        <group position={[0, cutY, 0]}>
-          <WhatsAppEmbossedEmblem size={size} diskRadius={diskRadius} />
+          {/* ── WhatsApp Logo Disk: flat black cap sealing the cut top ── */}
+          <group position={[0, cutY, 0]}>
+            <WhatsAppEmbossedEmblem size={size} diskRadius={diskRadius} />
+          </group>
         </group>
       </group>
     </group>
