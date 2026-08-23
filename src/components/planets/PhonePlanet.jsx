@@ -69,12 +69,12 @@ function WhatsAppEmbossedEmblem({ size, diskRadius }) {
       logoMatRef.current.emissiveIntensity = breath;
     }
 
-    // 2. Single, calm, outward-expanding holographic pulse wave from phone center
+    // 2. Single, calm, outward-expanding holographic pulse wave (Large final diameter)
     if (pulseRef.current) {
-      const p = (t * 0.45) % 1.0;
-      pulseRef.current.scale.setScalar(0.40 + p * 1.90);
-      pulseRef.current.position.z = size * 0.015 + p * (size * 0.05);
-      pulseRef.current.material.opacity = Math.pow(1.0 - p, 1.4) * 0.65;
+      const p = (t * 0.40) % 1.0;
+      pulseRef.current.scale.setScalar(0.35 + p * 3.45);
+      pulseRef.current.position.z = size * 0.015 + p * (size * 0.08);
+      pulseRef.current.material.opacity = Math.pow(1.0 - p, 1.2) * 0.70;
     }
   });
 
