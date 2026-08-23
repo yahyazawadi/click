@@ -105,7 +105,7 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
   });
 
   return (
-    <group rotation={[0.35, 0, 0]}>
+    <group rotation={[-0.38, 0, 0]}>
       {/* ── Rotating planet frame (scissors nested inside to lock to terrain) ── */}
       <group ref={planetRef}>
         <mesh>
