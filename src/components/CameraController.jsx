@@ -57,28 +57,34 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Aligns camera line-of-sight directly through the planet into the heart of the Nebulae
+      // PLANET FOCUS: Horizontal sightline through planet into Nebulae, with planet framed high in upper sky above dock
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
       const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
-      // The center of the background Nebulae in scene space is (0, 0, -55)
+      // Center of background Nebulae in scene space
       const nebulaCenter = new THREE.Vector3(0, 0, -55).applyQuaternion(targetQuat);
 
-      // Line-of-sight vector from the nebula center through the planet towards the camera
-      const viewDir = new THREE.Vector3().subVectors(targetPos, nebulaCenter).normalize();
-      const camOffsetY = (isMobile ? 0.6 : 1.0) * zoomFactor;
+      // Strictly horizontal sightline in X-Z plane (Y=0 eliminates vertical camera drift/tipping)
+      const viewDir = new THREE.Vector3(
+        targetPos.x - nebulaCenter.x,
+        0,
+        targetPos.z - nebulaCenter.z
+      ).normalize();
 
-      // Position camera along the direct nebula-to-planet sightline
-      targetCamPos.current
-        .copy(targetPos)
-        .addScaledVector(viewDir, distOffset);
-      targetCamPos.current.y += camOffsetY;
+      const camOffsetY = (isMobile ? 0.7 : 1.1) * zoomFactor;
 
-      // Frame the planet cleanly in the upper open half of the screen above the presentation dock
+      // Position camera along horizontal sightline with clean elevation
+      targetCamPos.current.set(
+        targetPos.x + viewDir.x * distOffset,
+        targetPos.y + camOffsetY,
+        targetPos.z + viewDir.z * distOffset
+      );
+
+      // Shift lookAt downward by 1.35 units so the planet floats high in the upper open viewport with full clearance above the dock card
       targetLookAt.current.set(
         targetPos.x,
-        targetPos.y - (isMobile ? 1.5 : 0.85),
+        targetPos.y - (isMobile ? 1.8 : 1.35),
         targetPos.z
       );
     } else {
