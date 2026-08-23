@@ -20,10 +20,10 @@ export function PlanetOrientationControls({
   const [isDraggingPitch, setIsDraggingPitch] = useState(false);
   const [isDraggingYaw, setIsDraggingYaw] = useState(false);
 
-  // Pitch range: [-PI, PI] (Up / Down tilt)
-  const MAX_PITCH = Math.PI;
-  // Yaw range: [-PI, PI] (Left / Right rotation)
-  const MAX_YAW = Math.PI;
+  // Pitch range: 4 full rotations ([-4π, +4π]) for multiple full spins
+  const MAX_PITCH = Math.PI * 4;
+  // Yaw range: 4 full rotations ([-4π, +4π])
+  const MAX_YAW = Math.PI * 4;
 
   // Normalized percentages [0..1] with center at 0.5 (0 rad)
   const pitchPercent = (orientation.pitch / (MAX_PITCH * 2)) + 0.5;
@@ -106,7 +106,7 @@ export function PlanetOrientationControls({
         style={{
           position: 'fixed',
           left: isMobile ? '14px' : '32px',
-          top: isMobile ? '40%' : '44%',
+          top: isMobile ? '42%' : '46%',
           transform: 'translateY(-50%)',
           zIndex: 140,
           display: 'flex',
@@ -130,15 +130,15 @@ export function PlanetOrientationControls({
           ▲
         </span>
 
-        {/* Vertical Track (Rounded Rectangle) */}
+        {/* Vertical Track (Tall Rounded Rectangle) */}
         <div
           ref={verticalTrackRef}
           onPointerDown={handlePitchPointerDown}
           onDoubleClick={handleResetPitch}
-          title="Tilt Pitch (Drag to orient, Double-click to reset)"
+          title="Tilt Pitch (Drag to spin multiple times, Double-click to reset)"
           style={{
             width: '6px',
-            height: isMobile ? '110px' : '140px',
+            height: isMobile ? '180px' : 'clamp(260px, 38vh, 380px)',
             borderRadius: '9999px',
             background: 'rgba(6, 18, 34, 0.75)',
             border: '1px solid rgba(0, 186, 227, 0.35)',
