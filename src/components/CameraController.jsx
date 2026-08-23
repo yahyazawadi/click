@@ -57,28 +57,32 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Rotates camera orientation with the scene so the Nebulae are ALWAYS in the background
+      // PLANET FOCUS: Tracks horizontal scene yaw so Nebulae are in the background, while anchoring vertical Y so planet is ALWAYS in the upper open viewport above the dock
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
       const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
-      // Forward vector in world space pointing outward from the planet toward the camera (+Z in scene space)
-      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(targetQuat).normalize();
-      // Upward vector in world space along the planet's North Pole (+Y in scene space)
-      const upDir = new THREE.Vector3(0, 1, 0).applyQuaternion(targetQuat).normalize();
+      // Extract horizontal forward direction in scene space (+Z rotated by scene yaw)
+      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(targetQuat);
+      const yaw = Math.atan2(forwardDir.x, forwardDir.z);
 
+      const camOffsetX = Math.sin(yaw) * distOffset;
+      const camOffsetZ = Math.cos(yaw) * distOffset;
       const camOffsetY = (isMobile ? 0.6 : 1.0) * zoomFactor;
 
-      // Position camera along the rotated forward vector so it looks straight into the Nebulae
-      targetCamPos.current
-        .copy(targetPos)
-        .addScaledVector(forwardDir, distOffset)
-        .addScaledVector(upDir, camOffsetY);
+      // Position camera elevated and facing through planet into background Nebulae
+      targetCamPos.current.set(
+        targetPos.x + camOffsetX,
+        targetPos.y + camOffsetY,
+        targetPos.z + camOffsetZ
+      );
 
-      // Frame the planet in the upper open space along the local up axis
-      targetLookAt.current
-        .copy(targetPos)
-        .addScaledVector(upDir, -(isMobile ? 1.5 : 0.85));
+      // Shift lookAt downward in World Y so planet floats cleanly in the open upper half of the screen above the presentation dock
+      targetLookAt.current.set(
+        targetPos.x,
+        targetPos.y - (isMobile ? 1.5 : 0.85),
+        targetPos.z
+      );
     } else {
       // Fallback
       targetCamPos.current.set(0, 4, 12);
