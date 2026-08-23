@@ -33,7 +33,7 @@ export function UIOverlay({
         <header className="top-header">
           <div className="brand-box" onClick={onReturn} title="Return to Orbit Overview">
             <div className="brand-dot"></div>
-            <h1 className="brand-title">EXATIK INTERNSHIP // YAHYA.CLICK</h1>
+            <h1 className="brand-title">YAHYA.CLICK</h1>
           </div>
 
           <div className="top-right-hud">
