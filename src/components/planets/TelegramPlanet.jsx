@@ -200,7 +200,7 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const gliderBaseScale = size * 0.22;
 
   return (
-    <group>
+    <group rotation={[-0.38, 0, 0]}>
       {/* ── Complete Celestial Cyan/Azure Planet ── */}
       <group ref={planetRef}>
         <mesh>
@@ -234,53 +234,51 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
             side={THREE.BackSide}
           />
         </mesh>
+      {/* ── Equatorial Orbital Slipstream & Squadron ── */}
+      {/* Glowing Cyan Orbital Slipstream Ribbon */}
+      <mesh ref={trailRingRef} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[orbitRadius, size * 0.008, 16, 80]} />
+        <meshStandardMaterial
+          color="#229ED9"
+          emissive="#40c8ff"
+          emissiveIntensity={1.2}
+          transparent
+          opacity={0.4}
+          roughness={0.2}
+        />
+      </mesh>
+
+      {/* ── 1. Flagship Lead Glider ── */}
+      <group ref={glider1Ref}>
+        <OrigamiGlider
+          leftWingGeo={leftWingGeo}
+          rightWingGeo={rightWingGeo}
+          keelGeo={keelGeo}
+          scale={gliderBaseScale * 1.25}
+          logoMatRef={logoMatRef}
+        />
       </group>
 
-      {/* ── Equatorial Orbital Plane Container (Tilted Forward Toward User) ── */}
-      <group rotation={[-0.38, 0, 0]}>
-        {/* Glowing Cyan Orbital Slipstream Ribbon */}
-        <mesh ref={trailRingRef} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[orbitRadius, size * 0.008, 16, 80]} />
-          <meshStandardMaterial
-            color="#229ED9"
-            emissive="#40c8ff"
-            emissiveIntensity={1.2}
-            transparent
-            opacity={0.4}
-            roughness={0.2}
-          />
-        </mesh>
+      {/* ── 2. Trailing Wingman Glider ── */}
+      <group ref={glider2Ref}>
+        <OrigamiGlider
+          leftWingGeo={leftWingGeo}
+          rightWingGeo={rightWingGeo}
+          keelGeo={keelGeo}
+          scale={gliderBaseScale * 0.95}
+          logoMatRef={logoMatRef}
+        />
+      </group>
 
-        {/* ── 1. Flagship Lead Glider ── */}
-        <group ref={glider1Ref}>
-          <OrigamiGlider
-            leftWingGeo={leftWingGeo}
-            rightWingGeo={rightWingGeo}
-            keelGeo={keelGeo}
-            scale={gliderBaseScale * 1.25}
-            logoMatRef={logoMatRef}
-          />
-        </group>
-
-        {/* ── 2. Trailing Wingman Glider ── */}
-        <group ref={glider2Ref}>
-          <OrigamiGlider
-            leftWingGeo={leftWingGeo}
-            rightWingGeo={rightWingGeo}
-            keelGeo={keelGeo}
-            scale={gliderBaseScale * 0.85}
-          />
-        </group>
-
-        {/* ── 3. Opposing Scout Glider (Ensures visibility from ALL 360° viewing angles) ── */}
-        <group ref={glider3Ref}>
-          <OrigamiGlider
-            leftWingGeo={leftWingGeo}
-            rightWingGeo={rightWingGeo}
-            keelGeo={keelGeo}
-            scale={gliderBaseScale * 1.10}
-          />
-        </group>
+      {/* ── 3. Opposing Celestial Scout Glider ── */}
+      <group ref={glider3Ref}>
+        <OrigamiGlider
+          leftWingGeo={leftWingGeo}
+          rightWingGeo={rightWingGeo}
+          keelGeo={keelGeo}
+          scale={gliderBaseScale * 1.10}
+          logoMatRef={logoMatRef}
+        />
       </group>
     </group>
   );
