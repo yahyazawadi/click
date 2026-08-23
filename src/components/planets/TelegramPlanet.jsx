@@ -8,6 +8,52 @@ import '../../shaders/ScissorMoonShaderMaterial';
 const SVG_PLANE_PATH =
   "M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z";
 
+// ── True 3D Symmetrical Origami Glider Geometry ─────────────────────────────
+function createOrigamiGliderGeometry() {
+  // Key 3D folded paper vertices (Symmetrical & dimensional)
+  // Coordinates are normalized [-1, 1]
+  const N   = [ 0.00,  1.05,  0.18 ];  // 0: Nose Tip (Pointed apex)
+  const WL  = [-0.92, -0.70,  0.36 ];  // 1: Left Wingtip (Swept back & raised up)
+  const WR  = [ 0.92, -0.70,  0.36 ];  // 2: Right Wingtip (Swept back & raised up)
+  const NL  = [-0.28, -0.58,  0.06 ];  // 3: Left Inner Notch / Crease
+  const NR  = [ 0.28, -0.58,  0.06 ];  // 4: Right Inner Notch / Crease
+  const T   = [ 0.00, -0.52,  0.14 ];  // 5: Center Tail Spine End
+  const K   = [ 0.00, -0.32, -0.28 ];  // 6: Underbody Keel / Fuselage Bottom (Underfold)
+
+  // Triangles defining the faceted origami paper plane
+  const positions = [
+    // ── Upper Left Wing (Tilted upward facet) ──
+    ...N, ...WL, ...NL,
+    // ── Upper Right Wing (Tilted upward facet) ──
+    ...N, ...NR, ...WR,
+
+    // ── Center Dorsal Spine Left ──
+    ...N, ...NL, ...T,
+    // ── Center Dorsal Spine Right ──
+    ...N, ...T, ...NR,
+
+    // ── Underbody Left Keel (Under-fold shadow facet) ──
+    ...N, ...K, ...NL,
+    // ── Underbody Right Keel (Under-fold shadow facet) ──
+    ...N, ...NR, ...K,
+
+    // ── Rear Keel Tail Walls ──
+    ...NL, ...K, ...T,
+    ...NR, ...T, ...K,
+
+    // ── Double-Sided Underwing Faces ──
+    ...N, ...NL, ...WL,
+    ...N, ...WR, ...NR,
+    ...N, ...T, ...NL,
+    ...N, ...NR, ...T,
+  ];
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.computeVertexNormals();
+  return geo;
+}
+
 // ── 3D Official Telegram Carved Emblem with Live Pulse Waves ─────────────────
 function TelegramEmbossedEmblem({ size, diskRadius }) {
   const CYAN       = '#229ED9';
@@ -18,38 +64,21 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
   const pulse1Ref  = useRef();
   const pulse2Ref  = useRef();
 
-  // Parse SVG paths into 3D Extruded Geometries with rich sculpted bevels
-  const { planeGeo } = useMemo(() => {
-    const loader = new SVGLoader();
-
-    // 1. Official Telegram Paper Plane Shape
-    const planePathData = loader.parse(`<svg><path d="${SVG_PLANE_PATH}"/></svg>`);
-    const planeShapesList = planePathData.paths[0].toShapes(true);
-
-    const pGeo = new THREE.ExtrudeGeometry(planeShapesList, {
-      depth: 2.8,
-      bevelEnabled: true,
-      bevelThickness: 0.50,
-      bevelSize: 0.28,
-      bevelSegments: 5,
-    });
-    pGeo.center();
-
-    return { planeGeo: pGeo };
-  }, []);
+  // Create the 3D Origami Glider Geometry
+  const gliderGeo = useMemo(() => createOrigamiGliderGeometry(), []);
 
   useEffect(() => {
     return () => {
-      planeGeo.dispose();
+      gliderGeo.dispose();
     };
-  }, [planeGeo]);
+  }, [gliderGeo]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
 
-    // 1. Rhythmic breathing glow on the carved plane
+    // 1. Rhythmic breathing glow on the 3D glider
     if (logoMatRef.current) {
-      const breath = Math.sin(t * 3.5) * 0.45 + 1.45;
+      const breath = Math.sin(t * 3.5) * 0.40 + 1.40;
       logoMatRef.current.emissiveIntensity = breath;
     }
 
@@ -70,8 +99,8 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
     }
   });
 
-  // Scale factor to map 32x32 SVG units cleanly inside the flat disk facet
-  const emblemScale = diskRadius * 0.048;
+  // Scale of the 3D glider relative to the carved facet
+  const gliderScale = diskRadius * 0.52;
 
   return (
     <group rotation={[-Math.PI / 2, 0, 0]}>
@@ -98,8 +127,8 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
       </mesh>
 
       {/* ── 3. Telegram Circular Border Ring (Tiered Lower Height) ── */}
-      <mesh position={[0, 0, size * 0.020]}>
-        <ringGeometry args={[diskRadius * 0.72, diskRadius * 0.82, 64]} />
+      <mesh position={[0, 0, size * 0.018]}>
+        <ringGeometry args={[diskRadius * 0.74, diskRadius * 0.83, 64]} />
         <meshStandardMaterial
           color={CYAN}
           emissive={CYAN_GLOW}
@@ -110,21 +139,25 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
         />
       </mesh>
 
-      {/* ── 4. Official Telegram Paper Plane (Tiered Higher Height) ── */}
-      <mesh
-        geometry={planeGeo}
-        scale={[emblemScale * 1.10, emblemScale * 1.10, emblemScale * 1.10]}
-        position={[-diskRadius * 0.03, diskRadius * 0.02, size * 0.045]}
+      {/* ── 4. Symmetrical 3D Origami Paper Glider (Faceted 3D Sculpt with Banked Stance) ── */}
+      <group
+        position={[-diskRadius * 0.02, diskRadius * 0.02, size * 0.040]}
+        rotation={[Math.PI * 0.06, Math.PI * 0.04, -Math.PI * 0.22]}
+        scale={[gliderScale, gliderScale, gliderScale * 1.15]}
       >
-        <meshStandardMaterial
-          ref={logoMatRef}
-          color={CYAN}
-          emissive={CYAN_GLOW}
-          emissiveIntensity={1.4}
-          roughness={0.15}
-          metalness={0.65}
-        />
-      </mesh>
+        <mesh geometry={gliderGeo}>
+          <meshStandardMaterial
+            ref={logoMatRef}
+            color={CYAN}
+            emissive={CYAN_GLOW}
+            emissiveIntensity={1.4}
+            roughness={0.18}
+            metalness={0.55}
+            flatShading={true}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
 
       {/* ── 5. Holographic Pulse Wave Rings emitting from the carved logo ── */}
       <mesh ref={pulse1Ref} position={[0, 0, size * 0.015]}>
