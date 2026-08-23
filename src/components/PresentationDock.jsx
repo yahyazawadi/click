@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SYSTEM_CONFIG } from "../config";
 
-const PHASE_STATUS = [
-  "SYS: NOMINAL \u00b7 MISSION: ACTIVE \u00b7 560H VERIFIED \u00b7 CORE SYSTEMS ONLINE \u00b7",
-  "PHASE 1: ONLINE \u00b7 GEOSPATIAL LINK: ESTABLISHED \u00b7 MAPBOX GRID: LOCKED \u00b7",
-  "PHASE 2: ONLINE \u00b7 UX MATRIX: CALIBRATED \u00b7 PWA ENGINE: ENGAGED \u00b7",
-  "PHASE 3: ONLINE \u00b7 ADVISORY LOCKS: ARMED \u00b7 RLS PERIMETER: SECURED \u00b7",
-  "PHASE 4: \u26a0 CRITICAL \u00b7 120 FPS ENGINE: PRIMED \u00b7 SHADER CORE: HOT \u00b7",
-];
 
 export function PresentationDock({
   selectedTarget,
@@ -36,7 +29,6 @@ export function PresentationDock({
     ? stages.findIndex((s) => s.id === selectedTarget)
     : -1;
 
-  const statusText = PHASE_STATUS[Math.max(0, Math.min(currentStageIndex, PHASE_STATUS.length - 1))];
 
   const currentGallery = selectedProject?.gallery || (isCore ? (SYSTEM_CONFIG.core?.gallery || [{
     title: "Exatik Training Milestone",
@@ -124,16 +116,6 @@ export function PresentationDock({
 
       <div className={`dock-shell${isSecretLove ? " secret-love-theme" : ""}${isLastPhase ? " dock-shell--critical" : ""}`}>
         <div className={`bottom-presentation-dock${isSecretLove ? " secret-love-theme" : ""}${liftedImage ? " dock-collapsed" : ""}`}>
-
-          <div className="dock-status-bar">
-            <span className="dock-status-indicator" />
-            <div className="dock-status-ticker">
-              <span className="dock-status-text">{statusText}    {statusText}</span>
-            </div>
-            <span className="dock-status-code">
-              {isLastPhase ? "\u26a0 PH-4" : `STA-${String(currentStageIndex).padStart(3, "0")}`}
-            </span>
-          </div>
 
           <div className="dock-header-bar">
             <span className="hud-bracket tl" />
