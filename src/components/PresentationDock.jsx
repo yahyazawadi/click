@@ -19,7 +19,7 @@ export function PresentationDock({
   const isOpen  = selectedTarget === "core" || Boolean(selectedProject);
 
   const stages = [
-    { id: "core", title: "CORE // OVERVIEW", category: "EXATIK 560H" },
+    { id: "core", title: "CORE // OVERVIEW", category: "OVERVIEW" },
     ...activeProjects.map((p, i) => ({
       id: p.id, title: p.title, category: p.category || `PHASE ${i + 1}`,
     })),
@@ -30,12 +30,7 @@ export function PresentationDock({
     : -1;
 
 
-  const currentGallery = selectedProject?.gallery || (isCore ? (SYSTEM_CONFIG.core?.gallery || [{
-    title: "Exatik Training Milestone",
-    caption: "560 verified hours at Exatik Nablus.",
-    url: "/gallery/exp-core-hud.png",
-    tag: "560 HOURS"
-  }]) : []);
+  const currentGallery = selectedProject?.gallery || [];
 
   useEffect(() => {
     setShowGallery(false);
@@ -122,7 +117,7 @@ export function PresentationDock({
 
               <div className="dock-col dock-col-main">
                 <span className="dock-tag">
-                  {isCore ? "[ EXATIK TRAINING PROFILE // 560 HOURS ]" : selectedProject?.category || "[ PHASE TRANSMISSION ]"}
+                  {isCore ? SYSTEM_CONFIG.core.subtitle : selectedProject?.category}
                 </span>
                 <h2 className="dock-title">{isCore ? SYSTEM_CONFIG.core.title : selectedProject?.title}</h2>
                 <p className="dock-desc" dangerouslySetInnerHTML={{
@@ -130,7 +125,7 @@ export function PresentationDock({
                 }} />
                 <div className="dock-tags-row">
                   {(isCore
-                    ? ["560 HOURS VERIFIED", "EXATIK NABLUS", "FULLSTACK & 3D", "AN-NAJAH UNIVERSITY"]
+                    ? ["FULL-STACK", "SPATIAL WEB", "3D WEBGL", "REACT"]
                     : selectedProject?.tags || []
                   ).map((tag, idx) => (<span key={idx} className="dock-tag-pill">{tag}</span>))}
                 </div>
@@ -138,7 +133,7 @@ export function PresentationDock({
 
               {!showGallery && (
                 <div className="dock-col dock-col-specs">
-                  <span className="dock-specs-title">// KEY ARCHITECTURAL DELIVERABLES &amp; SPECS</span>
+                  <span className="dock-specs-title">{isCore ? "// AT A GLANCE" : "// SPECS"}</span>
                   <div className="dock-specs-grid">
                     {isCore
                       ? SYSTEM_CONFIG.core.stats.map((stat, idx) => (
