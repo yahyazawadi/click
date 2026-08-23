@@ -69,6 +69,7 @@ export function PlanetNode({
 }) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
+  const [isNearby, setIsNearby] = useState(false);
   const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
   const [shouldRenderMesh, setShouldRenderMesh] = useState(isUnlocked);
 
@@ -124,6 +125,11 @@ export function PlanetNode({
       boundingSphereRef.current.set(worldPos.current, boundingRadius);
       const isVisibleInFrustum = frustum.current.intersectsSphere(boundingSphereRef.current);
       groupRef.current.visible = isVisibleInFrustum;
+
+      // Distance-gated label: only show title when planet is close to camera
+      const distToCamera = worldPos.current.distanceTo(state.camera.position);
+      const nearby = distToCamera < 8.5;
+      if (nearby !== isNearby) setIsNearby(nearby);
     }
 
     if (currentScaleRef.current > 0.02 && !shouldRenderMesh) {
@@ -169,7 +175,7 @@ export function PlanetNode({
         </React.Suspense>
       )}
       {/* Floating HTML Title Label — only mounted when actually visible */}
-      {!hasSelection && (hovered || showTitle) && (
+      {!hasSelection && isNearby && (hovered || showTitle) && (
         <Html distanceFactor={15} center style={{ pointerEvents: 'none' }}>
           <div className={`planet-label visible pulse`}>
             {project.title}
