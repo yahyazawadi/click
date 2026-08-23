@@ -211,20 +211,21 @@ export const SYSTEM_CONFIG = {
     },
     {
       id: 'proj-10',
-      title: 'SCISSOR WORLD',
+      title: 'BARBER SAAS',
       ringIndex: 1,
       shapeIndex: 10,
       startAngle: 4.2,
       size: 0.55,
       color: '#00BAE3',
-      category: 'PRECISION TOOLS',
-      shortDesc: 'Orbital world with animated scissors snapping at its north pole.',
-      fullDesc: 'A rogue planet with precision scissors mounted on its north pole — snapping open and closed as it orbits.',
-      tags: ['THREE.JS', 'GLSL', 'PROCEDURAL'],
+      category: 'MULTI-TENANT SAAS PLATFORM',
+      shortDesc: 'Enterprise barber shop SaaS — multi-tenant bookings, RBAC, WhatsApp bot, and real-time concurrency.',
+      fullDesc: 'Full-stack multi-tenant platform for barbershops. Feature-based React + Supabase architecture with PostgreSQL RLS, 20-key granular RBAC, transaction-scoped advisory locks for concurrent bookings, WhatsApp Edge Functions for automated confirmations, and a Super Admin live device lab.',
+      tags: ['SUPABASE', 'POSTGRESQL RLS', 'RBAC', 'WHATSAPP BOT', 'REACT', 'TYPESCRIPT'],
       specs: [
-        'Animated snapping scissors crown',
-        'Glowing icosahedral body',
-        'Inner ring orbit'
+        'Advisory locks: zero concurrent booking collisions',
+        '20-key granular RBAC with per-user overrides',
+        'WhatsApp bot Edge Functions (wamid lookup)',
+        'Supabase Realtime WebSocket live dashboard'
       ]
     }
   ]
