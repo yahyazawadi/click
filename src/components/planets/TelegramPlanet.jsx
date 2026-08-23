@@ -17,25 +17,31 @@ function createOrigamiGliderGeometries() {
   const T   = [  0.00,  0.08, -0.65 ];  // 5: Dorsal Tail Spine
   const K   = [  0.00, -0.28, -0.35 ];  // 6: Underbody Keel Fuselage (Down -Y)
 
-  // 1. Upper Main Wings & Spine (Bright Facets)
-  const wingPositions = [
+  // 1. Outer Main Wings (Pure Crisp White Facets)
+  const outerWingPositions = [
     // Upper Left Wing
     ...N, ...WL, ...NL,
     // Upper Right Wing
     ...N, ...NR, ...WR,
+
+    // Double-sided back faces
+    ...N, ...NL, ...WL,
+    ...N, ...WR, ...NR,
+  ];
+
+  // 2. Inner Central Valley Fold / Spine (Darker Inside Shaded Facets visible from above)
+  const innerFoldPositions = [
     // Center Dorsal Spine Left
     ...N, ...NL, ...T,
     // Center Dorsal Spine Right
     ...N, ...T, ...NR,
 
     // Double-sided back faces
-    ...N, ...NL, ...WL,
-    ...N, ...WR, ...NR,
     ...N, ...T, ...NL,
     ...N, ...NR, ...T,
   ];
 
-  // 2. Lower Keel / Underbody Triangles (Shaded Origami Facets)
+  // 3. Lower Keel / Underbody Triangles (Shaded Origami Underside)
   const keelPositions = [
     // Underbody Left Keel
     ...N, ...K, ...NL,
@@ -52,28 +58,34 @@ function createOrigamiGliderGeometries() {
     ...NR, ...K, ...T,
   ];
 
-  const wingsGeo = new THREE.BufferGeometry();
-  wingsGeo.setAttribute('position', new THREE.Float32BufferAttribute(wingPositions, 3));
-  wingsGeo.computeVertexNormals();
+  const outerWingsGeo = new THREE.BufferGeometry();
+  outerWingsGeo.setAttribute('position', new THREE.Float32BufferAttribute(outerWingPositions, 3));
+  outerWingsGeo.computeVertexNormals();
+
+  const innerFoldGeo = new THREE.BufferGeometry();
+  innerFoldGeo.setAttribute('position', new THREE.Float32BufferAttribute(innerFoldPositions, 3));
+  innerFoldGeo.computeVertexNormals();
 
   const keelGeo = new THREE.BufferGeometry();
   keelGeo.setAttribute('position', new THREE.Float32BufferAttribute(keelPositions, 3));
   keelGeo.computeVertexNormals();
 
-  return { wingsGeo, keelGeo };
+  return { outerWingsGeo, innerFoldGeo, keelGeo };
 }
 
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
-function OrigamiGlider({ wingsGeo, keelGeo, scale = 1.0, logoMatRef }) {
-  const ICE_WHITE   = '#ffffff';
-  const WHITE_GLOW  = '#e0f4ff';
-  const TELE_AZURE  = '#229ED9';
-  const AZURE_GLOW  = '#1278ad';
+function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logoMatRef }) {
+  const ICE_WHITE    = '#ffffff';
+  const WHITE_GLOW   = '#e0f4ff';
+  const SHADED_INNER = '#1a7ab5';
+  const INNER_GLOW   = '#10527c';
+  const TELE_AZURE   = '#229ED9';
+  const AZURE_GLOW   = '#1278ad';
 
   return (
     <group scale={[scale, scale, scale]}>
-      {/* Upper Main Wings (Crisp Ice-White Paper like official Telegram icon) */}
-      <mesh geometry={wingsGeo}>
+      {/* 1. Outer Main Wings (Pure Crisp Ice-White) */}
+      <mesh geometry={outerWingsGeo}>
         <meshStandardMaterial
           ref={logoMatRef}
           color={ICE_WHITE}
@@ -86,7 +98,20 @@ function OrigamiGlider({ wingsGeo, keelGeo, scale = 1.0, logoMatRef }) {
         />
       </mesh>
 
-      {/* Lower Keel Under-fold (Authentic Telegram Azure Blue) */}
+      {/* 2. Inner Central Fold (Darker Shaded Azure visible from above) */}
+      <mesh geometry={innerFoldGeo}>
+        <meshStandardMaterial
+          color={SHADED_INNER}
+          emissive={INNER_GLOW}
+          emissiveIntensity={0.55}
+          roughness={0.22}
+          metalness={0.45}
+          flatShading={true}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* 3. Lower Keel Under-fold (Authentic Telegram Azure Blue) */}
       <mesh geometry={keelGeo}>
         <meshStandardMaterial
           color={TELE_AZURE}
@@ -118,14 +143,15 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const orbitRadius    = planetRadius * 1.48;
 
   // Build high-definition 3D origami geometries
-  const { wingsGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
+  const { outerWingsGeo, innerFoldGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
 
   useEffect(() => {
     return () => {
-      wingsGeo.dispose();
+      outerWingsGeo.dispose();
+      innerFoldGeo.dispose();
       keelGeo.dispose();
     };
-  }, [wingsGeo, keelGeo]);
+  }, [outerWingsGeo, innerFoldGeo, keelGeo]);
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
@@ -250,7 +276,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 1. Flagship Lead Glider ── */}
         <group ref={glider1Ref}>
           <OrigamiGlider
-            wingsGeo={wingsGeo}
+            outerWingsGeo={outerWingsGeo}
+            innerFoldGeo={innerFoldGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 1.25}
             logoMatRef={logoMatRef}
@@ -260,7 +287,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 2. Trailing Wingman Glider ── */}
         <group ref={glider2Ref}>
           <OrigamiGlider
-            wingsGeo={wingsGeo}
+            outerWingsGeo={outerWingsGeo}
+            innerFoldGeo={innerFoldGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 0.85}
           />
@@ -269,7 +297,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 3. Opposing Scout Glider (Ensures visibility from ALL 360° viewing angles) ── */}
         <group ref={glider3Ref}>
           <OrigamiGlider
-            wingsGeo={wingsGeo}
+            outerWingsGeo={outerWingsGeo}
+            innerFoldGeo={innerFoldGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 1.10}
           />
