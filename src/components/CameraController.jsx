@@ -57,27 +57,25 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Tracks horizontal scene yaw so Nebulae are in the background, while anchoring vertical Y so planet is ALWAYS in the upper open viewport above the dock
+      // PLANET FOCUS: Aligns camera line-of-sight directly through the planet into the heart of the Nebulae
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
       const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
-      // Extract horizontal forward direction in scene space (+Z rotated by scene yaw)
-      const forwardDir = new THREE.Vector3(0, 0, 1).applyQuaternion(targetQuat);
-      const yaw = Math.atan2(forwardDir.x, forwardDir.z);
+      // The center of the background Nebulae in scene space is (0, 0, -55)
+      const nebulaCenter = new THREE.Vector3(0, 0, -55).applyQuaternion(targetQuat);
 
-      const camOffsetX = Math.sin(yaw) * distOffset;
-      const camOffsetZ = Math.cos(yaw) * distOffset;
+      // Line-of-sight vector from the nebula center through the planet towards the camera
+      const viewDir = new THREE.Vector3().subVectors(targetPos, nebulaCenter).normalize();
       const camOffsetY = (isMobile ? 0.6 : 1.0) * zoomFactor;
 
-      // Position camera elevated and facing through planet into background Nebulae
-      targetCamPos.current.set(
-        targetPos.x + camOffsetX,
-        targetPos.y + camOffsetY,
-        targetPos.z + camOffsetZ
-      );
+      // Position camera along the direct nebula-to-planet sightline
+      targetCamPos.current
+        .copy(targetPos)
+        .addScaledVector(viewDir, distOffset);
+      targetCamPos.current.y += camOffsetY;
 
-      // Shift lookAt downward in World Y so planet floats cleanly in the open upper half of the screen above the presentation dock
+      // Frame the planet cleanly in the upper open half of the screen above the presentation dock
       targetLookAt.current.set(
         targetPos.x,
         targetPos.y - (isMobile ? 1.5 : 0.85),
