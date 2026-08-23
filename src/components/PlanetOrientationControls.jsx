@@ -181,12 +181,12 @@ export function PlanetOrientationControls({
         </span>
       </div>
 
-      {/* ── 2. Horizontal Slider (Bottom: Yaw Left/Right) ── */}
+      {/* ── 2. Horizontal Slider (Yaw Left/Right) ── */}
       <div
         style={{
           position: 'fixed',
           left: '50%',
-          bottom: isMobile ? '230px' : '236px',
+          bottom: isMobile ? '340px' : 'clamp(395px, 45vh, 480px)',
           transform: 'translateX(-50%)',
           zIndex: 140,
           display: 'flex',
