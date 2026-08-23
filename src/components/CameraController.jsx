@@ -57,19 +57,25 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, zoomFacto
       targetCamPos.current.set(coreX, coreY, coreZ);
       targetLookAt.current.set(0, 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Elevated, cinematic framing positioned cleanly above the presentation dock
+      // PLANET FOCUS: Elevated, cinematic framing positioned cleanly with Glowing Nebulae as Backdrop
       const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
-      normal.current.copy(targetPlanetPosRef.current).normalize();
+      const targetPos = targetPlanetPosRef.current;
 
-      // Camera position: offset outwards radially and elevated upward
-      targetCamPos.current
-        .copy(targetPlanetPosRef.current)
-        .add(normal.current.multiplyScalar(distOffset))
-        .add(new THREE.Vector3(0, (isMobile ? 0.7 : 1.28) * zoomFactor, 0));
+      // Calculate camera position with positive +Z offset so line-of-sight always looks into -Z (Nebulae plane)
+      // Slight gentle tilt following planet's X position for organic parallax
+      const camOffsetX = targetPos.x * 0.22;
+      const camOffsetY = (isMobile ? 0.7 : 1.28) * zoomFactor;
+      const camOffsetZ = Math.sqrt(Math.max(0.1, distOffset * distOffset - camOffsetX * camOffsetX));
+
+      targetCamPos.current.set(
+        targetPos.x + camOffsetX,
+        targetPos.y + camOffsetY,
+        targetPos.z + camOffsetZ
+      );
 
       // LookAt target: shifted downward in 3D to center the planet in the upper open viewport
       targetLookAt.current
-        .copy(targetPlanetPosRef.current)
+        .copy(targetPos)
         .add(new THREE.Vector3(0, isMobile ? -1.5 : -0.85, 0));
     } else {
       // Fallback
