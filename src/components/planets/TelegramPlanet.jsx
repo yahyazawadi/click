@@ -9,86 +9,61 @@ function createOrigamiGliderGeometries() {
   // +Z = Forward (Nose)
   // +Y = Up (Spine / Dihedral)
   // ±X = Wings (Left / Right)
-  const N = [0.00, 0.06, 1.35];  // 0: Nose Tip (Forward +Z)
-  const WL = [-0.80, 0.25, -0.75];  // 1: Left Wingtip (-X, dihedral up +Y, back -Z)
-  const WR = [0.80, 0.25, -0.75];  // 2: Right Wingtip (+X, dihedral up +Y, back -Z)
-  const NL = [-0.22, 0.02, -0.60];  // 3: Left Inner Notch
-  const NR = [0.22, 0.02, -0.60];  // 4: Right Inner Notch
-  const T = [0.00, 0.08, -0.65];  // 5: Dorsal Tail Spine
-  const K = [0.00, -0.28, -0.35];  // 6: Underbody Keel Fuselage (Down -Y)
+  const N  = [  0.00,  0.06,  1.38 ];  // 0: Sharp Nose Apex (Forward +Z, X = 0)
+  const WL = [ -0.88,  0.28, -0.75 ];  // 1: Left Wingtip (-X, dihedral up +Y, back -Z)
+  const WR = [  0.88,  0.28, -0.75 ];  // 2: Right Wingtip (+X, dihedral up +Y, back -Z)
+  const T  = [  0.00,  0.08, -0.65 ];  // 3: Dorsal Tail Spine Apex (X = 0)
+  const K  = [  0.00, -0.28, -0.32 ];  // 4: Single Underbody Keel Fin Apex (Down -Y, X = 0)
 
-  // 1. Outer Main Wings (Pure Crisp White Facets)
-  const outerWingPositions = [
-    // Upper Left Wing
-    ...N, ...WL, ...NL,
-    // Upper Right Wing
-    ...N, ...NR, ...WR,
-
-    // Double-sided back faces
-    ...N, ...NL, ...WL,
-    ...N, ...WR, ...NR,
+  // 1. Left Wing Facet (Crisp White)
+  const leftWingPositions = [
+    ...N, ...WL, ...T,
+    // Double-sided backface
+    ...N, ...T, ...WL,
   ];
 
-  // 2. Inner Central Valley Fold / Spine (Darker Inside Shaded Facets visible from above)
-  const innerFoldPositions = [
-    // Center Dorsal Spine Left
-    ...N, ...NL, ...T,
-    // Center Dorsal Spine Right
-    ...N, ...T, ...NR,
-
-    // Double-sided back faces
-    ...N, ...T, ...NL,
-    ...N, ...NR, ...T,
+  // 2. Right Wing Facet (Crisp White)
+  const rightWingPositions = [
+    ...N, ...T, ...WR,
+    // Double-sided backface
+    ...N, ...WR, ...T,
   ];
 
-  // 3. Lower Keel / Underbody Triangles (Shaded Origami Underside)
+  // 3. Single Center Keel Fin (Lies strictly on X = 0, no far-side protrusion!)
   const keelPositions = [
-    // Underbody Left Keel
-    ...N, ...K, ...NL,
-    // Underbody Right Keel
-    ...N, ...NR, ...K,
-    // Rear Keel Tail Walls
-    ...NL, ...K, ...T,
-    ...NR, ...T, ...K,
-
-    // Double-sided back faces
-    ...N, ...NL, ...K,
-    ...N, ...K, ...NR,
-    ...NL, ...T, ...K,
-    ...NR, ...K, ...T,
+    ...N, ...K, ...T,
+    // Double-sided backface
+    ...N, ...T, ...K,
   ];
 
-  const outerWingsGeo = new THREE.BufferGeometry();
-  outerWingsGeo.setAttribute('position', new THREE.Float32BufferAttribute(outerWingPositions, 3));
-  outerWingsGeo.computeVertexNormals();
+  const leftWingGeo = new THREE.BufferGeometry();
+  leftWingGeo.setAttribute('position', new THREE.Float32BufferAttribute(leftWingPositions, 3));
+  leftWingGeo.computeVertexNormals();
 
-  const innerFoldGeo = new THREE.BufferGeometry();
-  innerFoldGeo.setAttribute('position', new THREE.Float32BufferAttribute(innerFoldPositions, 3));
-  innerFoldGeo.computeVertexNormals();
+  const rightWingGeo = new THREE.BufferGeometry();
+  rightWingGeo.setAttribute('position', new THREE.Float32BufferAttribute(rightWingPositions, 3));
+  rightWingGeo.computeVertexNormals();
 
   const keelGeo = new THREE.BufferGeometry();
   keelGeo.setAttribute('position', new THREE.Float32BufferAttribute(keelPositions, 3));
   keelGeo.computeVertexNormals();
 
-  return { outerWingsGeo, innerFoldGeo, keelGeo };
+  return { leftWingGeo, rightWingGeo, keelGeo };
 }
 
 // ── Glider Color Palette (Tune hex codes here) ──────────────────────────────
 let outerWingsColor     = '#ffffff';
 let outerWingsGlow      = '#e8f8ff';
 
-let centerCreaseColor   = '#3da6df';
-let centerCreaseGlow    = '#228ac8';
-
-let underbellyKeelColor = '#68c6f8';
-let underbellyKeelGlow  = '#38b4f6';
+let underbellyKeelColor = '#5ec2f8';
+let underbellyKeelGlow  = '#30b0f6';
 
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
-function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logoMatRef }) {
+function OrigamiGlider({ leftWingGeo, rightWingGeo, keelGeo, scale = 1.0, logoMatRef }) {
   return (
     <group scale={[scale, scale, scale]}>
-      {/* 1. Outer Main Wings (Pure Crisp Ice-White) */}
-      <mesh geometry={outerWingsGeo}>
+      {/* 1. Left Wing (Pure Crisp Ice-White) */}
+      <mesh geometry={leftWingGeo}>
         <meshStandardMaterial
           ref={logoMatRef}
           color={outerWingsColor}
@@ -101,25 +76,25 @@ function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logo
         />
       </mesh>
 
-      {/* 2. Inner Central Fold (Darker Shaded Azure visible from above) */}
-      <mesh geometry={innerFoldGeo}>
+      {/* 2. Right Wing (Pure Crisp Ice-White) */}
+      <mesh geometry={rightWingGeo}>
         <meshStandardMaterial
-          color={centerCreaseColor}
-          emissive={centerCreaseGlow}
-          emissiveIntensity={0.55}
-          roughness={0.22}
-          metalness={0.45}
+          color={outerWingsColor}
+          emissive={outerWingsGlow}
+          emissiveIntensity={0.65}
+          roughness={0.15}
+          metalness={0.20}
           flatShading={true}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* 3. Lower Keel Under-fold (Authentic Telegram Azure Blue) */}
+      {/* 3. Single Central Underbody Keel Fin (Vibrant Telegram Sky Blue on X=0) */}
       <mesh geometry={keelGeo}>
         <meshStandardMaterial
           color={underbellyKeelColor}
           emissive={underbellyKeelGlow}
-          emissiveIntensity={0.50}
+          emissiveIntensity={0.55}
           roughness={0.25}
           metalness={0.45}
           flatShading={true}
@@ -146,15 +121,15 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const orbitRadius = planetRadius * 1.48;
 
   // Build high-definition 3D origami geometries
-  const { outerWingsGeo, innerFoldGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
+  const { leftWingGeo, rightWingGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
 
   useEffect(() => {
     return () => {
-      outerWingsGeo.dispose();
-      innerFoldGeo.dispose();
+      leftWingGeo.dispose();
+      rightWingGeo.dispose();
       keelGeo.dispose();
     };
-  }, [outerWingsGeo, innerFoldGeo, keelGeo]);
+  }, [leftWingGeo, rightWingGeo, keelGeo]);
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
@@ -279,8 +254,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 1. Flagship Lead Glider ── */}
         <group ref={glider1Ref}>
           <OrigamiGlider
-            outerWingsGeo={outerWingsGeo}
-            innerFoldGeo={innerFoldGeo}
+            leftWingGeo={leftWingGeo}
+            rightWingGeo={rightWingGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 1.25}
             logoMatRef={logoMatRef}
@@ -290,8 +265,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 2. Trailing Wingman Glider ── */}
         <group ref={glider2Ref}>
           <OrigamiGlider
-            outerWingsGeo={outerWingsGeo}
-            innerFoldGeo={innerFoldGeo}
+            leftWingGeo={leftWingGeo}
+            rightWingGeo={rightWingGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 0.85}
           />
@@ -300,8 +275,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
         {/* ── 3. Opposing Scout Glider (Ensures visibility from ALL 360° viewing angles) ── */}
         <group ref={glider3Ref}>
           <OrigamiGlider
-            outerWingsGeo={outerWingsGeo}
-            innerFoldGeo={innerFoldGeo}
+            leftWingGeo={leftWingGeo}
+            rightWingGeo={rightWingGeo}
             keelGeo={keelGeo}
             scale={gliderBaseScale * 1.10}
           />
