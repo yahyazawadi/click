@@ -53,7 +53,19 @@ function PlanetFallbackMesh({ color, size }) {
   );
 }
 
-export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, showTitle, targetPlanetPosRef, isMobile, isUnlocked = true, perfTierFloat = 0.0 }) {
+export function PlanetNode({
+  project,
+  ring,
+  onSelect,
+  isSelected,
+  hasSelection,
+  showTitle,
+  targetPlanetPosRef,
+  isMobile,
+  isUnlocked = true,
+  perfTierFloat = 0.0,
+  planetOrientation = { pitch: 0, yaw: 0 },
+}) {
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
   const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
@@ -136,14 +148,16 @@ export function PlanetNode({ project, ring, onSelect, isSelected, hasSelection, 
     >
       {shouldRenderMesh && (
         <React.Suspense fallback={<PlanetFallbackMesh color={planetColor} size={project.size || 0.5} />}>
-          <ProceduralPlanetMesh
-            type={shapeIndex}
-            color={planetColor}
-            size={project.size || 0.5}
-            isSelected={isSelected}
-            isMobile={isMobile}
-            perfTierFloat={perfTierFloat}
-          />
+          <group rotation={[isSelected ? planetOrientation.pitch : 0, isSelected ? planetOrientation.yaw : 0, 0]}>
+            <ProceduralPlanetMesh
+              type={shapeIndex}
+              color={planetColor}
+              size={project.size || 0.5}
+              isSelected={isSelected}
+              isMobile={isMobile}
+              perfTierFloat={perfTierFloat}
+            />
+          </group>
         </React.Suspense>
       )}
       {/* Floating HTML Title Label — only mounted when actually visible */}

@@ -6,6 +6,7 @@ import { CosmicBackground } from './components/CosmicBackground';
 import { SystemCore } from './components/SystemCore';
 import { OrbitalPath } from './components/OrbitalPath';
 import { PlanetNode } from './components/PlanetNode';
+import { PlanetOrientationControls } from './components/PlanetOrientationControls';
 import { CameraController } from './components/CameraController';
 import { SceneRotator } from './components/SceneRotator';
 import { UIOverlay } from './components/UIOverlay';
@@ -221,6 +222,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [perfTierFloat, setPerfTierFloat] = useState(initialPerfTierFloat);
   // Manual override lock — once user clicks a tier manually, NEVER auto-demote!
   const [isTierManuallyLocked, setIsTierManuallyLocked] = useState(false);
+  // Real-time 3D Planet Pitch/Yaw Orientation (controlled via slim HUD sliders)
+  const [planetOrientation, setPlanetOrientation] = useState({ pitch: 0, yaw: 0 });
 
   // Secret URL trigger detection (?love or #love or /love)
   const [isLoveMode, setIsLoveMode] = useState(() => {
@@ -487,6 +490,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   }, [selectedTarget]);
 
   const handleSelect = (id) => {
+    setPlanetOrientation({ pitch: 0, yaw: 0 });
     if (selectedTarget === id) {
       fpsLogger.logInteraction({ type: 'DESELECT_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: id } });
       setSelectedTarget(null);
@@ -506,6 +510,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   };
 
   const handleReturn = () => {
+    setPlanetOrientation({ pitch: 0, yaw: 0 });
     fpsLogger.logInteraction({ type: 'CLICK_RETURN_TO_ORBIT', target: 'OVERVIEW', details: { previousTarget: selectedTarget } });
     setSelectedTarget(null);
     scrollToPlanetIndex(0);
@@ -581,6 +586,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                       showTitle={activeTitles.includes(proj.id)}
                       targetPlanetPosRef={targetPlanetPosRef}
                       perfTierFloat={perfTierFloat}
+                      planetOrientation={planetOrientation}
                     />
                   );
                 })}
@@ -591,6 +597,14 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
             </Suspense>
           </Canvas>
         </div>
+
+        {/* Minimalist Dual Planet Orientation Sliders (Left: Pitch, Bottom: Yaw) */}
+        <PlanetOrientationControls
+          visible={!!selectedTarget && selectedTarget !== 'core'}
+          orientation={planetOrientation}
+          onChange={setPlanetOrientation}
+          isMobile={isMobile}
+        />
 
         {/* HTML Foreground UI Overlay Layer */}
         <UIOverlay
