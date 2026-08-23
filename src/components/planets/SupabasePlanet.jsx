@@ -5,59 +5,61 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import '../../shaders/ScissorMoonShaderMaterial';
 
 // ── Official Supabase Bolt — SVG Paths (viewBox 0 0 512 512) ─────────────────
-// Front blade: tall right-leaning arrow (gradient green in the SVG)
+// Front blade: tall right-leaning arrow
 const SVG_FRONT_BLADE =
   'M297.6 501c-12.9 16.3-39.2 7.4-39.5-13.4L253.6 183h204.8c37.1 0 57.8 42.8 34.7 71.9z';
 
-// Back blade: tall left-leaning arrow (solid #3ecf8e in the SVG)
+// Back blade: tall left-leaning arrow
 const SVG_BACK_BLADE =
   'M214.4 11c12.9-16.3 39.2-7.4 39.5 13.4l2 304.5H53.7c-37.1 0-57.8-42.8-34.7-71.9z';
 
 // ── Supabase Color Palette ────────────────────────────────────────────────────
 const C = {
-  primary:    '#3ECF8E',   // Official Supabase mint green
-  dark:       '#249361',   // Deep brand green
-  neon:       '#1aff8e',   // Neon glow accent
-  plaqueBg:   '#030e08',   // Near-black mounting surface
-  rimMid:     '#1a6641',   // Mid-tone metallic ring
+  primary: '#3ECF8E',   // Official Supabase mint green
+  dark:    '#249361',   // Deep brand green
+  neon:    '#1aff8e',   // Neon glow accent
+  abyss:   '#020a06',   // Deep space obsidian
 };
 
-// ── Supabase Side-Mounted Emblem ─────────────────────────────────────────────
-// Placed at [planetRadius * 1.01, 0, 0] inside the spinning planetRef group.
-// The logo face points outward (+X) via the Y-axis rotation.
+// ── Supabase Side-Mounted Architectural Monolith ─────────────────────────────
+// Rises directly out of the planet surface like a towering cyber-building structure.
 function SupabaseEmblem({ size, planetRadius }) {
   const frontMatRef = useRef();
-  const rimRef      = useRef();
+  const sideMatRef  = useRef();
   const pulseRef    = useRef();
 
-  const plaqueRadius = planetRadius * 0.52;
+  const emblemScale = (planetRadius * 0.44) / 256;
 
   const { frontGeo, backGeo } = useMemo(() => {
     const loader = new SVGLoader();
 
-    // Front blade — bright primary green, extruded deep for 3D presence
-    const fData   = loader.parse(`<svg viewBox="0 0 512 512"><path d="${SVG_FRONT_BLADE}"/></svg>`);
+    // Flip SVG Y coordinates so top is +Y in Three.js
+    const yFlip = 'transform="scale(1,-1) translate(0,-512)"';
+    const centerMatrix = new THREE.Matrix4().makeTranslation(-256, -256, 0);
+
+    // 1. Front Blade (Bottom-right tower) — Taller monolithic skyscraper
+    const fData   = loader.parse(`<svg viewBox="0 0 512 512"><g ${yFlip}><path d="${SVG_FRONT_BLADE}"/></g></svg>`);
     const fShapes = fData.paths[0].toShapes(true);
     const fGeo    = new THREE.ExtrudeGeometry(fShapes, {
-      depth:          16,
+      depth:          75,    // Deep building extrusion
       bevelEnabled:   true,
-      bevelThickness: 5,
-      bevelSize:      3,
-      bevelSegments:  5,
-    });
-    fGeo.center();
-
-    // Back blade — darker green, slightly shallower extrusion
-    const bData   = loader.parse(`<svg viewBox="0 0 512 512"><path d="${SVG_BACK_BLADE}"/></svg>`);
-    const bShapes = bData.paths[0].toShapes(true);
-    const bGeo    = new THREE.ExtrudeGeometry(bShapes, {
-      depth:          10,
-      bevelEnabled:   true,
-      bevelThickness: 3,
-      bevelSize:      2,
+      bevelThickness: 10,
+      bevelSize:      6,
       bevelSegments:  4,
     });
-    bGeo.center();
+    fGeo.applyMatrix4(centerMatrix);
+
+    // 2. Back Blade (Top-left tower) — Complementary interlocking skyscraper
+    const bData   = loader.parse(`<svg viewBox="0 0 512 512"><g ${yFlip}><path d="${SVG_BACK_BLADE}"/></g></svg>`);
+    const bShapes = bData.paths[0].toShapes(true);
+    const bGeo    = new THREE.ExtrudeGeometry(bShapes, {
+      depth:          60,    // Distinct floor level
+      bevelEnabled:   true,
+      bevelThickness: 8,
+      bevelSize:      5,
+      bevelSegments:  4,
+    });
+    bGeo.applyMatrix4(centerMatrix);
 
     return { frontGeo: fGeo, backGeo: bGeo };
   }, []);
@@ -72,86 +74,78 @@ function SupabaseEmblem({ size, planetRadius }) {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
 
-    // Rhythmic breathing glow on the front blade
+    // Architectural beacon pulse on the monoliths
     if (frontMatRef.current) {
-      frontMatRef.current.emissiveIntensity = Math.sin(t * 2.4) * 0.45 + 1.25;
+      frontMatRef.current.emissiveIntensity = Math.sin(t * 2.4) * 0.45 + 1.35;
+    }
+    if (sideMatRef.current) {
+      sideMatRef.current.emissiveIntensity = Math.sin(t * 1.8) * 0.25 + 0.75;
     }
 
-    // Rim pulse, slightly offset phase from the logo breath
-    if (rimRef.current) {
-      rimRef.current.material.emissiveIntensity = Math.sin(t * 1.7 + 1.1) * 0.3 + 0.65;
-    }
-
-    // Single outward-expanding holographic pulse ring
+    // Expanding tectonic energy wave at the building's foundation
     if (pulseRef.current) {
-      const p = (t * 0.38) % 1.0;
-      pulseRef.current.scale.setScalar(0.28 + p * 3.5);
-      pulseRef.current.material.opacity = Math.pow(1.0 - p, 1.25) * 0.68;
+      const p = (t * 0.35) % 1.0;
+      pulseRef.current.scale.setScalar(0.4 + p * 2.4);
+      pulseRef.current.material.opacity = Math.pow(1.0 - p, 1.3) * 0.75;
     }
   });
 
-  // Scale: after geo.center(), the combined bolt spans ~±245 units (Y) in SVG space.
-  // Map that to fit within the plaque radius.
-  const emblemScale = plaqueRadius / 255;
-
   return (
-    // Rotate -PI/2 on Y so the extruded face (+Z) now aims outward (+X from planet center)
-    <group rotation={[0, -Math.PI / 2, 0]}>
+    // Local +Z points directly OUTWARD along planet normal
+    <group rotation={[0, Math.PI / 2, 0]}>
 
-      {/* ── 1. Dark circular mounting plaque ── */}
-      <mesh position={[0, 0, 0]}>
-        <circleGeometry args={[plaqueRadius * 1.025, 64]} />
-        <meshBasicMaterial color={C.plaqueBg} side={THREE.DoubleSide} />
-      </mesh>
-
-      {/* ── 2. Carved metallic rim ring ── */}
-      <mesh ref={rimRef} position={[0, 0, size * 0.003]}>
-        <ringGeometry args={[plaqueRadius * 0.88, plaqueRadius * 1.00, 64]} />
+      {/* ── 1. Sci-Fi Foundation Trench embedded slightly in ground ── */}
+      <mesh position={[0, 0, -0.002]}>
+        <ringGeometry args={[planetRadius * 0.36, planetRadius * 0.46, 64]} />
         <meshStandardMaterial
-          color={C.rimMid}
-          emissive={C.primary}
-          emissiveIntensity={0.65}
-          roughness={0.18}
-          metalness={0.88}
+          color="#061c12"
+          emissive={C.dark}
+          emissiveIntensity={0.5}
+          roughness={0.35}
+          metalness={0.9}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* ── 3. Back Blade (lower layer — deep brand green) ── */}
-      {/* Y scale is negated to correct SVG coordinate system (Y-down → Y-up) */}
+      {/* ── 2. Back Monolith Tower (Top-Left Blade) ── */}
+      {/* Sinks slightly into crust at base, rises high into orbit */}
       <mesh
         geometry={backGeo}
-        scale={[emblemScale, -emblemScale, emblemScale]}
-        position={[0, 0, size * 0.012]}
+        scale={[emblemScale, emblemScale, emblemScale]}
+        position={[0, 0, -0.006]}
       >
         <meshStandardMaterial
-          color={C.dark}
-          emissive={C.neon}
-          emissiveIntensity={0.85}
-          roughness={0.22}
-          metalness={0.52}
+          ref={sideMatRef}
+          color="#1b7a4c"
+          emissive={C.dark}
+          emissiveIntensity={0.75}
+          roughness={0.2}
+          metalness={0.75}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* ── 4. Front Blade (upper layer — vibrant primary, raised higher) ── */}
+      {/* ── 3. Front Monolith Tower (Bottom-Right Blade) ── */}
+      {/* Taller mega-structure with radiant emerald crown */}
       <mesh
         geometry={frontGeo}
-        scale={[emblemScale, -emblemScale, emblemScale]}
-        position={[0, 0, size * 0.026]}
+        scale={[emblemScale, emblemScale, emblemScale]}
+        position={[0, 0, -0.006]}
       >
         <meshStandardMaterial
           ref={frontMatRef}
           color={C.primary}
           emissive={C.neon}
-          emissiveIntensity={1.25}
-          roughness={0.10}
-          metalness={0.58}
+          emissiveIntensity={1.35}
+          roughness={0.12}
+          metalness={0.7}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* ── 5. Holographic pulse ring emitting from logo center ── */}
-      <mesh ref={pulseRef} position={[0, 0, size * 0.010]}>
-        <ringGeometry args={[plaqueRadius * 0.16, plaqueRadius * 0.22, 48]} />
+      {/* ── 4. Holographic Base Energy Shockwave ── */}
+      <mesh ref={pulseRef} position={[0, 0, 0.004]}>
+        <ringGeometry args={[planetRadius * 0.22, planetRadius * 0.28, 48]} />
         <meshBasicMaterial
           color={C.neon}
           transparent
@@ -178,10 +172,10 @@ export function SupabasePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime     = t;
       shaderMatRef.current.uPerfTier = perfTierFloat;
-      shaderMatRef.current.uCutY     = 9999.0; // Full sphere — no polar cut
+      shaderMatRef.current.uCutY     = 9999.0; // Full celestial sphere
     }
 
-    // Steady planetary spin — logo sweeps the equatorial arc
+    // Steady planetary rotation
     if (planetRef.current) {
       planetRef.current.rotation.y += safeDelta * 0.16;
     }
@@ -195,7 +189,7 @@ export function SupabasePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
       {/* ── Rotating Planet Body ── */}
       <group ref={planetRef}>
 
-        {/* ── Full Supabase-Themed Sphere ── */}
+        {/* ── Full Supabase-Themed Planet Sphere ── */}
         <mesh>
           <sphereGeometry args={[planetRadius, segments, segments]} />
           <scissorMoonShaderMaterial
@@ -215,7 +209,7 @@ export function SupabasePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
           />
         </mesh>
 
-        {/* ── Supabase Green Atmospheric Glow Halo ── */}
+        {/* ── Supabase Emerald Atmospheric Halo ── */}
         <mesh>
           <sphereGeometry args={[planetRadius * 1.048, 32, 32]} />
           <meshStandardMaterial
@@ -228,9 +222,8 @@ export function SupabasePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
           />
         </mesh>
 
-        {/* ── Supabase Bolt Logo — Side-Mounted on Equator ── */}
-        {/* Placed on the sphere surface along the +X axis (equator) */}
-        <group position={[planetRadius * 1.01, 0, 0]}>
+        {/* ── Supabase Monolith Towers — Emerging Outward from Equator ── */}
+        <group position={[planetRadius * 0.995, 0, 0]}>
           <SupabaseEmblem size={size} planetRadius={planetRadius} />
         </group>
 
