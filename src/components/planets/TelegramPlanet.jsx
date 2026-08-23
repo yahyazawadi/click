@@ -75,12 +75,17 @@ function createOrigamiGliderGeometries() {
 
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
 function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logoMatRef }) {
-  const ICE_WHITE    = '#ffffff';
-  const WHITE_GLOW   = '#e0f4ff';
-  const SHADED_INNER = '#1a7ab5';
-  const INNER_GLOW   = '#10527c';
-  const TELE_AZURE   = '#229ED9';
-  const AZURE_GLOW   = '#1278ad';
+  // 1. Top outer wings (White)
+  const outerWingsColor     = '#ffffff';
+  const outerWingsGlow      = '#e0f4ff';
+
+  // 2. Center spine fold visible from above (Darker crease)
+  const centerCreaseColor   = '#1a7ab5';
+  const centerCreaseGlow    = '#10527c';
+
+  // 3. Underbelly keel fold on the bottom (Azure blue)
+  const underbellyKeelColor = '#229ED9';
+  const underbellyKeelGlow  = '#1278ad';
 
   return (
     <group scale={[scale, scale, scale]}>
@@ -88,8 +93,8 @@ function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logo
       <mesh geometry={outerWingsGeo}>
         <meshStandardMaterial
           ref={logoMatRef}
-          color={ICE_WHITE}
-          emissive={WHITE_GLOW}
+          color={outerWingsColor}
+          emissive={outerWingsGlow}
           emissiveIntensity={0.65}
           roughness={0.15}
           metalness={0.20}
@@ -101,8 +106,8 @@ function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logo
       {/* 2. Inner Central Fold (Darker Shaded Azure visible from above) */}
       <mesh geometry={innerFoldGeo}>
         <meshStandardMaterial
-          color={SHADED_INNER}
-          emissive={INNER_GLOW}
+          color={centerCreaseColor}
+          emissive={centerCreaseGlow}
           emissiveIntensity={0.55}
           roughness={0.22}
           metalness={0.45}
@@ -114,8 +119,8 @@ function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logo
       {/* 3. Lower Keel Under-fold (Authentic Telegram Azure Blue) */}
       <mesh geometry={keelGeo}>
         <meshStandardMaterial
-          color={TELE_AZURE}
-          emissive={AZURE_GLOW}
+          color={underbellyKeelColor}
+          emissive={underbellyKeelGlow}
           emissiveIntensity={0.50}
           roughness={0.25}
           metalness={0.45}
