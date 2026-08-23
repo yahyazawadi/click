@@ -75,13 +75,13 @@ function createOrigamiGliderGeometries() {
 
 // ── Glider Color Palette (Tune hex codes here) ──────────────────────────────
 let outerWingsColor     = '#ffffff';
-let outerWingsGlow      = '#e0f4ff';
+let outerWingsGlow      = '#e8f8ff';
 
-let centerCreaseColor   = '#1a7ab5';
-let centerCreaseGlow    = '#10527c';
+let centerCreaseColor   = '#3da6df';
+let centerCreaseGlow    = '#228ac8';
 
-let underbellyKeelColor = '#9cc6d9';
-let underbellyKeelGlow  = '#1278ad';
+let underbellyKeelColor = '#68c6f8';
+let underbellyKeelGlow  = '#38b4f6';
 
 // ── Individual 3D Origami Glider Craft ────────────────────────────────────────
 function OrigamiGlider({ outerWingsGeo, innerFoldGeo, keelGeo, scale = 1.0, logoMatRef }) {
