@@ -157,32 +157,34 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
       const angle = t * speed + angleOffset;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
-      const y = Math.sin(angle * 2.0) * (size * 0.10);
+      const y = Math.sin(angle * 2.0) * (size * 0.06);
 
       ref.current.position.set(x, y, z);
 
-      // Next position in the trajectory
-      const dt = 0.06;
-      const nextAngle = angle + dt;
-      const nextX = Math.cos(nextAngle) * radius;
-      const nextZ = Math.sin(nextAngle) * radius;
-      const nextY = Math.sin(nextAngle * 2.0) * (size * 0.10);
+      // Exact tangent flight heading in orbital plane (Nose is local +Z)
+      const forwardX = -Math.sin(angle);
+      const forwardZ =  Math.cos(angle);
+      const heading = Math.atan2(forwardX, forwardZ);
 
-      // Point the nose (+Z) directly at the forward path point
-      ref.current.lookAt(nextX, nextY, nextZ);
+      // Lock heading around Y axis
+      ref.current.rotation.set(0, heading, 0);
 
-      // Bank into the curve (roll around local forward axis)
+      // Subtle flight pitch following wave undulation
+      const pitch = Math.cos(angle * 2.0) * 0.10;
+      ref.current.rotateX(-pitch);
+
+      // Inward banking roll into the turn around the fuselage axis (+Z)
       ref.current.rotateZ(bankAngle);
     };
 
     // Glider 1: Lead flagship glider
-    updateGlider(glider1Ref, 0.0, orbitRadius, -Math.PI * 0.16);
+    updateGlider(glider1Ref, 0.0, orbitRadius, -Math.PI * 0.25);
 
     // Glider 2: Trailing wingman (close formation)
-    updateGlider(glider2Ref, -0.40, orbitRadius * 0.93, -Math.PI * 0.20);
+    updateGlider(glider2Ref, -0.38, orbitRadius * 0.94, -Math.PI * 0.28);
 
     // Glider 3: Opposing celestial scout (180° opposite for 360° all-around visibility)
-    updateGlider(glider3Ref, Math.PI, orbitRadius * 1.05, -Math.PI * 0.16);
+    updateGlider(glider3Ref, Math.PI, orbitRadius * 1.04, -Math.PI * 0.25);
 
     // Slipstream pulse animation
     if (trailRingRef.current) {
