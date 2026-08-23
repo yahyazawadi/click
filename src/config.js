@@ -172,6 +172,14 @@ export const SYSTEM_CONFIG = {
         'Database: Supabase PostgreSQL & Spatial Schemas',
         'Telemetry: Real-Time Environmental Health Indices',
         'Interface: Multi-Language Disease Intelligence'
+      ],
+      gallery: [
+        {
+          title: 'ClimaMedix Live Platform',
+          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+          url: '/gallery/climamedix-home.png',
+          tag: 'LIVE SITE'
+        }
       ]
     },
     {
@@ -191,6 +199,14 @@ export const SYSTEM_CONFIG = {
         'Atmosphere: Real-Time Parallax Cloud Drift',
         'Oceans: High-Definition Specular Glint Mapping',
         'Performance: Hardware-Accelerated 120 FPS'
+      ],
+      gallery: [
+        {
+          title: 'ClimaMedix Live Platform',
+          caption: 'The ClimaMedix platform — empowering healthcare providers for climate action.',
+          url: '/gallery/climamedix-home.png',
+          tag: 'LIVE SITE'
+        }
       ]
     },
     {
