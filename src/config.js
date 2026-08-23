@@ -350,8 +350,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 0.72,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.0, // Static freeze baseline
-    seedX: generateTimeBasedSeed(1),
-    seedY: generateTimeBasedSeed(2),
+    seedX: -100.1,
+    seedY: 56.0,
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -382,8 +382,8 @@ export const DEFAULT_NEBULA_CONFIG = {
     alpha: 1,
     gradientSoftness: 1.0, // 0.1 = steep high-contrast, 1.0+ = silky continuous velvet gradient
     speed: 0.0, // Static freeze baseline
-    seedX: generateTimeBasedSeed(3),
-    seedY: generateTimeBasedSeed(4),
+    seedX: 107.7,
+    seedY: -10.0,
     // Multi-Core & Cellular Convection Parameters
     multiCoreStrength: 0.0,
     multiCoreScale: 1.8,
@@ -428,12 +428,6 @@ if (typeof window !== 'undefined') {
       if (parsed.nebula1) Object.assign(NEBULA_CONFIG.nebula1, parsed.nebula1);
       if (parsed.nebula2) Object.assign(NEBULA_CONFIG.nebula2, parsed.nebula2);
     }
-    
-    // Always generate unique timestamp seeds on session startup for both nebulae
-    NEBULA_CONFIG.nebula1.seedX = generateTimeBasedSeed(1);
-    NEBULA_CONFIG.nebula1.seedY = generateTimeBasedSeed(2);
-    NEBULA_CONFIG.nebula2.seedX = generateTimeBasedSeed(3);
-    NEBULA_CONFIG.nebula2.seedY = generateTimeBasedSeed(4);
   } catch (e) {
     console.warn('LocalStorage config load error:', e);
   }
