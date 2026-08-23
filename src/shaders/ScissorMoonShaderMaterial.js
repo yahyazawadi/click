@@ -6,6 +6,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   {
     uTime:       0,
     uPerfTier:   0.0,  // 0.0=high, 0.5=med, 1.0=low
+    uCutY:       9999.0, // Geometric height clipping (discards above this Y in local space)
     uDeepSea:    new THREE.Color('#031224'),
     uMidSea:     new THREE.Color('#07304d'),
     uShallowSea: new THREE.Color('#0f5d75'),
@@ -39,6 +40,7 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
   /* glsl */ `
     uniform float uTime;
     uniform float uPerfTier;  // 0.0=high, 0.5=med, 1.0=low
+    uniform float uCutY;
     uniform vec3  uDeepSea;
     uniform vec3  uMidSea;
     uniform vec3  uShallowSea;
@@ -100,6 +102,10 @@ export const ScissorMoonShaderMaterial = shaderMaterial(
     }
 
     void main() {
+      if (vPosition.y > uCutY) {
+        discard;
+      }
+
       vec3 N  = normalize(vWorldNormal);
       vec3 p  = normalize(vPosition);  // seamless sphere coords
 

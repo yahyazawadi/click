@@ -12,7 +12,7 @@ const SVG_BUBBLE_PATH =
   "M13.29 2.68A7.36 7.36 0 0 0 8 .5a7.44 7.44 0 0 0-6.41 11.15l-1 3.85 3.94-1a7.4 7.4 0 0 0 3.55.9H8a7.44 7.44 0 0 0 5.29-12.72zM8 14.12a6.12 6.12 0 0 1-3.15-.87l-.22-.13-2.34.61.62-2.28-.14-.23a6.18 6.18 0 0 1 9.6-7.65 6.12 6.12 0 0 1 1.81 4.37A6.19 6.19 0 0 1 8 14.12z";
 
 // ── 3D Official WhatsApp Inlaid Emblem on a 2D Carved Flat Facet ───────────
-function WhatsAppEmbossedEmblem({ size }) {
+function WhatsAppEmbossedEmblem({ size, diskRadius }) {
   const GREEN      = '#25D366';
   const GREEN_GLOW = '#1aff7a';
   const PURE_BLACK = '#000000';
@@ -26,10 +26,10 @@ function WhatsAppEmbossedEmblem({ size }) {
     const phoneShapesList = phonePathData.paths[0].toShapes(true);
     
     const pGeo = new THREE.ExtrudeGeometry(phoneShapesList, {
-      depth: 0.15,
+      depth: 0.12,
       bevelEnabled: true,
-      bevelThickness: 0.05,
-      bevelSize: 0.04,
+      bevelThickness: 0.04,
+      bevelSize: 0.03,
       bevelSegments: 2,
     });
     pGeo.center();
@@ -39,10 +39,10 @@ function WhatsAppEmbossedEmblem({ size }) {
     const bubbleShapesList = bubblePathData.paths[0].toShapes(true);
     
     const bGeo = new THREE.ExtrudeGeometry(bubbleShapesList, {
-      depth: 0.15,
+      depth: 0.12,
       bevelEnabled: true,
-      bevelThickness: 0.05,
-      bevelSize: 0.04,
+      bevelThickness: 0.04,
+      bevelSize: 0.03,
       bevelSegments: 2,
     });
     bGeo.center();
@@ -57,14 +57,14 @@ function WhatsAppEmbossedEmblem({ size }) {
     };
   }, [phoneGeo, bubbleGeo]);
 
-  // Scale factor to map 16x16 SVG units nicely onto the carved flat facet
-  const emblemScale = size * 0.044;
+  // Scale factor to map 16x16 SVG units cleanly inside the flat disk facet
+  const emblemScale = diskRadius * 0.088;
 
   return (
     <group rotation={[-Math.PI / 2, 0, 0]}>
-      {/* ── 1. Pure 2D Flat Black Slicing Disk (Cuts clean flat facet through the sphere) ── */}
+      {/* ── 1. Pure 2D Flat Black Slicing Disk (Covers the sliced dome cleanly) ── */}
       <mesh position={[0, 0, 0]}>
-        <circleGeometry args={[size * 0.44, 64]} />
+        <circleGeometry args={[diskRadius * 1.015, 64]} />
         <meshBasicMaterial
           color={PURE_BLACK}
           side={THREE.DoubleSide}
@@ -75,7 +75,7 @@ function WhatsAppEmbossedEmblem({ size }) {
       <mesh
         geometry={bubbleGeo}
         scale={[emblemScale, emblemScale, emblemScale]}
-        position={[0, 0, size * 0.012]}
+        position={[0, 0, size * 0.010]}
       >
         <meshStandardMaterial
           color={GREEN}
@@ -90,7 +90,7 @@ function WhatsAppEmbossedEmblem({ size }) {
       <mesh
         geometry={phoneGeo}
         scale={[emblemScale * 1.05, emblemScale * 1.05, emblemScale * 1.05]}
-        position={[0, 0, size * 0.014]}
+        position={[0, 0, size * 0.012]}
       >
         <meshStandardMaterial
           color={GREEN}
@@ -110,11 +110,10 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const shaderMatRef = useRef();
 
   const planetRadius = size * 0.85;
-  // Y level where the cut happens — logo disk sits here
-  const cutY = planetRadius * 0.88;
-
-  // Clipping plane: hide everything ABOVE y = cutY (normal points down = -Y cuts above)
-  const clipPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, -1, 0), cutY), [cutY]);
+  // Y level where the cut happens (slices top ~20% off the sphere)
+  const cutY = planetRadius * 0.78;
+  // Radius of the circle where the sphere is sliced at cutY
+  const diskRadius = Math.sqrt(planetRadius * planetRadius - cutY * cutY);
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
@@ -123,9 +122,10 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime     = t;
       shaderMatRef.current.uPerfTier = perfTierFloat;
+      shaderMatRef.current.uCutY     = cutY;
     }
 
-    // Steady planet rotation — logo disk and clip are children so they rotate together
+    // Steady planet rotation — logo disk rotates seamlessly with the sliced sphere
     if (planetRef.current) {
       planetRef.current.rotation.y += safeDelta * 0.18;
     }
@@ -137,12 +137,13 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
     <group>
       {/* ── Rotating Planet Body ── */}
       <group ref={planetRef}>
-        {/* Sphere clipped to only render BELOW the cut level */}
+        {/* Sphere with top sliced off via GLSL discard */}
         <mesh>
           <sphereGeometry args={[planetRadius, segments, segments]} />
           <scissorMoonShaderMaterial
             ref={shaderMatRef}
             uPerfTier={perfTierFloat}
+            uCutY={cutY}
             uDeepSea={new THREE.Color('#021408')}
             uMidSea={new THREE.Color('#053315')}
             uShallowSea={new THREE.Color('#0a5c24')}
@@ -153,14 +154,12 @@ export function PhonePlanet({ size, isMobile, perfTierFloat = 0.0 }) {
             uCloud={new THREE.Color('#c2ffd6')}
             uAtmosphere={new THREE.Color('#25D366')}
             uStorm={new THREE.Color('#1aff7a')}
-            clippingPlanes={[clipPlane]}
-            clipShadows={true}
           />
         </mesh>
 
-        {/* ── WhatsApp Logo Disk: flat black cap sitting exactly at the cut ── */}
+        {/* ── WhatsApp Logo Disk: flat black cap sealing the cut top ── */}
         <group position={[0, cutY, 0]}>
-          <WhatsAppEmbossedEmblem size={size} />
+          <WhatsAppEmbossedEmblem size={size} diskRadius={diskRadius} />
         </group>
       </group>
     </group>
