@@ -117,34 +117,6 @@ export function PresentationDock({
       <div className={`dock-shell${isSecretLove ? " secret-love-theme" : ""}${isLastPhase ? " dock-shell--critical" : ""}`}>
         <div className={`bottom-presentation-dock${isSecretLove ? " secret-love-theme" : ""}${liftedImage ? " dock-collapsed" : ""}`}>
 
-          <div className="dock-header-bar">
-            <span className="hud-bracket tl" />
-            <div className="dock-stage-indicators">
-              {stages.map((stage, idx) => (
-                <button key={stage.id}
-                  className={`dock-pill-indicator${stage.id === selectedTarget ? " active" : ""}`}
-                  onClick={() => onSelectTarget(stage.id)} title={stage.title}>
-                  <span className="led-dot" />
-                  <span className="pill-text">{idx === 0 ? "CORE" : `PHASE ${idx}`}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="dock-actions-row">
-              {currentGallery.length > 0 && (
-                <button className={`dock-gallery-toggle-btn${showGallery ? " active" : ""}`}
-                  onClick={() => { if (showGallery) { closeLifted(); setShowGallery(false); } else setShowGallery(true); }}
-                  title="Toggle photo strip">
-                  {showGallery ? "HIDE" : "PHOTOS"} ({currentGallery.length})
-                </button>
-              )}
-              <button className="dock-nav-btn icon-only" onClick={handlePrev} disabled={currentStageIndex === 0}>&#9664;</button>
-              <button className="dock-nav-btn icon-only" onClick={handleNext} disabled={currentStageIndex === stages.length - 1}>&#9654;</button>
-              <button className="dock-close-btn icon-only" onClick={onReturn}>&#10005;</button>
-            </div>
-            <span className="hud-bracket tr" />
-          </div>
-
           <div className="dock-body-wrap" ref={bodyRef}>
             <div className={`dock-body-grid${showGallery ? " gallery-mode" : ""}`}>
 
@@ -235,6 +207,34 @@ export function PresentationDock({
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="dock-header-bar dock-controls-bottom">
+            <span className="hud-bracket bl" />
+            <div className="dock-stage-indicators">
+              {stages.map((stage, idx) => (
+                <button key={stage.id}
+                  className={`dock-pill-indicator${stage.id === selectedTarget ? " active" : ""}`}
+                  onClick={() => onSelectTarget(stage.id)} title={stage.title}>
+                  <span className="led-dot" />
+                  <span className="pill-text">{idx === 0 ? "CORE" : `PHASE ${idx}`}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="dock-actions-row">
+              {currentGallery.length > 0 && (
+                <button className={`dock-gallery-toggle-btn${showGallery ? " active" : ""}`}
+                  onClick={() => { if (showGallery) { closeLifted(); setShowGallery(false); } else setShowGallery(true); }}
+                  title="Toggle photo strip">
+                  {showGallery ? "HIDE" : "PHOTOS"} ({currentGallery.length})
+                </button>
+              )}
+              <button className="dock-nav-btn icon-only" onClick={handlePrev} disabled={currentStageIndex === 0}>&#9664;</button>
+              <button className="dock-nav-btn icon-only" onClick={handleNext} disabled={currentStageIndex === stages.length - 1}>&#9654;</button>
+              <button className="dock-close-btn icon-only" onClick={onReturn}>&#10005;</button>
+            </div>
+            <span className="hud-bracket br" />
           </div>
         </div>
       </div>
