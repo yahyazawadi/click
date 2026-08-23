@@ -1,25 +1,20 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import '../../shaders/ScissorMoonShaderMaterial';
 
-// ── Exact SVG Paper Plane Path from official Telegram icon (viewBox 0 0 32 32) ─
-const SVG_PLANE_PATH =
-  "M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z";
-
-// ── 3D Symmetrical Origami Glider Geometries ────────────────────────────────
+// ── Slender, Aerodynamic 3D Origami Glider Geometries ─────────────────────────
 function createOrigamiGliderGeometries() {
-  // Key 3D folded paper vertices (Symmetrical & dimensional)
-  const N   = [ 0.00,  1.08,  0.20 ];  // 0: Nose Tip (Pointed apex)
-  const WL  = [-0.96, -0.72,  0.38 ];  // 1: Left Wingtip (Swept back & raised up)
-  const WR  = [ 0.96, -0.72,  0.38 ];  // 2: Right Wingtip (Swept back & raised up)
-  const NL  = [-0.28, -0.60,  0.06 ];  // 3: Left Inner Notch / Crease
-  const NR  = [ 0.28, -0.60,  0.06 ];  // 4: Right Inner Notch / Crease
-  const T   = [ 0.00, -0.54,  0.15 ];  // 5: Center Tail Spine End
-  const K   = [ 0.00, -0.32, -0.32 ];  // 6: Underbody Keel / Fuselage Bottom (Underfold)
+  // Vertices for a long-nosed aerodynamic paper airplane dart
+  const N   = [  0.00,  1.30,  0.15 ];  // 0: Long tapered nose apex
+  const WL  = [ -0.75, -0.75,  0.30 ];  // 1: Left Wingtip (Swept back & raised dihedral)
+  const WR  = [  0.75, -0.75,  0.30 ];  // 2: Right Wingtip (Swept back & raised dihedral)
+  const NL  = [ -0.20, -0.62,  0.05 ];  // 3: Left Inner Notch
+  const NR  = [  0.20, -0.62,  0.05 ];  // 4: Right Inner Notch
+  const T   = [  0.00, -0.58,  0.12 ];  // 5: Central Dorsal Tail
+  const K   = [  0.00, -0.35, -0.25 ];  // 6: Underbody Keel Fuselage (Folded belly)
 
-  // 1. Upper Main Wings & Spine (Bright Top Facets)
+  // 1. Upper Main Wings & Spine (Bright Facets)
   const wingPositions = [
     // Upper Left Wing
     ...N, ...WL, ...NL,
@@ -37,7 +32,7 @@ function createOrigamiGliderGeometries() {
     ...N, ...NR, ...T,
   ];
 
-  // 2. Lower Keel / Underbody Triangles (Darker Shadow Facets)
+  // 2. Lower Keel / Underbody Triangles (Shaded Origami Facets)
   const keelPositions = [
     // Underbody Left Keel
     ...N, ...K, ...NL,
@@ -65,19 +60,61 @@ function createOrigamiGliderGeometries() {
   return { wingsGeo, keelGeo };
 }
 
-// ── 3D Official Telegram Carved Emblem with Live Pulse Waves ─────────────────
-function TelegramEmbossedEmblem({ size, diskRadius }) {
+// ── Individual 3D Origami Glider Craft ────────────────────────────────────────
+function OrigamiGlider({ wingsGeo, keelGeo, scale = 1.0, logoMatRef }) {
   const CYAN_BRIGHT = '#38c0ff';
-  const CYAN_GLOW   = '#70dcff';
+  const CYAN_GLOW   = '#80e4ff';
   const SHADED_CYAN = '#1a72ab';
   const SHADED_GLOW = '#228ac8';
-  const PURE_BLACK  = '#000000';
 
-  const logoMatRef = useRef();
-  const pulse1Ref  = useRef();
-  const pulse2Ref  = useRef();
+  return (
+    <group scale={[scale, scale, scale]}>
+      {/* Upper Main Wings (Bright Electric Cyan) */}
+      <mesh geometry={wingsGeo}>
+        <meshStandardMaterial
+          ref={logoMatRef}
+          color={CYAN_BRIGHT}
+          emissive={CYAN_GLOW}
+          emissiveIntensity={1.4}
+          roughness={0.16}
+          metalness={0.45}
+          flatShading={true}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
-  // Create the two-tier Origami Glider Geometries
+      {/* Lower Keel Under-fold (Medium-Shaded Azure) */}
+      <mesh geometry={keelGeo}>
+        <meshStandardMaterial
+          color={SHADED_CYAN}
+          emissive={SHADED_GLOW}
+          emissiveIntensity={0.75}
+          roughness={0.28}
+          metalness={0.55}
+          flatShading={true}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// ── Main TelegramPlanet with Active Orbital Glider Squadron ───────────────────
+export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
+  const planetRef      = useRef();
+  const shaderMatRef   = useRef();
+  const logoMatRef     = useRef();
+
+  // Glider references for dynamic orbital flight paths
+  const glider1Ref     = useRef();
+  const glider2Ref     = useRef();
+  const glider3Ref     = useRef();
+  const trailRingRef   = useRef();
+
+  const planetRadius   = size * 0.85;
+  const orbitRadius    = planetRadius * 1.48;
+
+  // Build high-definition 3D origami geometries
   const { wingsGeo, keelGeo } = useMemo(() => createOrigamiGliderGeometries(), []);
 
   useEffect(() => {
@@ -87,170 +124,79 @@ function TelegramEmbossedEmblem({ size, diskRadius }) {
     };
   }, [wingsGeo, keelGeo]);
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-
-    // 1. Rhythmic breathing glow on the 3D glider wings
-    if (logoMatRef.current) {
-      const breath = Math.sin(t * 3.5) * 0.40 + 1.40;
-      logoMatRef.current.emissiveIntensity = breath;
-    }
-
-    // 2. Outward expanding holographic pulse wave 1
-    if (pulse1Ref.current) {
-      const p1 = (t * 1.4) % 1.0;
-      pulse1Ref.current.scale.setScalar(0.70 + p1 * 0.55);
-      pulse1Ref.current.position.z = size * 0.015 + p1 * (size * 0.04);
-      pulse1Ref.current.material.opacity = (1.0 - p1) * 0.65;
-    }
-
-    // 3. Offset outward expanding holographic pulse wave 2
-    if (pulse2Ref.current) {
-      const p2 = (t * 1.4 + 0.5) % 1.0;
-      pulse2Ref.current.scale.setScalar(0.70 + p2 * 0.55);
-      pulse2Ref.current.position.z = size * 0.015 + p2 * (size * 0.04);
-      pulse2Ref.current.material.opacity = (1.0 - p2) * 0.65;
-    }
-  });
-
-  // Scale of the 3D glider enlarged to fill the circular facet prominently
-  const gliderScale = diskRadius * 0.84;
-
-  return (
-    <group rotation={[-Math.PI / 2, 0, 0]}>
-      {/* ── 1. Pure 2D Flat Black Slicing Disk (Seals the sliced dome cleanly) ── */}
-      <mesh position={[0, 0, 0]}>
-        <circleGeometry args={[diskRadius * 1.015, 64]} />
-        <meshBasicMaterial
-          color={PURE_BLACK}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* ── 2. Carved Outer Metallic Rim with Beveled Trench ── */}
-      <mesh position={[0, 0, size * 0.005]}>
-        <ringGeometry args={[diskRadius * 0.94, diskRadius * 1.01, 64]} />
-        <meshStandardMaterial
-          color="#04182b"
-          emissive="#229ED9"
-          emissiveIntensity={0.6}
-          roughness={0.25}
-          metalness={0.9}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* ── 3. Telegram Circular Border Ring (Tiered Lower Height) ── */}
-      <mesh position={[0, 0, size * 0.018]}>
-        <ringGeometry args={[diskRadius * 0.80, diskRadius * 0.88, 64]} />
-        <meshStandardMaterial
-          color="#229ED9"
-          emissive={CYAN_GLOW}
-          emissiveIntensity={1.2}
-          roughness={0.15}
-          metalness={0.65}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* ── 4. Symmetrical 3D Origami Glider with High-Contrast Shaded Keel ── */}
-      <group
-        position={[-diskRadius * 0.03, diskRadius * 0.03, size * 0.048]}
-        rotation={[Math.PI * 0.06, Math.PI * 0.04, -Math.PI * 0.22]}
-        scale={[gliderScale, gliderScale, gliderScale * 1.18]}
-      >
-        {/* Upper Main Wings (Bright Electric Cyan) */}
-        <mesh geometry={wingsGeo}>
-          <meshStandardMaterial
-            ref={logoMatRef}
-            color={CYAN_BRIGHT}
-            emissive={CYAN_GLOW}
-            emissiveIntensity={1.4}
-            roughness={0.16}
-            metalness={0.45}
-            flatShading={true}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Lower Keel Under-fold (Medium-Shaded Azure for Natural Origami Fold Contrast) */}
-        <mesh geometry={keelGeo}>
-          <meshStandardMaterial
-            color={SHADED_CYAN}
-            emissive={SHADED_GLOW}
-            emissiveIntensity={0.75}
-            roughness={0.28}
-            metalness={0.55}
-            flatShading={true}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      </group>
-
-      {/* ── 5. Holographic Pulse Wave Rings emitting from the carved logo ── */}
-      <mesh ref={pulse1Ref} position={[0, 0, size * 0.015]}>
-        <ringGeometry args={[diskRadius * 0.44, diskRadius * 0.50, 48]} />
-        <meshBasicMaterial
-          color="#40c8ff"
-          transparent
-          opacity={0.6}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      <mesh ref={pulse2Ref} position={[0, 0, size * 0.015]}>
-        <ringGeometry args={[diskRadius * 0.44, diskRadius * 0.50, 48]} />
-        <meshBasicMaterial
-          color="#229ED9"
-          transparent
-          opacity={0.6}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-// ── Main TelegramPlanet ───────────────────────────────────────────────────────
-export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
-  const planetRef    = useRef();
-  const shaderMatRef = useRef();
-
-  const planetRadius = size * 0.85;
-  // Y level where the cut happens (slices top ~20% off the sphere)
-  const cutY = planetRadius * 0.78;
-  // Radius of the circle where the sphere is sliced at cutY
-  const diskRadius = Math.sqrt(planetRadius * planetRadius - cutY * cutY);
-
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     const safeDelta = Math.min(delta, 0.1);
 
+    // Planet terrain shader update
     if (shaderMatRef.current) {
       shaderMatRef.current.uTime     = t;
       shaderMatRef.current.uPerfTier = perfTierFloat;
-      shaderMatRef.current.uCutY     = cutY;
+      shaderMatRef.current.uCutY     = 9999.0; // Render full celestial sphere
     }
 
-    // Steady planet rotation — logo disk rotates seamlessly with the sliced sphere
+    // Steady planet rotation
     if (planetRef.current) {
-      planetRef.current.rotation.y += safeDelta * 0.18;
+      planetRef.current.rotation.y += safeDelta * 0.14;
+    }
+
+    // Rhythmic breathing emissive glow on gliders
+    if (logoMatRef.current) {
+      logoMatRef.current.emissiveIntensity = Math.sin(t * 3.5) * 0.40 + 1.40;
+    }
+
+    // ── Orbital Flight Kinematics for 3 Gliders ──
+    const speed = 0.85;
+
+    // Helper to position and bank a glider along the orbit
+    const updateGlider = (ref, angleOffset, radius, bankAngle) => {
+      if (!ref.current) return;
+      const angle = t * speed + angleOffset;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      const y = Math.sin(angle * 2.0) * (size * 0.12); // Subtle harmonic undulation
+
+      ref.current.position.set(x, y, z);
+
+      // Tangent flight heading: look in the forward orbital velocity direction
+      const forwardX = -Math.sin(angle);
+      const forwardZ =  Math.cos(angle);
+      const targetAngle = Math.atan2(forwardX, forwardZ);
+
+      // Apply yaw heading + inward banking roll
+      ref.current.rotation.set(0, targetAngle + Math.PI / 2, 0);
+      ref.current.rotateZ(bankAngle);
+      ref.current.rotateX(Math.sin(angle * 2.0) * 0.15); // subtle pitch
+    };
+
+    // Glider 1: Lead flagship glider
+    updateGlider(glider1Ref, 0.0, orbitRadius, -Math.PI * 0.18);
+
+    // Glider 2: Trailing wingman (close formation)
+    updateGlider(glider2Ref, -0.42, orbitRadius * 0.94, -Math.PI * 0.22);
+
+    // Glider 3: Opposing celestial scout (180° opposite so a plane is ALWAYS in view from every side!)
+    updateGlider(glider3Ref, Math.PI, orbitRadius * 1.05, -Math.PI * 0.18);
+
+    // Slipstream pulse animation
+    if (trailRingRef.current) {
+      trailRingRef.current.material.opacity = Math.sin(t * 2.5) * 0.15 + 0.35;
     }
   });
 
   const segments = perfTierFloat >= 0.8 ? 24 : 48;
+  const gliderBaseScale = size * 0.22;
 
   return (
     <group>
-      {/* ── Rotating Planet Body ── */}
+      {/* ── Complete Celestial Cyan/Azure Planet ── */}
       <group ref={planetRef}>
-        {/* Sphere with top sliced off via GLSL discard */}
         <mesh>
           <sphereGeometry args={[planetRadius, segments, segments]} />
           <scissorMoonShaderMaterial
             ref={shaderMatRef}
             uPerfTier={perfTierFloat}
-            uCutY={cutY}
+            uCutY={9999.0}
             uDeepSea={new THREE.Color('#020d1c')}
             uMidSea={new THREE.Color('#05233d')}
             uShallowSea={new THREE.Color('#09446d')}
@@ -264,11 +210,64 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
           />
         </mesh>
 
-        {/* ── Telegram Logo Disk: flat black cap sealing the cut top ── */}
-        <group position={[0, cutY, 0]}>
-          <TelegramEmbossedEmblem size={size} diskRadius={diskRadius} />
+        {/* Emerald/Cyan Atmospheric Glow Rim */}
+        <mesh>
+          <sphereGeometry args={[planetRadius * 1.045, 32, 32]} />
+          <meshStandardMaterial
+            color="#229ED9"
+            emissive="#229ED9"
+            emissiveIntensity={0.25}
+            transparent
+            opacity={0.10}
+            side={THREE.BackSide}
+          />
+        </mesh>
+      </group>
+
+      {/* ── Inclined Orbital Plane Container ── */}
+      <group rotation={[Math.PI * 0.15, Math.PI * 0.08, -Math.PI * 0.12]}>
+        {/* Glowing Cyan Orbital Slipstream Ribbon */}
+        <mesh ref={trailRingRef} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[orbitRadius, size * 0.008, 16, 80]} />
+          <meshStandardMaterial
+            color="#229ED9"
+            emissive="#40c8ff"
+            emissiveIntensity={1.2}
+            transparent
+            opacity={0.4}
+            roughness={0.2}
+          />
+        </mesh>
+
+        {/* ── 1. Flagship Lead Glider ── */}
+        <group ref={glider1Ref}>
+          <OrigamiGlider
+            wingsGeo={wingsGeo}
+            keelGeo={keelGeo}
+            scale={gliderBaseScale * 1.25}
+            logoMatRef={logoMatRef}
+          />
+        </group>
+
+        {/* ── 2. Trailing Wingman Glider ── */}
+        <group ref={glider2Ref}>
+          <OrigamiGlider
+            wingsGeo={wingsGeo}
+            keelGeo={keelGeo}
+            scale={gliderBaseScale * 0.85}
+          />
+        </group>
+
+        {/* ── 3. Opposing Scout Glider (Ensures visibility from ALL 360° viewing angles) ── */}
+        <group ref={glider3Ref}>
+          <OrigamiGlider
+            wingsGeo={wingsGeo}
+            keelGeo={keelGeo}
+            scale={gliderBaseScale * 1.10}
+          />
         </group>
       </group>
     </group>
   );
 }
+
