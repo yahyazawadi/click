@@ -234,6 +234,8 @@ export function TelegramPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
             side={THREE.BackSide}
           />
         </mesh>
+      </group>
+
       {/* ── Equatorial Orbital Slipstream & Squadron ── */}
       {/* Glowing Cyan Orbital Slipstream Ribbon */}
       <mesh ref={trailRingRef} rotation={[Math.PI / 2, 0, 0]}>
