@@ -304,6 +304,25 @@ export const SYSTEM_CONFIG = {
         'Tile Pipeline: Sub-millisecond Mapbox vector tile caching',
         'Geo-Analytics: Custom Turf.js spatial queries & WebGL layers'
       ]
+    },
+    {
+      id: 'proj-playwright-e2e',
+      title: 'PLAYWRIGHT // E2E LAB',
+      ringIndex: 2,
+      shapeIndex: 'playwright',
+      startAngle: 4.0,
+      size: 0.50,
+      color: '#2EAD33',
+      category: 'AUTOMATED QA & CONCURRENCY TEST SUITE',
+      shortDesc: 'High-concurrency automated testing lab simulating race conditions, advisory locks, and multi-tenant RLS isolation.',
+      fullDesc: 'Comprehensive Playwright & Vitest automated test suite integrated with GitHub Actions CI/CD pipelines. Simulates multi-user concurrent booking collisions, verifies PostgreSQL transaction-scoped advisory locks, audits RLS policy isolation, and tests WhatsApp webhook delivery across Chromium, Firefox, and WebKit.',
+      tags: ['PLAYWRIGHT', 'VITEST', 'CI/CD PIPELINES', 'E2E TESTING', 'RACE CONDITIONS', 'CONCURRENCY'],
+      specs: [
+        'Concurrency Stress: Multi-user booking collision simulation',
+        'RLS Security Audits: Automated cross-tenant leak detection',
+        'Cross-Browser Grid: Headless Chromium, Firefox & WebKit',
+        'CI/CD Pipelines: Automated GitHub Actions regression test run'
+      ]
     }
   ]
 };

@@ -13,6 +13,7 @@ import {
   TelegramPlanet,
   SupabasePlanet,
   MapboxPlanet,
+  PlaywrightPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -40,6 +41,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'mapbox' || type === 'mapbox-gis' || type === 'geospatial') {
     return <MapboxPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'playwright' || type === 'playwright-e2e' || type === 'e2e-testing') {
+    return <PlaywrightPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
