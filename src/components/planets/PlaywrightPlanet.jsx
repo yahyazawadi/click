@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
+import '../../shaders/PlaywrightPlanetShaderMaterial';
 
 // ── Official Playwright Dual Masks SVG Paths (viewBox 0 0 24 24) ─────────────
 const SVG_PLAYWRIGHT_LOGO = `
@@ -26,14 +27,14 @@ const SVG_PLAYWRIGHT_LOGO = `
 // ── Color Palette ─────────────────────────────────────────────────────────────
 const C = {
   emeraldBright: '#2EAD33', // Playwright Green Mask
-  emeraldGlow:   '#45E64B',
-  rubyBright:    '#E2574C', // Playwright Red Mask
-  rubyGlow:      '#FF6B5E',
-  slateDark:     '#1B2730', // Planet Base Obsidian Slate
-  slateTrim:     '#2D4552', // Structural titanium framing
+  emeraldGlow:   '#00F59B', // Radiant Mint Green Highlight
+  rubyBright:    '#FF2D6E', // Radiant Reddish-Pink / Raspberry Coral
+  rubyGlow:      '#FF6088', // Luminous Rose Pink Glow
+  slateDark:     '#140818', // Deep Velvet Obsidian
+  slateTrim:     '#221528', // Polished Chassis
   chromiumCyan:  '#00D4FF', // Browser node 1
   firefoxOrange: '#FF8A00', // Browser node 2
-  webkitPurple:  '#A855F7', // Browser node 3
+  webkitPurple:  '#D946EF', // Browser node 3
 };
 
 // ── 3D Architectural Playwright Masks Monolith ────────────────────────────────
@@ -55,7 +56,6 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
     data.paths.forEach((p) => {
       const color = (p.color?.getHexString?.() || '').toLowerCase();
       const shapes = p.toShapes(true);
-      // Group by fill category
       if (color.includes('e2574c') || color.includes('d65348') || color.includes('c04b41')) {
         redShapes.push(...shapes);
       } else if (color.includes('2ead33') || color.includes('1d8d22')) {
@@ -96,46 +96,46 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (redMatRef.current) {
-      redMatRef.current.emissiveIntensity = 1.3 + Math.sin(t * 2.8) * 0.45;
+      redMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8) * 0.45;
     }
     if (greenMatRef.current) {
-      greenMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8 + 1.2) * 0.45;
+      greenMatRef.current.emissiveIntensity = 1.5 + Math.sin(t * 2.8 + 1.2) * 0.45;
     }
   });
 
   return (
     <group position={[0, 0, planetRadius * 0.98]} scale={[emblemScale, emblemScale, emblemScale]}>
-      {/* 1. Slate Support Chassis */}
+      {/* 1. Dark Support Chassis */}
       <mesh geometry={slateGeo}>
         <meshStandardMaterial
           color={C.slateTrim}
           roughness={0.4}
           metalness={0.8}
-          emissive="#101c24"
+          emissive="#120618"
           emissiveIntensity={0.4}
         />
       </mesh>
 
-      {/* 2. Left Red Theatre Mask (Ruby Crystal) */}
+      {/* 2. Left Red Theatre Mask (Ruby/Reddish-Pink Crystal) */}
       <mesh geometry={redGeo} position={[0, 0, 0.3]}>
         <meshStandardMaterial
           ref={redMatRef}
           color={C.rubyBright}
           emissive={C.rubyGlow}
-          emissiveIntensity={1.3}
-          roughness={0.15}
+          emissiveIntensity={1.4}
+          roughness={0.12}
           metalness={0.85}
         />
       </mesh>
 
-      {/* 3. Right Green Theatre Mask (Emerald Crystal) */}
+      {/* 3. Right Green Theatre Mask (Emerald/Mint Crystal) */}
       <mesh geometry={greenGeo} position={[0, 0, 0.6]}>
         <meshStandardMaterial
           ref={greenMatRef}
           color={C.emeraldBright}
           emissive={C.emeraldGlow}
-          emissiveIntensity={1.4}
-          roughness={0.15}
+          emissiveIntensity={1.5}
+          roughness={0.12}
           metalness={0.85}
         />
       </mesh>
@@ -146,6 +146,7 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
 // ── Main PlaywrightPlanet Component ───────────────────────────────────────────
 export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat = 0.0 }) {
   const planetGroupRef = useRef();
+  const shaderMatRef   = useRef();
   const ring1Ref       = useRef();
   const ring2Ref       = useRef();
   const runnerRefs     = useRef([]);
@@ -154,9 +155,9 @@ export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat =
 
   // Tri-browser test runner satellites (Chromium, Firefox, WebKit)
   const browserNodes = useMemo(() => [
-    { name: 'Chromium', color: C.chromiumCyan,  speed:  0.8, offset: 0.0, ringRadius: planetRadius * 1.32, tiltX:  0.45 },
-    { name: 'Firefox',  color: C.firefoxOrange, speed: -0.6, offset: 2.1, ringRadius: planetRadius * 1.48, tiltX: -0.35 },
-    { name: 'WebKit',   color: C.webkitPurple,  speed:  0.7, offset: 4.2, ringRadius: planetRadius * 1.62, tiltX:  0.20 },
+    { name: 'Chromium', color: C.chromiumCyan,  speed:  0.8, offset: 0.0, ringRadius: planetRadius * 1.30, tiltX:  0.45 },
+    { name: 'Firefox',  color: C.firefoxOrange, speed: -0.6, offset: 2.1, ringRadius: planetRadius * 1.45, tiltX: -0.35 },
+    { name: 'WebKit',   color: C.webkitPurple,  speed:  0.7, offset: 4.2, ringRadius: planetRadius * 1.60, tiltX:  0.20 },
   ], [planetRadius]);
 
   const tempPos = useMemo(() => new THREE.Vector3(), []);
@@ -164,6 +165,12 @@ export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat =
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     const safeDelta = Math.min(delta, 0.1);
+
+    // Update organic shader time and tier
+    if (shaderMatRef.current) {
+      shaderMatRef.current.uTime = t;
+      shaderMatRef.current.uPerfTier = perfTierFloat;
+    }
 
     // Planet axial rotation
     if (planetGroupRef.current) {
@@ -181,13 +188,13 @@ export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat =
         const angle = t * node.speed + node.offset;
         const x = Math.cos(angle) * node.ringRadius;
         const z = Math.sin(angle) * node.ringRadius;
-        const y = Math.sin(angle * 2.0) * (node.ringRadius * 0.12);
+        const y = Math.sin(angle * 2.0) * (node.ringRadius * 0.10);
 
         tempPos.set(x, y, z).applyAxisAngle(new THREE.Vector3(1, 0, 0), node.tiltX);
         runner.position.copy(tempPos);
 
         if (runner.material) {
-          runner.material.emissiveIntensity = 2.2 + Math.sin(t * 5.0 + i) * 0.6;
+          runner.material.emissiveIntensity = 2.4 + Math.sin(t * 5.0 + i) * 0.6;
         }
       }
     });
@@ -197,57 +204,33 @@ export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat =
     <group rotation={[-0.35, 0, 0]}>
       {/* ── Rotating Planet Core ── */}
       <group ref={planetGroupRef}>
-        {/* 1. Deep Slate Titanium Base Sphere */}
+        {/* 1. Smooth Organic Dual-Tone Reddish-Pink & Emerald Shader (No Grid Lines!) */}
         <mesh>
           <sphereGeometry args={[planetRadius, perfTierFloat >= 0.8 ? 24 : 48, perfTierFloat >= 0.8 ? 24 : 48]} />
-          <meshStandardMaterial
-            color={C.slateDark}
-            roughness={0.35}
-            metalness={0.85}
-            emissive="#0a1218"
-            emissiveIntensity={0.6}
+          <playwrightPlanetShaderMaterial
+            ref={shaderMatRef}
+            uPerfTier={perfTierFloat}
           />
         </mesh>
 
-        {/* 2. Dual-Tone Coordinate Grid Ring (Latitude & Longitude) */}
-        <mesh>
-          <sphereGeometry args={[planetRadius * 1.002, 24, 16]} />
-          <meshBasicMaterial
-            color="#22394a"
-            wireframe={true}
-            transparent={true}
-            opacity={0.35}
-          />
-        </mesh>
-
-        {/* 3. Equatorial Green & Red Dual Orbit Lines */}
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[planetRadius * 1.004, planetRadius * 1.012, 64]} />
-          <meshBasicMaterial color={C.emeraldBright} transparent opacity={0.65} side={THREE.DoubleSide} />
-        </mesh>
-        <mesh rotation={[Math.PI / 2 + 0.08, 0, 0]}>
-          <ringGeometry args={[planetRadius * 1.014, planetRadius * 1.020, 64]} />
-          <meshBasicMaterial color={C.rubyBright} transparent opacity={0.55} side={THREE.DoubleSide} />
-        </mesh>
-
-        {/* 4. Extruded 3D Playwright Dual Masks Monolith */}
+        {/* 2. Extruded 3D Playwright Dual Masks Monolith */}
         <PlaywrightEmblem size={size} planetRadius={planetRadius} isMobile={isMobile} />
       </group>
 
-      {/* ── Inclined Test Track Laser Rings ── */}
+      {/* ── Inclined Test Track Laser Rings (Reddish-Pink & Emerald) ── */}
       {/* Ring 1 (Emerald Test Track) */}
       <group ref={ring1Ref} rotation={[0.45, 0.2, 0]}>
         <mesh>
-          <ringGeometry args={[planetRadius * 1.30, planetRadius * 1.34, 64]} />
-          <meshBasicMaterial color={C.emeraldBright} transparent opacity={0.45} side={THREE.DoubleSide} />
+          <ringGeometry args={[planetRadius * 1.28, planetRadius * 1.32, 64]} />
+          <meshBasicMaterial color={C.emeraldBright} transparent opacity={0.50} side={THREE.DoubleSide} />
         </mesh>
       </group>
 
-      {/* Ring 2 (Ruby Test Track) */}
+      {/* Ring 2 (Reddish-Pink Test Track) */}
       <group ref={ring2Ref} rotation={[-0.35, -0.4, 0]}>
         <mesh>
-          <ringGeometry args={[planetRadius * 1.46, planetRadius * 1.50, 64]} />
-          <meshBasicMaterial color={C.rubyBright} transparent opacity={0.40} side={THREE.DoubleSide} />
+          <ringGeometry args={[planetRadius * 1.43, planetRadius * 1.47, 64]} />
+          <meshBasicMaterial color={C.rubyBright} transparent opacity={0.45} side={THREE.DoubleSide} />
         </mesh>
       </group>
 
@@ -265,16 +248,16 @@ export function PlaywrightPlanet({ size = 0.5, isMobile = false, perfTierFloat =
         </mesh>
       ))}
 
-      {/* Atmospheric Fresnel Outer Glow Shell */}
+      {/* Atmospheric Fresnel Outer Glow Shell (Reddish-Pink & Emerald Aura) */}
       <mesh>
-        <sphereGeometry args={[planetRadius * 1.09, 24, 24]} />
+        <sphereGeometry args={[planetRadius * 1.10, 24, 24]} />
         <meshStandardMaterial
-          color="#2EAD33"
+          color="#FF2D6E"
           transparent
-          opacity={0.06}
+          opacity={0.07}
           side={THREE.BackSide}
-          emissive="#1B8D22"
-          emissiveIntensity={0.3}
+          emissive="#2EAD33"
+          emissiveIntensity={0.35}
         />
       </mesh>
     </group>
