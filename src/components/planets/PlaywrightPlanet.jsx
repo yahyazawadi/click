@@ -37,12 +37,12 @@ const C = {
   webkitPurple:  '#D946EF', // Browser node 3
 };
 
-// ── 3D Architectural Playwright Masks Monolith ────────────────────────────────
+// ── 3D Architectural Playwright Masks Monolith (Sculpted Medallion) ───────────
 function PlaywrightEmblem({ size, planetRadius, isMobile }) {
   const redMatRef   = useRef();
   const greenMatRef = useRef();
 
-  const emblemScale = (planetRadius * 0.45) / 12;
+  const emblemScale = (planetRadius * 0.46) / 13.5;
 
   const { redGeo, greenGeo, slateGeo } = useMemo(() => {
     const loader = new SVGLoader();
@@ -65,21 +65,22 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
       }
     });
 
+    // Sleek low-profile extrusion configs to prevent blocky side-profile
     const extrudeConfig = (depth, bevelThick) => ({
       depth,
       bevelEnabled:   true,
       bevelThickness: bevelThick,
-      bevelSize:      bevelThick * 0.6,
-      bevelSegments:  isMobile ? 1 : 3,
+      bevelSize:      bevelThick * 0.7,
+      bevelSegments:  isMobile ? 1 : 4,
     });
 
-    const rGeo = new THREE.ExtrudeGeometry(redShapes, extrudeConfig(2.6, 0.45));
+    const rGeo = new THREE.ExtrudeGeometry(redShapes, extrudeConfig(0.38, 0.16));
     rGeo.applyMatrix4(centerMatrix);
 
-    const gGeo = new THREE.ExtrudeGeometry(greenShapes, extrudeConfig(3.2, 0.55));
+    const gGeo = new THREE.ExtrudeGeometry(greenShapes, extrudeConfig(0.48, 0.18));
     gGeo.applyMatrix4(centerMatrix);
 
-    const sGeo = new THREE.ExtrudeGeometry(slateShapes, extrudeConfig(1.8, 0.35));
+    const sGeo = new THREE.ExtrudeGeometry(slateShapes, extrudeConfig(0.22, 0.10));
     sGeo.applyMatrix4(centerMatrix);
 
     return { redGeo: rGeo, greenGeo: gGeo, slateGeo: sGeo };
@@ -96,47 +97,70 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (redMatRef.current) {
-      redMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8) * 0.45;
+      redMatRef.current.emissiveIntensity = 1.3 + Math.sin(t * 2.8) * 0.4;
     }
     if (greenMatRef.current) {
-      greenMatRef.current.emissiveIntensity = 1.5 + Math.sin(t * 2.8 + 1.2) * 0.45;
+      greenMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8 + 1.2) * 0.4;
     }
   });
 
   return (
-    <group position={[0, 0, planetRadius * 0.98]} scale={[emblemScale, emblemScale, emblemScale]}>
-      {/* 1. Dark Support Chassis */}
-      <mesh geometry={slateGeo}>
+    <group position={[0, 0, planetRadius * 0.992]} scale={[emblemScale, emblemScale, emblemScale]}>
+      {/* 1. Sleek Circular Bezel Medallion (blends flush with sphere surface) */}
+      <mesh position={[0, 0, -0.08]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[13.2, 13.6, 0.28, 48]} />
+        <meshStandardMaterial
+          color="#120618"
+          roughness={0.4}
+          metalness={0.85}
+          emissive="#0d0412"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      {/* 2. Outer Dual-Tone Glowing Medallion Rim */}
+      <mesh position={[0, 0, 0.08]}>
+        <ringGeometry args={[13.1, 13.7, 64]} />
+        <meshBasicMaterial
+          color="#FF2D6E"
+          transparent
+          opacity={0.65}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* 3. Dark Support Chassis */}
+      <mesh geometry={slateGeo} position={[0, 0, 0.05]}>
         <meshStandardMaterial
           color={C.slateTrim}
-          roughness={0.4}
-          metalness={0.8}
+          roughness={0.35}
+          metalness={0.9}
           emissive="#120618"
           emissiveIntensity={0.4}
         />
       </mesh>
 
-      {/* 2. Left Red Theatre Mask (Ruby/Reddish-Pink Crystal) */}
-      <mesh geometry={redGeo} position={[0, 0, 0.3]}>
+      {/* 4. Left Red Theatre Mask (Ruby/Reddish-Pink Crystal Relief) */}
+      <mesh geometry={redGeo} position={[0, 0, 0.12]}>
         <meshStandardMaterial
           ref={redMatRef}
           color={C.rubyBright}
           emissive={C.rubyGlow}
-          emissiveIntensity={1.4}
-          roughness={0.12}
-          metalness={0.85}
+          emissiveIntensity={1.3}
+          roughness={0.15}
+          metalness={0.8}
         />
       </mesh>
 
-      {/* 3. Right Green Theatre Mask (Emerald/Mint Crystal) */}
-      <mesh geometry={greenGeo} position={[0, 0, 0.6]}>
+      {/* 5. Right Green Theatre Mask (Emerald/Mint Crystal Relief) */}
+      <mesh geometry={greenGeo} position={[0, 0, 0.18]}>
         <meshStandardMaterial
           ref={greenMatRef}
           color={C.emeraldBright}
           emissive={C.emeraldGlow}
-          emissiveIntensity={1.5}
-          roughness={0.12}
-          metalness={0.85}
+          emissiveIntensity={1.4}
+          roughness={0.15}
+          metalness={0.8}
         />
       </mesh>
     </group>
