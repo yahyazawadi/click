@@ -42,7 +42,7 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
   const redMatRef   = useRef();
   const greenMatRef = useRef();
 
-  const emblemScale = (planetRadius * 0.45) / 12;
+  const emblemScale = (planetRadius * 0.72) / 12;
 
   // Deep blackish obsidian material for mask side walls and interior eye/mouth cutouts
   const darkSideMat = useMemo(() => new THREE.MeshStandardMaterial({
