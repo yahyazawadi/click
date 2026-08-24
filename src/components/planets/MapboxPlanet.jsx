@@ -145,6 +145,18 @@ export function MapboxPlanet({ size = 0.5, isMobile = false, perfTierFloat = 0.0
     };
   }, [standardPinTex, anchorPinTex]);
 
+  // Clean cartographic latitude & longitude grid lines (no diagonals)
+  const gridGeo = useMemo(() => {
+    const sphere = new THREE.SphereGeometry(planetRadius * 1.002, 24, 14);
+    const edges = new THREE.EdgesGeometry(sphere, 1);
+    sphere.dispose();
+    return edges;
+  }, [planetRadius]);
+
+  useEffect(() => {
+    return () => gridGeo?.dispose();
+  }, [gridGeo]);
+
   // 2. Hub Surface Positions on the sphere
   const hubs = useMemo(() => {
     return GLOBAL_HUBS.map((hub) => {
@@ -282,16 +294,14 @@ export function MapboxPlanet({ size = 0.5, isMobile = false, perfTierFloat = 0.0
           />
         </mesh>
 
-        {/* 2. Sleek Coordinate Grid Wireframe (Latitude & Longitude) */}
-        <mesh>
-          <sphereGeometry args={[planetRadius * 1.002, 20, 16]} />
-          <meshBasicMaterial
-            color="#143a63"
-            wireframe={true}
+        {/* 2. Sleek Coordinate Grid Lines (Clean Latitude & Longitude parallels) */}
+        <lineSegments geometry={gridGeo}>
+          <lineBasicMaterial
+            color="#00BAE3"
             transparent={true}
-            opacity={0.32}
+            opacity={0.46}
           />
-        </mesh>
+        </lineSegments>
 
         {/* 3. Glowing Equatorial Coordinate Line */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
