@@ -37,21 +37,33 @@ const C = {
   webkitPurple:  '#D946EF', // Browser node 3
 };
 
-// ── 3D Architectural Playwright Masks Monolith (Sculpted Medallion) ───────────
+// ── 3D Architectural Playwright Masks Monolith ────────────────────────────────
 function PlaywrightEmblem({ size, planetRadius, isMobile }) {
   const redMatRef   = useRef();
   const greenMatRef = useRef();
 
-  const emblemScale = (planetRadius * 0.46) / 13.5;
+  const emblemScale = (planetRadius * 0.45) / 12;
 
-  const { redGeo, greenGeo, slateGeo } = useMemo(() => {
+  // Deep blackish obsidian material for mask side walls and interior eye/mouth cutouts
+  const darkSideMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#08040c',
+    roughness: 0.35,
+    metalness: 0.9,
+    emissive: '#030105',
+    emissiveIntensity: 0.15,
+  }), []);
+
+  useEffect(() => {
+    return () => darkSideMat?.dispose?.();
+  }, [darkSideMat]);
+
+  const { redGeo, greenGeo } = useMemo(() => {
     const loader = new SVGLoader();
     const data = loader.parse(SVG_PLAYWRIGHT_LOGO);
     const centerMatrix = new THREE.Matrix4().makeTranslation(-12, -12, 0);
 
     const redShapes   = [];
     const greenShapes = [];
-    const slateShapes = [];
 
     data.paths.forEach((p) => {
       const color = (p.color?.getHexString?.() || '').toLowerCase();
@@ -60,108 +72,77 @@ function PlaywrightEmblem({ size, planetRadius, isMobile }) {
         redShapes.push(...shapes);
       } else if (color.includes('2ead33') || color.includes('1d8d22')) {
         greenShapes.push(...shapes);
-      } else {
-        slateShapes.push(...shapes);
       }
     });
 
-    // Sleek low-profile extrusion configs to prevent blocky side-profile
     const extrudeConfig = (depth, bevelThick) => ({
       depth,
       bevelEnabled:   true,
       bevelThickness: bevelThick,
-      bevelSize:      bevelThick * 0.7,
-      bevelSegments:  isMobile ? 1 : 4,
+      bevelSize:      bevelThick * 0.5,
+      bevelSegments:  isMobile ? 1 : 3,
     });
 
-    const rGeo = new THREE.ExtrudeGeometry(redShapes, extrudeConfig(0.38, 0.16));
+    // 1. Left Red Mask Geometry (Ruby / Reddish-Pink)
+    const rGeo = new THREE.ExtrudeGeometry(redShapes, extrudeConfig(3.2, 0.45));
     rGeo.applyMatrix4(centerMatrix);
 
-    const gGeo = new THREE.ExtrudeGeometry(greenShapes, extrudeConfig(0.48, 0.18));
+    // 2. Right Green Mask Geometry (Emerald Green)
+    const gGeo = new THREE.ExtrudeGeometry(greenShapes, extrudeConfig(3.6, 0.5));
     gGeo.applyMatrix4(centerMatrix);
 
-    const sGeo = new THREE.ExtrudeGeometry(slateShapes, extrudeConfig(0.22, 0.10));
-    sGeo.applyMatrix4(centerMatrix);
-
-    return { redGeo: rGeo, greenGeo: gGeo, slateGeo: sGeo };
+    return { redGeo: rGeo, greenGeo: gGeo };
   }, [isMobile]);
 
   useEffect(() => {
     return () => {
       redGeo?.dispose?.();
       greenGeo?.dispose?.();
-      slateGeo?.dispose?.();
     };
-  }, [redGeo, greenGeo, slateGeo]);
+  }, [redGeo, greenGeo]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (redMatRef.current) {
-      redMatRef.current.emissiveIntensity = 1.3 + Math.sin(t * 2.8) * 0.4;
+      redMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8) * 0.45;
     }
     if (greenMatRef.current) {
-      greenMatRef.current.emissiveIntensity = 1.4 + Math.sin(t * 2.8 + 1.2) * 0.4;
+      greenMatRef.current.emissiveIntensity = 1.5 + Math.sin(t * 2.8 + 1.2) * 0.45;
     }
   });
 
   return (
-    <group position={[0, 0, planetRadius * 0.992]} scale={[emblemScale, emblemScale, emblemScale]}>
-      {/* 1. Sleek Circular Bezel Medallion (blends flush with sphere surface) */}
-      <mesh position={[0, 0, -0.08]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[13.2, 13.6, 0.28, 48]} />
+    <group position={[0, 0, planetRadius * 0.98]} scale={[emblemScale, emblemScale, emblemScale]}>
+      {/* 1. Left Red Theatre Mask (Ruby Crystal Front, Blackish Sides & Eye Cavities) */}
+      <mesh geometry={redGeo} position={[0, 0, 0.0]}>
+        {/* Material 0: Front face cap (Ruby Pink) */}
         <meshStandardMaterial
-          color="#120618"
-          roughness={0.4}
-          metalness={0.85}
-          emissive="#0d0412"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      {/* 2. Outer Dual-Tone Glowing Medallion Rim */}
-      <mesh position={[0, 0, 0.08]}>
-        <ringGeometry args={[13.1, 13.7, 64]} />
-        <meshBasicMaterial
-          color="#FF2D6E"
-          transparent
-          opacity={0.65}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* 3. Dark Support Chassis */}
-      <mesh geometry={slateGeo} position={[0, 0, 0.05]}>
-        <meshStandardMaterial
-          color={C.slateTrim}
-          roughness={0.35}
-          metalness={0.9}
-          emissive="#120618"
-          emissiveIntensity={0.4}
-        />
-      </mesh>
-
-      {/* 4. Left Red Theatre Mask (Ruby/Reddish-Pink Crystal Relief) */}
-      <mesh geometry={redGeo} position={[0, 0, 0.12]}>
-        <meshStandardMaterial
+          attach="material-0"
           ref={redMatRef}
           color={C.rubyBright}
           emissive={C.rubyGlow}
-          emissiveIntensity={1.3}
-          roughness={0.15}
-          metalness={0.8}
+          emissiveIntensity={1.4}
+          roughness={0.12}
+          metalness={0.85}
         />
+        {/* Material 1: Extruded Side Walls & Inner Eye/Mouth Cavity Walls (Deep Blackish Obsidian) */}
+        <primitive attach="material-1" object={darkSideMat} />
       </mesh>
 
-      {/* 5. Right Green Theatre Mask (Emerald/Mint Crystal Relief) */}
-      <mesh geometry={greenGeo} position={[0, 0, 0.18]}>
+      {/* 2. Right Green Theatre Mask (Emerald Crystal Front, Blackish Sides & Eye Cavities) */}
+      <mesh geometry={greenGeo} position={[0, 0, 0.35]}>
+        {/* Material 0: Front face cap (Emerald Green) */}
         <meshStandardMaterial
+          attach="material-0"
           ref={greenMatRef}
           color={C.emeraldBright}
           emissive={C.emeraldGlow}
-          emissiveIntensity={1.4}
-          roughness={0.15}
-          metalness={0.8}
+          emissiveIntensity={1.5}
+          roughness={0.12}
+          metalness={0.85}
         />
+        {/* Material 1: Extruded Side Walls & Inner Eye/Mouth Cavity Walls (Deep Blackish Obsidian) */}
+        <primitive attach="material-1" object={darkSideMat} />
       </mesh>
     </group>
   );
