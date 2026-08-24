@@ -299,10 +299,10 @@ export const SYSTEM_CONFIG = {
       fullDesc: 'High-performance Mapbox GL JS spatial platform developed for epidemiology tracking, live contagion cluster visualization, dynamic vector tile caching, and custom geo-analytics. Features interactive vector layers, great-circle geodesic flight routes, and spatial queries.',
       tags: ['MAPBOX GL JS', 'GEOSPATIAL', 'GEOJSON', 'VECTOR TILES', 'SPATIAL CLUSTERING', 'TURF.JS'],
       specs: [
-        'Real-time great-circle geodesic routing',
-        'Dynamic contagion spatial cluster heatmaps',
-        'Sub-millisecond vector tile cache pipeline',
-        'Custom WebGL choropleth & telemetry layers'
+        'Spatial Routing: Real-time great-circle geodesic flight paths',
+        'Contagion Heatmaps: Dynamic epidemiological cluster visualization',
+        'Tile Pipeline: Sub-millisecond Mapbox vector tile caching',
+        'Geo-Analytics: Custom Turf.js spatial queries & WebGL layers'
       ]
     }
   ]
