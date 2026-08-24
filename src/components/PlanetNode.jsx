@@ -12,6 +12,7 @@ import {
   PhonePlanet,
   TelegramPlanet,
   SupabasePlanet,
+  MapboxPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -36,6 +37,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'supabase') {
     return <SupabasePlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'mapbox' || type === 'mapbox-gis' || type === 'geospatial') {
+    return <MapboxPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }

@@ -285,6 +285,25 @@ export const SYSTEM_CONFIG = {
         'Realtime WebSocket live dashboard subscriptions',
         'Deno Edge Functions + Supabase Storage (R2)'
       ]
+    },
+    {
+      id: 'proj-mapbox-gis',
+      title: 'MAPBOX GEOSPATIAL // GIS',
+      ringIndex: 0,
+      shapeIndex: 'mapbox',
+      startAngle: 0.4,
+      size: 0.52,
+      color: '#4264FB',
+      category: 'GEOSPATIAL INTELLIGENCE & GIS ENGINE',
+      shortDesc: 'Interactive vector mapping engine with great-circle routing, epidemiological spatial clustering, and real-time telemetry.',
+      fullDesc: 'High-performance Mapbox GL JS spatial platform developed for epidemiology tracking, live contagion cluster visualization, dynamic vector tile caching, and custom geo-analytics. Features interactive vector layers, great-circle geodesic flight routes, and spatial queries.',
+      tags: ['MAPBOX GL JS', 'GEOSPATIAL', 'GEOJSON', 'VECTOR TILES', 'SPATIAL CLUSTERING', 'TURF.JS'],
+      specs: [
+        'Real-time great-circle geodesic routing',
+        'Dynamic contagion spatial cluster heatmaps',
+        'Sub-millisecond vector tile cache pipeline',
+        'Custom WebGL choropleth & telemetry layers'
+      ]
     }
   ]
 };

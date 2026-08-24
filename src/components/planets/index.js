@@ -9,6 +9,7 @@ import { SimpleEarthPlanet } from './SimpleEarthPlanet';
 import { PhonePlanet } from './PhonePlanet';
 import { TelegramPlanet } from './TelegramPlanet';
 import { SupabasePlanet } from './SupabasePlanet';
+import { MapboxPlanet } from './MapboxPlanet';
 
 export {
   ScissorPlanet,
@@ -22,6 +23,7 @@ export {
   PhonePlanet,
   TelegramPlanet,
   SupabasePlanet,
+  MapboxPlanet,
 };
 
 
