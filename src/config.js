@@ -307,21 +307,21 @@ export const SYSTEM_CONFIG = {
     },
     {
       id: 'proj-playwright-e2e',
-      title: 'PLAYWRIGHT // E2E LAB',
+      title: 'PLAYWRIGHT // CONCURRENCY QA',
       ringIndex: 2,
       shapeIndex: 'playwright',
       startAngle: 4.0,
       size: 0.50,
       color: '#2EAD33',
-      category: 'AUTOMATED QA & CONCURRENCY TEST SUITE',
-      shortDesc: 'High-concurrency automated testing lab simulating race conditions, advisory locks, and multi-tenant RLS isolation.',
-      fullDesc: 'Comprehensive Playwright & Vitest automated test suite integrated with GitHub Actions CI/CD pipelines. Simulates multi-user concurrent booking collisions, verifies PostgreSQL transaction-scoped advisory locks, audits RLS policy isolation, and tests WhatsApp webhook delivery across Chromium, Firefox, and WebKit.',
-      tags: ['PLAYWRIGHT', 'VITEST', 'CI/CD PIPELINES', 'E2E TESTING', 'RACE CONDITIONS', 'CONCURRENCY'],
+      category: 'HIGH-CONCURRENCY E2E & SECURITY QA LAB',
+      shortDesc: 'Battle-tested automated testing suite built to stress-test high-concurrency race conditions, PostgreSQL advisory locks, and multi-tenant RLS isolation.',
+      fullDesc: 'Production-grade automated QA lab designed to ensure zero double-booking collisions under extreme concurrency. Uses Playwright and Vitest to orchestrate sub-millisecond multi-user booking races against PostgreSQL pg_advisory_xact_lock, verify zero-trust Row-Level Security (RLS) tenant isolation across API endpoints, and validate end-to-end user booking lifecycles through WhatsApp webhook delivery. Fully automated in GitHub Actions across Chromium, Firefox, and WebKit.',
+      tags: ['PLAYWRIGHT', 'VITEST', 'RACE CONDITIONS', 'ADVISORY LOCKS', 'RLS PENETRATION', 'CI/CD PIPELINES', 'CROSS-BROWSER'],
       specs: [
-        'Concurrency Stress: Multi-user booking collision simulation',
-        'RLS Security Audits: Automated cross-tenant leak detection',
-        'Cross-Browser Grid: Headless Chromium, Firefox & WebKit',
-        'CI/CD Pipelines: Automated GitHub Actions regression test run'
+        'Race Condition Stress: Multi-user concurrent sub-ms booking simulation',
+        'Zero-Trust RLS Audits: Automated cross-tenant JWT leak detection',
+        'End-to-End Pipelines: Full booking lifecycle & WhatsApp webhook QA',
+        'Multi-Browser CI/CD: Automated GitHub Actions on Chromium, Firefox & WebKit'
       ]
     }
   ]
