@@ -129,6 +129,30 @@ export function PresentationDock({
                     : selectedProject?.tags || []
                   ).map((tag, idx) => (<span key={idx} className="dock-tag-pill">{tag}</span>))}
                 </div>
+                {(selectedProject?.liveUrl || selectedProject?.githubUrl) && (
+                  <div className="dock-project-links">
+                    {selectedProject.liveUrl && (
+                      <a
+                        href={selectedProject.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="dock-action-link primary"
+                      >
+                        Launch Platform ↗
+                      </a>
+                    )}
+                    {selectedProject.githubUrl && (
+                      <a
+                        href={selectedProject.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="dock-action-link secondary"
+                      >
+                        Source Code ↗
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
 
               {!showGallery && (

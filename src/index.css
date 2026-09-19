@@ -656,6 +656,58 @@ html, body, #root {
   font-family: var(--font-mono);
 }
 
+.dock-project-links {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dock-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.95rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dock-action-link.primary {
+  background: var(--primary-cyan);
+  color: #030816;
+  border: 1px solid var(--primary-cyan);
+  box-shadow: 0 0 16px rgba(0, 186, 227, 0.4);
+}
+
+.dock-action-link.primary:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #030816;
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.dock-action-link.secondary {
+  background: rgba(0, 50, 104, 0.35);
+  color: var(--primary-cyan);
+  border: 1px solid rgba(0, 186, 227, 0.35);
+}
+
+.dock-action-link.secondary:hover {
+  background: rgba(0, 186, 227, 0.2);
+  border-color: var(--primary-cyan);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(0, 186, 227, 0.3);
+  transform: translateY(-1px);
+}
+
 /* Column 2: Specs Cards Grid */
 .dock-specs-title {
   font-size: 0.68rem;

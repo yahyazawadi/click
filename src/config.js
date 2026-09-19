@@ -194,6 +194,8 @@ export const SYSTEM_CONFIG = {
       category: 'AUTHENTIC NASA CONTINENTS',
       shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
       fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
+      liveUrl: 'https://climamedix.pages.dev/',
+      githubUrl: 'https://github.com/yahyazawadi/climamedix',
       tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
       specs: [
         'Real NASA continental geography',
@@ -297,6 +299,8 @@ export const SYSTEM_CONFIG = {
       category: 'GEOSPATIAL INTELLIGENCE & GIS ENGINE',
       shortDesc: 'Interactive vector mapping engine with great-circle routing, epidemiological spatial clustering, and real-time telemetry.',
       fullDesc: 'High-performance Mapbox GL JS spatial platform developed for epidemiology tracking, live contagion cluster visualization, dynamic vector tile caching, and custom geo-analytics. Features interactive vector layers, great-circle geodesic flight routes, and spatial queries.',
+      liveUrl: 'https://climamedix-sql.pages.dev/debug',
+      githubUrl: 'https://github.com/yahyazawadi/climamedix',
       tags: ['MAPBOX GL JS', 'GEOSPATIAL', 'GEOJSON', 'VECTOR TILES', 'SPATIAL CLUSTERING', 'TURF.JS'],
       specs: [
         'Spatial Routing: Real-time great-circle geodesic flight paths',
