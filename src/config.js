@@ -198,10 +198,10 @@ export const SYSTEM_CONFIG = {
       githubUrl: 'https://github.com/yahyazawadi/climamedix',
       tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
       specs: [
-        'Real NASA continental geography',
-        'Specular ocean glint mapping',
-        'True 3D parallax cloud drift',
-        '120 FPS hardware-accelerated'
+        'Continental Topography: NASA Blue Marble texture mapping',
+        'Ocean Shader: Specular solar reflections & atmospheric limb glow',
+        'Atmospheric Drift: 3D parallax volumetric cloud animation',
+        'Frame Performance: Hardware-accelerated 120 FPS runtime'
       ],
       gallery: [
         {
@@ -244,10 +244,10 @@ export const SYSTEM_CONFIG = {
       fullDesc: 'Production messaging automation pipeline integrated directly with Meta WhatsApp Business Cloud API. Powered by Supabase Edge Functions with 6 verified utility message templates, interactive quick-reply booking confirmations, dual automated reminder cron workers (24h & 2h prior), wamid status tracking, and passwordless login verifications.',
       tags: ['META CLOUD API', 'EDGE FUNCTIONS', 'SUPABASE', 'CRON WORKERS', 'WEBHOOKS', 'DENO'],
       specs: [
-        '6 Meta utility message templates integrated',
-        'Interactive quick-replies (15-min timeout)',
-        'Dual automated reminder dispatch (24h & 2h)',
-        'wamid status tracking & webhook ingress'
+        'Message Templates: 6 Meta utility message templates integrated',
+        'Interactive Confirmation: Quick-replies with 15-min timeout',
+        'Automated Scheduling: Dual reminder cron dispatch (24h & 2h)',
+        'Delivery Telemetry: wamid status tracking & webhook ingress'
       ]
     },
     {
@@ -263,10 +263,10 @@ export const SYSTEM_CONFIG = {
       fullDesc: 'Serverless Telegram automation bot designed for high-throughput messaging, interactive inline keyboards, automated broadcast dispatches, and real-time webhook payload handling with end-to-end type safety.',
       tags: ['TELEGRAM API', 'EDGE FUNCTIONS', 'TYPESCRIPT', 'WEBHOOKS', 'INLINE BOT'],
       specs: [
-        'Serverless webhook routing architecture',
-        'Interactive inline keyboard workflows',
-        'Automated real-time notification dispatch',
-        'Low-latency global edge execution'
+        'Edge Architecture: Serverless webhook routing via Edge Functions',
+        'Inline Workflows: Interactive inline keyboards & menus',
+        'Notification Engine: Automated real-time broadcast dispatch',
+        'Global Latency: Low-latency edge execution'
       ]
     },
     {
@@ -326,6 +326,27 @@ export const SYSTEM_CONFIG = {
         'Zero-Trust RLS Audits: Automated cross-tenant JWT leak detection',
         'End-to-End Pipelines: Full booking lifecycle & WhatsApp webhook QA',
         'Multi-Browser CI/CD: Automated GitHub Actions on Chromium, Firefox & WebKit'
+      ]
+    },
+    {
+      id: 'proj-apify-radar',
+      title: 'APIFY // REGIONAL DATA RADAR',
+      ringIndex: 1,
+      shapeIndex: 'apify',
+      startAngle: 3.0,
+      size: 0.52,
+      color: '#246DFF',
+      category: 'DISTRIBUTED CRAWLERS & OCR PIPELINES',
+      shortDesc: 'Automated data intelligence network — Damascus sports radar & West Bank scanner with Apify web actors, OCR, and Cloudflare R2.',
+      fullDesc: 'Distributed web data harvesting and document OCR infrastructure. Coordinates multi-actor Apify web crawlers, headless browser clusters, high-speed OCR pipelines, and Cloudflare R2 object storage to monitor regional sports facilities, hardware inventories, and real-time market prices with automated deduplication and live webhook dispatches.',
+      liveUrl: 'https://laptop-lookups.super-yahyaaa.workers.dev/',
+      githubUrl: 'https://github.com/yahyazawadi/gyms_sham',
+      tags: ['APIFY', 'WEB SCRAPING', 'OCR PIPELINES', 'HEADLESS BROWSER', 'DATA MINING', 'CLOUDFLARE R2', 'REST APIS'],
+      specs: [
+        'Multi-Actor Crawling: Headless Apify actors & dynamic content scrapers',
+        'Vision & OCR Ingestion: Automated text recognition & price parsing',
+        'Edge Storage & Deduplication: Cloudflare Worker R2 caching & data cleaning',
+        'Telemetry Alerts: Automated webhook feeds & change detection telemetry'
       ]
     }
   ]

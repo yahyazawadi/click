@@ -11,6 +11,7 @@ import { TelegramPlanet } from './TelegramPlanet';
 import { SupabasePlanet } from './SupabasePlanet';
 import { MapboxPlanet } from './MapboxPlanet';
 import { PlaywrightPlanet } from './PlaywrightPlanet';
+import { ApifyPlanet } from './ApifyPlanet';
 
 export {
   ScissorPlanet,
@@ -26,6 +27,7 @@ export {
   SupabasePlanet,
   MapboxPlanet,
   PlaywrightPlanet,
+  ApifyPlanet,
 };
 
 

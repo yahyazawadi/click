@@ -14,6 +14,7 @@ import {
   SupabasePlanet,
   MapboxPlanet,
   PlaywrightPlanet,
+  ApifyPlanet,
 } from './planets';
 
   // Central mesh dispatcher mapping shapeIndex/type to dedicated component files
@@ -44,6 +45,9 @@ function ProceduralPlanetMesh({ type, color, size, isSelected: _isSelected, isMo
   }
   if (type === 'playwright' || type === 'playwright-e2e' || type === 'e2e-testing') {
     return <PlaywrightPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
+  }
+  if (type === 'apify' || type === 'apify-scraper' || type === 'data-radar') {
+    return <ApifyPlanet size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
   }
   return <ScissorMoonPlanet color={color} size={size} isMobile={isMobile} perfTierFloat={perfTierFloat} />;
 }
