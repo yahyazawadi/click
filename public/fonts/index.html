@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fonts — yahya.click</title>
+
+  <!-- Google Fonts & Fontshare for premium curated typefaces -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=Audiowide&family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@600;700;800&family=Bebas+Neue&family=Bruno+Ace&family=Bruno+Ace+SC&family=Chakra+Petch:wght@600;700&family=Cinzel+Decorative:wght@700;900&family=DM+Sans:wght@600;700;800&family=Electrolize&family=Epilogue:wght@700;800&family=Fira+Code:wght@400;600;700&family=Goldman:wght@400;700&family=Gruppo&family=IBM+Plex+Mono:wght@400;600;700&family=Inconsolata:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Krona+One&family=Major+Mono+Display&family=Manrope:wght@600;700;800&family=Michroma&family=Orbitron:wght@600;700;900&family=Outfit:wght@600;700;800&family=Oxanium:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Quantico:wght@700&family=Rajdhani:wght@600;700&family=Red+Hat+Mono:wght@400;600;700&family=Righteous&family=Russo+One&family=Saira+Expanded:wght@600;700;800&family=Share+Tech+Mono&family=Silkscreen:wght@400;700&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&family=Space+Mono:wght@400;700&family=Syncopate:wght@700&family=Syne:wght@700;800&family=Teko:wght@600;700&family=Unbounded:wght@700;900&family=Zen+Dots&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=cabinet-grotesk@700,800,900&f[]=satoshi@700,900&f[]=general-sans@600,700&f[]=panchang@600,700,800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #060e1e;
+      --bg2: #0b1628;
+      --border: rgba(0, 186, 227, 0.18);
+      --border-hover: rgba(0, 186, 227, 0.55);
+      --cyan: #00BAE3;
+      --cyan-glow: rgba(0, 186, 227, 0.25);
+      --text: #FCFCFC;
+      --muted: rgba(252, 252, 252, 0.45);
+      --card: rgba(6, 14, 30, 0.85);
+      --gold: #F5A623;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 6rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Ambient starfield */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 73% 12%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 42% 68%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 88% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 5% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(2px 2px at 95% 8%, rgba(0,186,227,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 45%, rgba(255,255,255,0.35) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    header .label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      color: var(--cyan);
+      margin-bottom: 0.4rem;
+    }
+
+    header h1 {
+      font-family: 'Michroma', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.04em;
+      background: linear-gradient(120deg, #fff 40%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Sticky Interactive Control Bar */
+    .toolbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 100;
+      background: rgba(6, 14, 30, 0.95);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 20px var(--cyan-glow);
+    }
+
+    .toolbar-inputs-row {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      align-items: center;
+    }
+
+    .flex-1 { flex: 1; }
+    .hero-group { flex: 0 0 260px; }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toolbar-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .toolbar-input {
+      background: rgba(11, 22, 40, 0.9);
+      border: 1px solid rgba(0, 186, 227, 0.3);
+      border-radius: 6px;
+      color: #fff;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .toolbar-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 186, 227, 0.3);
+    }
+
+    /* Preset row */
+    .preset-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    .preset-pills {
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding: 0.15rem 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .preset-pills::-webkit-scrollbar { display: none; }
+
+    .preset-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.05em;
+      padding: 0.32rem 0.65rem;
+      background: rgba(0, 186, 227, 0.08);
+      border: 1px solid rgba(0, 186, 227, 0.25);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .preset-pill:hover, .preset-pill.active {
+      background: var(--cyan);
+      color: #030816;
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 186, 227, 0.4);
+    }
+
+    /* Bottom row of controls */
+    .toolbar-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 0.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .size-range {
+      accent-color: var(--cyan);
+      width: 80px;
+      cursor: pointer;
+    }
+
+    .size-display {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--cyan);
+      min-width: 32px;
+    }
+
+    .case-group {
+      display: flex;
+      gap: 0.2rem;
+    }
+
+    .case-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 0.22rem 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .case-btn:hover, .case-btn.active {
+      background: rgba(0, 186, 227, 0.2);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .filter-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.65rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .filter-btn.active {
+      background: rgba(0, 186, 227, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .filter-btn.highlight {
+      border-color: rgba(245, 166, 35, 0.6);
+      color: var(--gold);
+      background: rgba(245, 166, 35, 0.08);
+    }
+
+    .filter-btn.highlight.active {
+      background: rgba(245, 166, 35, 0.25);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    /* Section label */
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin: 3rem 0 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+      gap: 1.15rem;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 30px rgba(0, 186, 227, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .card.spotlight {
+      border-color: rgba(245, 166, 35, 0.4);
+      background: linear-gradient(180deg, rgba(245,166,35,0.04) 0%, rgba(6,14,30,0.85) 100%);
+    }
+
+    .card.spotlight:hover {
+      border-color: var(--gold);
+      box-shadow: 0 8px 30px rgba(245, 166, 35, 0.2);
+    }
+
+    .card-header {
+      padding: 0.65rem 1rem;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-font-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.52rem;
+      padding: 0.18rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(0,186,227,0.25);
+      color: rgba(252,252,252,0.5);
+    }
+
+    .card-badge.gold {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(245,166,35,0.12);
+      font-weight: 700;
+    }
+
+    .card-badge.top-pick {
+      border-color: #00BAE3;
+      color: #00BAE3;
+      background: rgba(0,186,227,0.12);
+      font-weight: 700;
+    }
+
+    .copy-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.52rem;
+      padding: 0.2rem 0.55rem;
+      background: rgba(0, 186, 227, 0.08);
+      border: 1px solid rgba(0, 186, 227, 0.3);
+      border-radius: 4px;
+      color: var(--cyan);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      background: var(--cyan);
+      color: #030816;
+    }
+
+    /* Mock dock preview */
+    .mock-dock {
+      padding: 1rem 1.1rem 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .mock-identity {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mock-category {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mock-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mock-desc {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mock-actions {
+      display: flex;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .mock-btn-primary {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      background: var(--cyan);
+      color: #030816;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .mock-btn-ghost {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      padding: 0.35rem 0.55rem;
+      background: transparent;
+      color: rgba(252,252,252,0.45);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .mock-rail {
+      padding: 0 1.1rem 0.75rem;
+      display: flex;
+      gap: 3px;
+    }
+
+    .rail-seg {
+      flex: 1;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(0,186,227,0.15);
+    }
+
+    .rail-seg.active {
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+      height: 3px;
+      margin-top: -0.5px;
+    }
+
+    /* Big display preview */
+    .display-preview {
+      padding: 0.85rem 1.1rem 1rem;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      background: rgba(0,0,0,0.15);
+      margin-top: auto;
+    }
+
+    .display-preview .headline {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      word-break: break-word;
+    }
+
+    .display-preview .sub {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: rgba(252,252,252,0.6);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .display-preview .dna-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      color: rgba(245, 166, 35, 0.9);
+      letter-spacing: 0.08em;
+      margin-top: 0.5rem;
+      padding-top: 0.4rem;
+      border-top: 1px dashed rgba(245, 166, 35, 0.2);
+    }
+
+    /* Mono Grid */
+    .mono-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .mono-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .mono-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 6px 20px rgba(0,186,227,0.12);
+    }
+
+    .mono-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .mono-font-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .mono-sample-cat {
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .mono-sample-counter {
+      font-size: 0.78rem;
+      color: rgba(252,252,252,0.35);
+      margin-bottom: 0.6rem;
+    }
+
+    .mono-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .mono-tag {
+      font-size: 0.58rem;
+      padding: 0.18rem 0.45rem;
+      background: rgba(0,186,227,0.08);
+      border: 1px solid rgba(0,186,227,0.22);
+      border-radius: 4px;
+      color: rgba(93,186,225,0.9);
+    }
+
+    /* Pairing combos */
+    .pair-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+      gap: 1.15rem;
+    }
+
+    .pair-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.3rem;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pair-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 30px rgba(0, 186, 227, 0.15);
+    }
+
+    .pair-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      color: var(--cyan);
+      margin-bottom: 0.9rem;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pair-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+    }
+
+    .pair-desc {
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: rgba(252,252,252,0.65);
+    }
+
+    .pair-meta {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      text-transform: uppercase;
+    }
+
+    /* Toast notification for copy */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #00BAE3;
+      color: #060e1e;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 186, 227, 0.4);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-align: center;
+    }
+
+    /* Dynamic font specimen character strip */
+    .font-specimen-strip {
+      padding: 0.55rem 1rem;
+      background: rgba(0, 0, 0, 0.28);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .specimen-letters {
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      color: rgba(252, 252, 252, 0.78);
+      word-break: break-all;
+      line-height: 1.35;
+    }
+    .specimen-nums {
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: rgba(0, 186, 227, 0.75);
+      word-break: break-all;
+    }
+
+    /* Mobile media queries */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem 0.75rem 5rem;
+      }
+      header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+      }
+      header h1 {
+        font-size: 1.45rem;
+      }
+      .toolbar {
+        position: relative;
+        top: 0;
+        padding: 0.75rem 0.85rem;
+        gap: 0.65rem;
+        margin-bottom: 1.5rem;
+      }
+      .toolbar-inputs-row {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .hero-group {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+      .toolbar-group {
+        width: 100%;
+      }
+      .toolbar-input {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px; /* prevent iOS auto-zoom */
+      }
+      .preset-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+      .toolbar-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+      }
+      .controls-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .filters {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.3rem;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+      }
+      .filters::-webkit-scrollbar { display: none; }
+      .filter-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .grid, .pair-grid, .mono-grid {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+      }
+      .card {
+        border-radius: 10px;
+      }
+      .mock-dock {
+        padding: 0.85rem 0.9rem;
+      }
+      .display-preview {
+        padding: 0.75rem 0.9rem;
+      }
+      .display-preview .headline {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="content">
+
+  <header>
+    <div class="label">// FONTS & TYPOGRAPHY LAB // YAHYA.CLICK</div>
+    <h1>Michroma & The Eurostile Space-Age Family</h1>
+    <p>Michroma belongs to the iconic <strong>Microgramma / Eurostile Extended</strong> lineage — 1960s NASA telemetry, 2001: A Space Odyssey & sci-fi cockpit consoles. Below are its closest siblings side-by-side.</p>
+  </header>
+
+  <!-- Interactive Control Bar -->
+  <div class="toolbar">
+    <!-- Row 1: Live Inputs -->
+    <div class="toolbar-inputs-row">
+      <div class="toolbar-group flex-1">
+        <span class="toolbar-label">Preview Text:</span>
+        <input type="text" id="liveText" class="toolbar-input" value="The quick brown fox jumps over the lazy dog" placeholder="Type anything to test fonts..." />
+      </div>
+      <div class="toolbar-group hero-group">
+        <span class="toolbar-label">Hero Title:</span>
+        <input type="text" id="liveHero" class="toolbar-input" value="YAHYA CORE" placeholder="Hero headline..." />
+      </div>
+    </div>
+
+    <!-- Row 2: Pangram & Presets -->
+    <div class="preset-row">
+      <span class="toolbar-label">Pangram Presets:</span>
+      <div class="preset-pills">
+        <button class="preset-pill active" onclick="setPreset('The quick brown fox jumps over the lazy dog')">🦊 Pangram (All Letters)</button>
+        <button class="preset-pill" onclick="setPreset('THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG')">🦊 PANGRAM (ALL CAPS)</button>
+        <button class="preset-pill" onclick="setPreset('ABCDEFGHIJKLMNOPQRSTUVWXYZ · 0123456789')">🔤 A-Z & 0-9</button>
+        <button class="preset-pill" onclick="setPreset('CLIMAMEDIX // TERRA & SPATIAL RADAR')">🪐 Planet Title</button>
+        <button class="preset-pill" onclick="setPreset('APIFY // REGIONAL DATA RADAR')">🛰️ Apify Scraper</button>
+        <button class="preset-pill" onclick="setPreset('LATENCY: 12ms // 60 FPS // R2 STORAGE')">⚡ HUD Telemetry</button>
+      </div>
+    </div>
+
+    <!-- Row 3: Size, Case & Category Filters -->
+    <div class="toolbar-bottom-row">
+      <div class="controls-group">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Size:</span>
+          <input type="range" id="sizeSlider" min="12" max="32" value="16" class="size-range" />
+          <span id="sizeValue" class="size-display">16px</span>
+        </div>
+        <div class="case-group">
+          <button class="case-btn active" data-case="none" onclick="setCase('none')">Aa</button>
+          <button class="case-btn" data-case="uppercase" onclick="setCase('uppercase')">AA</button>
+          <button class="case-btn" data-case="lowercase" onclick="setCase('lowercase')">aa</button>
+        </div>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn highlight active" data-filter="michroma">★ MICHROMA (10)</button>
+        <button class="filter-btn" data-filter="all">ALL (38)</button>
+        <button class="filter-btn" data-filter="scifi">SCI-FI</button>
+        <button class="filter-btn" data-filter="brutalist">BRUTALIST</button>
+        <button class="filter-btn" data-filter="clean">CLEAN</button>
+        <button class="filter-btn" data-filter="condensed">TALL</button>
+        <button class="filter-btn" data-filter="mono">MONO</button>
+        <button class="filter-btn" data-filter="pairs">PAIRS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── THE MICHROMA CLAN (EUROSTILE / NASA CONSOLE SANS) ───────── -->
+  <div id="section-michroma" class="font-section">
+    <div class="section-label" style="color:var(--gold);">★ THE MICHROMA CLAN — RETRO-FUTURISTIC / EUROSTILE / NASA HUD</div>
+    <div class="grid" id="michromaGrid">
+
+      <!-- MICHROMA (THE ORIGINAL) -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Michroma (Your Pick)</span>
+          <div class="card-meta">
+            <span class="card-badge gold">THE BASELINE</span>
+            <button class="copy-btn" onclick="copyFont('Michroma')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Michroma',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.86rem;letter-spacing:0.05em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Michroma',sans-serif;font-size:1.4rem;letter-spacing:0.06em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">DNA: Direct digitization of Microgramma / Eurostile Extended. Flat horizontal terminals, squarish rounded corners.</div>
+        </div>
+      </div>
+
+      <!-- PANCHANG -->
+      <div class="card spotlight" data-category="michroma scifi brutalist">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Panchang</span>
+          <div class="card-meta">
+            <span class="card-badge gold">CLOSEST MODERN TWIN</span>
+            <button class="copy-btn" onclick="copyFont('Panchang')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Panchang',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.8rem;letter-spacing:0.06em;font-weight:800;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Panchang',sans-serif;font-size:1.35rem;letter-spacing:0.08em;font-weight:800;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Ultra-wide extended footprint with heavier, punchier weights. The modern high-fashion sibling of Michroma.</div>
+        </div>
+      </div>
+
+      <!-- BRUNO ACE SC -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Bruno Ace SC</span>
+          <div class="card-meta">
+            <span class="card-badge gold">70s SPACECRAFT HUD</span>
+            <button class="copy-btn" onclick="copyFont('Bruno Ace SC')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Bruno Ace SC',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.95rem;letter-spacing:0.04em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Bruno Ace SC',sans-serif;font-size:1.55rem;letter-spacing:0.05em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Designed specifically as an all-caps tribute to 70s/80s avionics displays and rally automotive dashboards.</div>
+        </div>
+      </div>
+
+      <!-- ZEN DOTS -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Zen Dots</span>
+          <div class="card-meta">
+            <span class="card-badge gold">CYBER COCKPIT</span>
+            <button class="copy-btn" onclick="copyFont('Zen Dots')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Zen Dots',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.88rem;letter-spacing:0.03em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Zen Dots',sans-serif;font-size:1.4rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Rounded square letterforms with crisp horizontal slit cutouts. Ultra futuristic anime/sci-fi command bridge feel.</div>
+        </div>
+      </div>
+
+      <!-- GOLDMAN -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Goldman</span>
+          <div class="card-meta">
+            <span class="card-badge tag">AEROSPACE AVIONICS</span>
+            <button class="copy-btn" onclick="copyFont('Goldman')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Goldman',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.95rem;letter-spacing:0.04em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Goldman',sans-serif;font-size:1.55rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Square geometry with chamfered cut corners, purpose-built for flight control systems and speed gauges.</div>
+        </div>
+      </div>
+
+      <!-- ELECTROLIZE -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Electrolize</span>
+          <div class="card-meta">
+            <span class="card-badge tag">CYBER TERMINAL</span>
+            <button class="copy-btn" onclick="copyFont('Electrolize')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Electrolize',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.05rem;letter-spacing:0.03em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Electrolize',sans-serif;font-size:1.65rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Rounded exterior contours with square interior negative space. Clean and extremely readable at micro scale.</div>
+        </div>
+      </div>
+
+      <!-- QUANTICO -->
+      <div class="card spotlight" data-category="michroma scifi">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Quantico</span>
+          <div class="card-meta">
+            <span class="card-badge tag">BEVELED MIL-SPEC</span>
+            <button class="copy-btn" onclick="copyFont('Quantico')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Quantico',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.02rem;letter-spacing:0.04em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Quantico',sans-serif;font-size:1.6rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Square proportions with symmetrical 30-degree angles, inspired by military aviation and aerospace packaging.</div>
+        </div>
+      </div>
+
+      <!-- KRONA ONE -->
+      <div class="card spotlight" data-category="michroma scifi clean">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Krona One</span>
+          <div class="card-meta">
+            <span class="card-badge tag">LOW-SLUNG STANCE</span>
+            <button class="copy-btn" onclick="copyFont('Krona One')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Krona One',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.92rem;letter-spacing:0.03em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Krona One',sans-serif;font-size:1.45rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Wide, low-center-of-gravity modernist letterforms. Has the grounded, wide stance of Michroma without sharp edges.</div>
+        </div>
+      </div>
+
+      <!-- RUSSO ONE -->
+      <div class="card spotlight" data-category="michroma scifi brutalist">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Russo One</span>
+          <div class="card-meta">
+            <span class="card-badge tag">HEAVY SQUARE PUNCH</span>
+            <button class="copy-btn" onclick="copyFont('Russo One')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Russo One',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1rem;letter-spacing:0.04em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Russo One',sans-serif;font-size:1.6rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: High-mass rounded-box silhouette. Same bold geometric geometry as Michroma, dialed up to maximum weight.</div>
+        </div>
+      </div>
+
+      <!-- SAIRA EXPANDED -->
+      <div class="card spotlight" data-category="michroma scifi clean">
+        <div class="card-header">
+          <span class="card-font-name" style="color:var(--gold);">Saira Expanded</span>
+          <div class="card-meta">
+            <span class="card-badge tag">WIDE SHOULDERS</span>
+            <button class="copy-btn" onclick="copyFont('Saira Expanded')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Saira Expanded',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.95rem;letter-spacing:0.04em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active" style="background:var(--gold);box-shadow:0 0 6px var(--gold);"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Saira Expanded',sans-serif;font-size:1.5rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+          <div class="dna-note">WHY CLOSE: Broad, technical sans-serif with horizontal weight distribution and square curves.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── OTHER DISPLAY FONTS ────────────────────────────────────── -->
+  <div id="section-display" class="font-section">
+    <div class="section-label">// MORE DISPLAY & TITLE CANDIDATES</div>
+    <div class="grid" id="displayGrid">
+
+      <!-- 1. SYNE -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Syne</span>
+          <div class="card-meta">
+            <span class="card-badge top-pick">#1 TOP PICK</span>
+            <button class="copy-btn" onclick="copyFont('Syne')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Syne',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Syne',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 2. CLASH DISPLAY -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Clash Display</span>
+          <div class="card-meta">
+            <span class="card-badge top-pick">STELLAR CONTENDER</span>
+            <button class="copy-btn" onclick="copyFont('Clash Display')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Clash Display',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Clash Display',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 3. ORBITRON -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Orbitron</span>
+          <div class="card-meta">
+            <span class="card-badge tag">PURE SCI-FI</span>
+            <button class="copy-btn" onclick="copyFont('Orbitron')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Orbitron',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.92rem;letter-spacing:0.04em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Orbitron',sans-serif;font-size:1.45rem;letter-spacing:0.06em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 4. OXANIUM -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Oxanium</span>
+          <div class="card-meta">
+            <span class="card-badge tag">CYBER TECH</span>
+            <button class="copy-btn" onclick="copyFont('Oxanium')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Oxanium',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.02rem;letter-spacing:0.03em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Oxanium',sans-serif;font-size:1.55rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 5. RAJDHANI -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Rajdhani</span>
+          <div class="card-meta">
+            <span class="card-badge tag">AEROSPACE HUD</span>
+            <button class="copy-btn" onclick="copyFont('Rajdhani')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Rajdhani',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.2rem;letter-spacing:0.04em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Rajdhani',sans-serif;font-size:1.9rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 6. CHAKRA PETCH -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Chakra Petch</span>
+          <div class="card-meta">
+            <span class="card-badge tag">ANGULAR MECHA</span>
+            <button class="copy-btn" onclick="copyFont('Chakra Petch')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Chakra Petch',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1rem;letter-spacing:0.03em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Chakra Petch',sans-serif;font-size:1.6rem;letter-spacing:0.03em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 7. SORA -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">Sora</span>
+          <div class="card-meta">
+            <span class="card-badge top-pick">CRYPTO & FINTECH</span>
+            <button class="copy-btn" onclick="copyFont('Sora')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Sora',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.02rem;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Sora',sans-serif;font-size:1.65rem;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 8. PLUS JAKARTA SANS -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">Plus Jakarta Sans</span>
+          <div class="card-meta">
+            <span class="card-badge">REFINED CONTENDER</span>
+            <button class="copy-btn" onclick="copyFont('Plus Jakarta Sans')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Plus Jakarta Sans',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Plus Jakarta Sans',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 9. CABINET GROTESK -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Cabinet Grotesk</span>
+          <div class="card-meta">
+            <span class="card-badge tag">AVANT-GARDE</span>
+            <button class="copy-btn" onclick="copyFont('Cabinet Grotesk')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Cabinet Grotesk',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.05rem;font-weight:800;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Cabinet Grotesk',sans-serif;font-size:1.75rem;font-weight:900;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 10. UNBOUNDED -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Unbounded</span>
+          <div class="card-meta">
+            <span class="card-badge tag">WIDE BRUTALIST</span>
+            <button class="copy-btn" onclick="copyFont('Unbounded')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Unbounded',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.8rem;letter-spacing:0.01em;">APIFY // DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Unbounded',sans-serif;font-size:1.2rem;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 11. SYNCOPATE -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Syncopate</span>
+          <div class="card-meta">
+            <span class="card-badge tag">ULTRA-WIDE DISPLAY</span>
+            <button class="copy-btn" onclick="copyFont('Syncopate')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Syncopate',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.75rem;letter-spacing:0.08em;font-weight:700;">APIFY // DATA RADAR</div>
+            <div class="mock-desc">Multi-actor crawlers & OCR pipelines.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Syncopate',sans-serif;font-size:1.2rem;letter-spacing:0.12em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 12. AUDIOWIDE -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Audiowide</span>
+          <div class="card-meta">
+            <span class="card-badge tag">SYNTHWAVE TECH</span>
+            <button class="copy-btn" onclick="copyFont('Audiowide')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Audiowide',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.88rem;letter-spacing:0.04em;">APIFY // DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Audiowide',sans-serif;font-size:1.4rem;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 13. BARLOW CONDENSED -->
+      <div class="card" data-category="condensed">
+        <div class="card-header">
+          <span class="card-font-name">Barlow Condensed</span>
+          <div class="card-meta">
+            <span class="card-badge tag">NASA AEROSPACE</span>
+            <button class="copy-btn" onclick="copyFont('Barlow Condensed')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Barlow Condensed',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.22rem;letter-spacing:0.05em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 14. TEKO -->
+      <div class="card" data-category="condensed">
+        <div class="card-header">
+          <span class="card-font-name">Teko</span>
+          <div class="card-meta">
+            <span class="card-badge tag">TALL ARCHITECTURAL</span>
+            <button class="copy-btn" onclick="copyFont('Teko')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Teko',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.4rem;letter-spacing:0.06em;line-height:1;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Teko',sans-serif;font-size:2.6rem;letter-spacing:0.06em;line-height:1;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 15. BEBAS NEUE -->
+      <div class="card" data-category="condensed">
+        <div class="card-header">
+          <span class="card-font-name">Bebas Neue</span>
+          <div class="card-meta">
+            <span class="card-badge tag">ICONIC HEADLINE</span>
+            <button class="copy-btn" onclick="copyFont('Bebas Neue')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Bebas Neue',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.3rem;letter-spacing:0.07em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Bebas Neue',sans-serif;font-size:2.3rem;letter-spacing:0.07em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 16. SPACE GROTESK -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">Space Grotesk</span>
+          <div class="card-meta">
+            <span class="card-badge tag">CURRENT SITE FONT</span>
+            <button class="copy-btn" onclick="copyFont('Space Grotesk')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Space Grotesk',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Space Grotesk',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 17. SATOSHI -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">Satoshi</span>
+          <div class="card-meta">
+            <span class="card-badge top-pick">SILICON VALLEY STANDARD</span>
+            <button class="copy-btn" onclick="copyFont('Satoshi')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Satoshi',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.05rem;font-weight:900;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Satoshi',sans-serif;font-size:1.75rem;font-weight:900;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 18. GENERAL SANS -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">General Sans</span>
+          <div class="card-meta">
+            <span class="card-badge tag">INTERNATIONAL NEO-GROTESK</span>
+            <button class="copy-btn" onclick="copyFont('General Sans')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'General Sans',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.05rem;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'General Sans',sans-serif;font-size:1.65rem;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 19. MANROPE -->
+      <div class="card" data-category="clean">
+        <div class="card-header">
+          <span class="card-font-name">Manrope</span>
+          <div class="card-meta">
+            <span class="card-badge tag">CRISP GEOMETRIC</span>
+            <button class="copy-btn" onclick="copyFont('Manrope')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Manrope',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Manrope',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 20. EPILOGUE -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Epilogue</span>
+          <div class="card-meta">
+            <span class="card-badge tag">EDITORIAL IMPACT</span>
+            <button class="copy-btn" onclick="copyFont('Epilogue')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Epilogue',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Epilogue',sans-serif;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 21. RIGHTEOUS -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Righteous</span>
+          <div class="card-meta">
+            <span class="card-badge tag">80s SYNTH SPACE</span>
+            <button class="copy-btn" onclick="copyFont('Righteous')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Righteous',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.05rem;letter-spacing:0.04em;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Righteous',sans-serif;font-size:1.6rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 22. GRUPPO -->
+      <div class="card" data-category="scifi clean">
+        <div class="card-header">
+          <span class="card-font-name">Gruppo</span>
+          <div class="card-meta">
+            <span class="card-badge tag">MINIMAL SCI-FI</span>
+            <button class="copy-btn" onclick="copyFont('Gruppo')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Gruppo',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.15rem;letter-spacing:0.08em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Gruppo',sans-serif;font-size:1.8rem;letter-spacing:0.08em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 23. CINZEL DECORATIVE -->
+      <div class="card" data-category="brutalist">
+        <div class="card-header">
+          <span class="card-font-name">Cinzel Decorative</span>
+          <div class="card-meta">
+            <span class="card-badge tag">CELESTIAL LUXURY</span>
+            <button class="copy-btn" onclick="copyFont('Cinzel Decorative')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Cinzel Decorative',serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.95rem;letter-spacing:0.06em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Cinzel Decorative',serif;font-size:1.55rem;letter-spacing:0.08em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 24. ANTONIO -->
+      <div class="card" data-category="condensed">
+        <div class="card-header">
+          <span class="card-font-name">Antonio</span>
+          <div class="card-meta">
+            <span class="card-badge tag">SWISS INDUSTRIAL</span>
+            <button class="copy-btn" onclick="copyFont('Antonio')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Antonio',sans-serif;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:1.3rem;letter-spacing:0.06em;font-weight:700;">APIFY // REGIONAL DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines, Cloudflare R2.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Antonio',sans-serif;font-size:2.2rem;letter-spacing:0.06em;font-weight:700;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+      <!-- 25. SILKSCREEN -->
+      <div class="card" data-category="scifi">
+        <div class="card-header">
+          <span class="card-font-name">Silkscreen</span>
+          <div class="card-meta">
+            <span class="card-badge tag">8-BIT ARCADE</span>
+            <button class="copy-btn" onclick="copyFont('Silkscreen')">Copy CSS</button>
+          </div>
+        </div>
+        <div class="mock-dock">
+          <div class="mock-identity" style="font-family:'Silkscreen',monospace;">
+            <div class="mock-category">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mock-title preview-target" style="font-size:0.75rem;letter-spacing:0.04em;">APIFY // DATA RADAR</div>
+            <div class="mock-desc">Multi-actor Apify crawlers, OCR pipelines.</div>
+          </div>
+          <div class="mock-actions">
+            <button class="mock-btn-primary">Launch ↗</button>
+            <button class="mock-btn-ghost">+ Specs</button>
+          </div>
+        </div>
+        <div class="mock-rail">
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div><div class="rail-seg"></div>
+          <div class="rail-seg active"></div><div class="rail-seg"></div>
+          <div class="rail-seg"></div><div class="rail-seg"></div>
+        </div>
+        <div class="display-preview">
+          <div class="headline preview-hero" style="font-family:'Silkscreen',monospace;font-size:1.15rem;letter-spacing:0.04em;">YAHYA CORE</div>
+          <div class="sub">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── MONO FONTS SECTION ─────────────────────────────────────── -->
+  <div id="section-mono" class="font-section">
+    <div class="section-label">// MONOSPACE FONTS — for categories, counters, specs & tags</div>
+    <div class="mono-grid">
+
+      <!-- SPACE MONO -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Space Mono (Top Pick)</span>
+            <button class="copy-btn" onclick="copyFont('Space Mono')">Copy</button>
+          </div>
+          <div style="font-family:'Space Mono',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHARE TECH MONO -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Share Tech Mono (NASA Telemetry)</span>
+            <button class="copy-btn" onclick="copyFont('Share Tech Mono')">Copy</button>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;">
+            <div class="mono-sample-cat preview-target" style="font-size:0.7rem;">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JETBRAINS MONO -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">JetBrains Mono (Current)</span>
+            <button class="copy-btn" onclick="copyFont('JetBrains Mono')">Copy</button>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RED HAT MONO -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Red Hat Mono</span>
+            <button class="copy-btn" onclick="copyFont('Red Hat Mono')">Copy</button>
+          </div>
+          <div style="font-family:'Red Hat Mono',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IBM PLEX MONO -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">IBM Plex Mono</span>
+            <button class="copy-btn" onclick="copyFont('IBM Plex Mono')">Copy</button>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIRA CODE -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Fira Code</span>
+            <button class="copy-btn" onclick="copyFont('Fira Code')">Copy</button>
+          </div>
+          <div style="font-family:'Fira Code',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INCONSOLATA -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Inconsolata</span>
+            <button class="copy-btn" onclick="copyFont('Inconsolata')">Copy</button>
+          </div>
+          <div style="font-family:'Inconsolata',monospace;">
+            <div class="mono-sample-cat preview-target">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+      <!-- MAJOR MONO DISPLAY -->
+      <div class="mono-card">
+        <div>
+          <div class="mono-header">
+            <span class="mono-font-name">Major Mono (Glitch Cyber)</span>
+            <button class="copy-btn" onclick="copyFont('Major Mono Display')">Copy</button>
+          </div>
+          <div style="font-family:'Major Mono Display',monospace;">
+            <div class="mono-sample-cat preview-target" style="font-size:0.75rem;">DISTRIBUTED CRAWLERS & OCR</div>
+            <div class="mono-sample-counter">07 / 10</div>
+            <div class="mono-tags">
+              <span class="mono-tag">APIFY</span>
+              <span class="mono-tag">OCR PIPELINES</span>
+              <span class="mono-tag">CLOUDFLARE R2</span>
+              <span class="mono-tag">CRAWLER CLUSTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── PAIRING COMBOS SECTION ────────────────────────────────── -->
+  <div id="section-pairs" class="font-section">
+    <div class="section-label">// FULL CURATED PAIRINGS FEATURING MICHROMA & SIBLINGS</div>
+    <div class="pair-grid">
+
+      <!-- COMBO M1 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 1 // MICHROMA + PLUS JAKARTA SANS + SPACE MONO</span>
+          <span class="card-badge gold">RETRO NASA HUD</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Michroma',sans-serif;font-size:1.3rem;letter-spacing:0.06em;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'Plus Jakarta Sans',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'Space Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+      <!-- COMBO M2 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 2 // PANCHANG + SATOSHI + SHARE TECH MONO</span>
+          <span class="card-badge gold">ULTRA-WIDE LUXURY</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Panchang',sans-serif;font-size:1.25rem;letter-spacing:0.08em;font-weight:800;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'Satoshi',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'Share Tech Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+      <!-- COMBO M3 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 3 // BRUNO ACE SC + SORA + RED HAT MONO</span>
+          <span class="card-badge gold">70s SPACECRAFT</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Bruno Ace SC',sans-serif;letter-spacing:0.06em;font-size:1.45rem;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'Sora',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'Red Hat Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+      <!-- COMBO M4 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 4 // ZEN DOTS + GENERAL SANS + SPACE MONO</span>
+          <span class="card-badge gold">CYBER BRIDGE</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Zen Dots',sans-serif;font-size:1.35rem;letter-spacing:0.04em;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'General Sans',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'Space Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+      <!-- COMBO M5 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 5 // ELECTROLIZE + PLUS JAKARTA SANS + JETBRAINS MONO</span>
+          <span class="card-badge tag">CLEAN CYBERNETIC</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Electrolize',sans-serif;font-size:1.55rem;letter-spacing:0.04em;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'Plus Jakarta Sans',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'JetBrains Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+      <!-- COMBO M6 -->
+      <div class="pair-card">
+        <div class="pair-label">
+          <span>COMBO 6 // GOLDMAN + MANROPE + IBM PLEX MONO</span>
+          <span class="card-badge tag">AVIONICS HUD</span>
+        </div>
+        <div class="pair-title preview-hero" style="font-family:'Goldman',sans-serif;font-size:1.5rem;letter-spacing:0.05em;font-weight:700;">YAHYA CORE</div>
+        <div class="pair-desc" style="font-family:'Manrope',sans-serif;">Full-stack developer building high-concurrency platforms, real-time systems, and spatial web interfaces.</div>
+        <div class="pair-meta" style="font-family:'IBM Plex Mono',monospace;">STATUS // ONLINE · DOMAIN // YAHYA.CLICK · FOCUS // SPATIAL & FULLSTACK</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>FONTS // YAHYA.CLICK — INTERACTIVE TYPOGRAPHY EXPLORER</footer>
+
+</div>
+
+<!-- Toast -->
+<div id="toast">CSS COPIED TO CLIPBOARD</div>
+
+<script>
+  // Live input synchronization
+  const liveInput = document.getElementById('liveText');
+  const liveHero = document.getElementById('liveHero');
+  const targets = document.querySelectorAll('.preview-target');
+  const heroes = document.querySelectorAll('.preview-hero');
+  const sizeSlider = document.getElementById('sizeSlider');
+  const sizeValue = document.getElementById('sizeValue');
+  const caseBtns = document.querySelectorAll('.case-btn');
+
+  function updatePreviewText(val) {
+    targets.forEach(el => el.textContent = val);
+  }
+
+  if (liveInput) {
+    liveInput.addEventListener('input', (e) => {
+      updatePreviewText(e.target.value || 'The quick brown fox jumps over the lazy dog');
+    });
+  }
+
+  if (liveHero) {
+    liveHero.addEventListener('input', (e) => {
+      const val = e.target.value || 'YAHYA CORE';
+      heroes.forEach(el => el.textContent = val);
+    });
+  }
+
+  // Preset button handler
+  window.setPreset = function(text) {
+    if (liveInput) {
+      liveInput.value = text;
+      updatePreviewText(text);
+    }
+    document.querySelectorAll('.preset-pill').forEach(pill => {
+      const sample = text.slice(0, 8).toUpperCase();
+      pill.classList.toggle('active', pill.textContent.toUpperCase().includes(sample));
+    });
+  };
+
+  // Case transform handler
+  window.setCase = function(mode) {
+    caseBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-case') === mode);
+    });
+    targets.forEach(el => {
+      el.style.textTransform = mode;
+    });
+    heroes.forEach(el => {
+      el.style.textTransform = mode;
+    });
+  };
+
+  // Font size slider handler
+  if (sizeSlider && sizeValue) {
+    sizeSlider.addEventListener('input', (e) => {
+      const px = e.target.value + 'px';
+      sizeValue.textContent = px;
+      targets.forEach(el => {
+        el.style.fontSize = px;
+      });
+    });
+  }
+
+  // Inject specimen character strip into every card
+  document.querySelectorAll('.card').forEach(card => {
+    const fontName = card.getAttribute('data-font');
+    if (!fontName) return;
+    const strip = document.createElement('div');
+    strip.className = 'font-specimen-strip';
+    strip.innerHTML = `
+      <div class="specimen-letters" style="font-family: '${fontName}', sans-serif;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</div>
+      <div class="specimen-nums" style="font-family: '${fontName}', sans-serif;">0123456789 &bull; !@#$%^&*()_+-=[]{}|;:,.</div>
+    `;
+    const displayPreview = card.querySelector('.display-preview');
+    if (displayPreview) {
+      card.insertBefore(strip, displayPreview);
+    } else {
+      card.appendChild(strip);
+    }
+  });
+
+  // Initial populate with pangram
+  if (liveInput && liveInput.value) {
+    updatePreviewText(liveInput.value);
+  }
+
+  // Filter Buttons
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const allCards = document.querySelectorAll('.card');
+  const sectionMichroma = document.getElementById('section-michroma');
+  const sectionDisplay = document.getElementById('section-display');
+  const sectionMono = document.getElementById('section-mono');
+  const sectionPairs = document.getElementById('section-pairs');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+
+      if (filter === 'all') {
+        sectionMichroma.style.display = 'block';
+        sectionDisplay.style.display = 'block';
+        sectionMono.style.display = 'block';
+        sectionPairs.style.display = 'block';
+        allCards.forEach(c => c.style.display = 'flex');
+      } else if (filter === 'michroma') {
+        sectionMichroma.style.display = 'block';
+        sectionDisplay.style.display = 'none';
+        sectionMono.style.display = 'none';
+        sectionPairs.style.display = 'none';
+        allCards.forEach(c => {
+          const cat = c.getAttribute('data-category') || '';
+          c.style.display = cat.includes('michroma') ? 'flex' : 'none';
+        });
+      } else if (filter === 'mono') {
+        sectionMichroma.style.display = 'none';
+        sectionDisplay.style.display = 'none';
+        sectionMono.style.display = 'block';
+        sectionPairs.style.display = 'none';
+      } else if (filter === 'pairs') {
+        sectionMichroma.style.display = 'none';
+        sectionDisplay.style.display = 'none';
+        sectionMono.style.display = 'none';
+        sectionPairs.style.display = 'block';
+      } else {
+        sectionMichroma.style.display = 'block';
+        sectionDisplay.style.display = 'block';
+        sectionMono.style.display = 'none';
+        sectionPairs.style.display = 'none';
+        allCards.forEach(c => {
+          const cat = c.getAttribute('data-category') || '';
+          c.style.display = cat.includes(filter) ? 'flex' : 'none';
+        });
+      }
+    });
+  });
+
+  // Copy CSS Helper
+  function copyFont(fontName) {
+    const css = `font-family: '${fontName}', sans-serif;`;
+    navigator.clipboard.writeText(css).then(() => {
+      const toast = document.getElementById('toast');
+      toast.textContent = `COPIED: ${css}`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+  }
+</script>
+</body>
+</html>

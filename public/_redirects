@@ -1,5 +1,3 @@
-/fonts           /fonts.html      200
-/font            /font.html       200
-/font-lab        /fonts.html      200
-/font-lab.html   /fonts.html      200
-/*               /index.html      200
+/font-lab        /fonts        301
+/font-lab.html   /fonts        301
+/*               /index.html   200
