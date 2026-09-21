@@ -2,8 +2,8 @@
    🎛️ GLOBAL TYPOGRAPHY DESIGN TOKENS (عدل خطوط المشروع بالكامل من هنا)
    ========================================================================= */
 :root {
-  /* 1. Title Font (الي فوق) — Orbitron */
-  --font-title: 'Orbitron', 'Space Grotesk', sans-serif;
+  /* 1. Title Font (الي فوق) — Chakra Petch */
+  --font-title: 'Chakra Petch', 'Space Grotesk', sans-serif;
 
   /* 2. Sub / Body Font (الي تحته) — Chakra Petch */
   --font-sub: 'Chakra Petch', 'Space Grotesk', sans-serif;
