@@ -1,12 +1,24 @@
-/* YAHYA.CLICK — COSMIC ORBITAL STYLES */
+/* =========================================================================
+   🎛️ GLOBAL TYPOGRAPHY DESIGN TOKENS (عدل خطوط المشروع بالكامل من هنا)
+   ========================================================================= */
 :root {
+  /* 1. Title Font (الي فوق) — Orbitron */
+  --font-title: 'Orbitron', 'Space Grotesk', sans-serif;
+
+  /* 2. Sub / Body Font (الي تحته) — Chakra Petch */
+  --font-sub: 'Chakra Petch', 'Space Grotesk', sans-serif;
+
+  /* 3. Monospace / HUD / Telemetry — JetBrains Mono */
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Global Fallback Alias */
+  --font-sans: var(--font-title);
+
   --bg-void: #071124;
   --deep-shadow: #003268;
   --primary-cyan: #00BAE3;
   --secondary-blue: #5DBAE1;
   --text-pure: #FCFCFC;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Space Grotesk', sans-serif;
 }
 
 *, *::before, *::after {
@@ -127,9 +139,10 @@ html, body, #root {
 }
 
 .brand-title {
+  font-family: var(--font-title);
   font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   color: var(--text-pure);
   margin: 0;
 }
@@ -254,6 +267,7 @@ html, body, #root {
 }
 
 .bottom-hint-tag {
+  font-family: var(--font-sub);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   color: var(--secondary-blue);
@@ -288,8 +302,9 @@ html, body, #root {
   background: rgba(0, 50, 104, 0.4);
   border: 1px solid rgba(0, 186, 227, 0.25);
   color: var(--text-pure);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-family: var(--font-sub);
+  font-size: 0.74rem;
+  font-weight: 600;
   padding: 0.45rem 0.95rem;
   border-radius: 999px;
   cursor: pointer;
@@ -545,7 +560,7 @@ html, body, #root {
   }
 
   .mob-sheet-row-title {
-    font-family: var(--font-sans);
+    font-family: var(--font-title);
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--text-pure);
@@ -556,9 +571,9 @@ html, body, #root {
   }
 
   .mob-sheet-row-cat {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    color: rgba(252,252,252,0.4);
+    font-family: var(--font-sub);
+    font-size: 0.62rem;
+    color: rgba(252,252,252,0.6);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
@@ -727,8 +742,9 @@ html, body, #root {
 }
 
 .mini-dock-category {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-family: var(--font-sub);
+  font-size: 0.62rem;
+  font-weight: 700;
   letter-spacing: 0.14em;
   color: var(--primary-cyan);
   text-transform: uppercase;
@@ -738,11 +754,11 @@ html, body, #root {
 }
 
 .mini-dock-title {
-  font-family: var(--font-sans);
-  font-size: 1.0rem;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--text-pure);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -750,9 +766,9 @@ html, body, #root {
 }
 
 .mini-dock-desc {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: rgba(252,252,252,0.5);
+  font-family: var(--font-sub);
+  font-size: 0.74rem;
+  color: rgba(252,252,252,0.68);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -957,8 +973,8 @@ html, body, #root {
 }
 
 .mini-spec-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-family: var(--font-sub);
+  font-size: 0.65rem;
   color: var(--primary-cyan);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -966,8 +982,9 @@ html, body, #root {
 }
 
 .mini-spec-val {
-  font-size: 0.72rem;
-  color: rgba(252,252,252,0.85);
+  font-family: var(--font-sub);
+  font-size: 0.8rem;
+  color: rgba(252,252,252,0.88);
   line-height: 1.35;
 }
 
