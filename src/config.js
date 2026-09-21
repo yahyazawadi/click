@@ -299,8 +299,7 @@ export const SYSTEM_CONFIG = {
       category: 'GEOSPATIAL INTELLIGENCE & GIS ENGINE',
       shortDesc: 'Interactive vector mapping engine with great-circle routing, epidemiological spatial clustering, and real-time telemetry.',
       fullDesc: 'High-performance Mapbox GL JS spatial platform developed for epidemiology tracking, live contagion cluster visualization, dynamic vector tile caching, and custom geo-analytics. Features interactive vector layers, great-circle geodesic flight routes, and spatial queries.',
-      liveUrl: 'https://climamedix-sql.pages.dev/debug',
-      githubUrl: 'https://github.com/yahyazawadi/climamedix',
+      liveUrl: 'https://climamedix.pages.dev/news',
       tags: ['MAPBOX GL JS', 'GEOSPATIAL', 'GEOJSON', 'VECTOR TILES', 'SPATIAL CLUSTERING', 'TURF.JS'],
       specs: [
         'Spatial Routing: Real-time great-circle geodesic flight paths',
