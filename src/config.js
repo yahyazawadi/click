@@ -195,7 +195,6 @@ export const SYSTEM_CONFIG = {
       shortDesc: 'Photorealistic 3D Earth — real NASA landmasses, specular oceans, parallax clouds.',
       fullDesc: 'Real NASA Blue Marble continental mapping with specular ocean reflections and 3D parallax cloud drift. Hardware-accelerated at 120 FPS.',
       liveUrl: 'https://climamedix.pages.dev/',
-      githubUrl: 'https://github.com/yahyazawadi/climamedix',
       tags: ['NASA MAPS', 'THREE.JS', 'GLSL', '120 FPS'],
       specs: [
         'Continental Topography: NASA Blue Marble texture mapping',
