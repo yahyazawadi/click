@@ -60,7 +60,9 @@ export function PresentationDock({
     ? SYSTEM_CONFIG.core.aboutText
     : selectedProject?.shortDesc;
   const liveUrl = selectedProject?.liveUrl;
-  const githubUrl = selectedProject?.githubUrl;
+  const liveLabel = selectedProject?.liveLabel || "Launch ↗";
+  const secondaryUrl = selectedProject?.secondaryUrl || selectedProject?.githubUrl;
+  const secondaryLabel = selectedProject?.secondaryLabel || (selectedProject?.githubUrl ? "Code ↗" : "Deploy ↗");
   const specs = isCore ? SYSTEM_CONFIG.core.stats : selectedProject?.specs;
   const tags = isCore
     ? ["FULL-STACK", "SPATIAL WEB", "3D WEBGL", "REACT"]
@@ -112,17 +114,17 @@ export function PresentationDock({
                 rel="noopener noreferrer"
                 className="mini-btn primary"
               >
-                Launch ↗
+                {liveLabel}
               </a>
             )}
-            {githubUrl && (
+            {secondaryUrl && (
               <a
-                href={githubUrl}
+                href={secondaryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mini-btn secondary"
               >
-                Code ↗
+                {secondaryLabel}
               </a>
             )}
             {specs?.length > 0 && (
@@ -226,8 +228,8 @@ export function PresentationDock({
             </div>
           )}
 
-          {/* Mobile Action Buttons (Launch & Code) */}
-          {(liveUrl || githubUrl) && (
+          {/* Mobile Action Buttons */}
+          {(liveUrl || secondaryUrl) && (
             <div className="mini-drawer-mobile-actions">
               {liveUrl && (
                 <a
@@ -236,17 +238,17 @@ export function PresentationDock({
                   rel="noopener noreferrer"
                   className="mini-btn primary"
                 >
-                  Launch ↗
+                  {liveLabel}
                 </a>
               )}
-              {githubUrl && (
+              {secondaryUrl && (
                 <a
-                  href={githubUrl}
+                  href={secondaryUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mini-btn secondary"
                 >
-                  Code ↗
+                  {secondaryLabel}
                 </a>
               )}
             </div>

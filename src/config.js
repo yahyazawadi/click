@@ -340,7 +340,8 @@ export const SYSTEM_CONFIG = {
       shortDesc: 'Automated data intelligence network — Damascus sports radar & West Bank scanner with Apify web actors, OCR, and Cloudflare R2.',
       fullDesc: 'Distributed web data harvesting and document OCR infrastructure. Coordinates multi-actor Apify web crawlers, headless browser clusters, high-speed OCR pipelines, and Cloudflare R2 object storage to monitor regional sports facilities, hardware inventories, and real-time market prices with automated deduplication and live webhook dispatches.',
       liveUrl: 'https://laptop-lookups.super-yahyaaa.workers.dev/',
-      githubUrl: 'https://github.com/yahyazawadi/gyms_sham',
+      secondaryUrl: 'https://gyms-sham.super-yahyaaa.workers.dev/',
+      secondaryLabel: 'Gyms ↗',
       tags: ['APIFY', 'WEB SCRAPING', 'OCR PIPELINES', 'HEADLESS BROWSER', 'DATA MINING', 'CLOUDFLARE R2', 'REST APIS'],
       specs: [
         'Multi-Actor Crawling: Headless Apify actors & dynamic content scrapers',
