@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Font Lab — yahya.click</title>
+  <title>Fonts — yahya.click</title>
 
   <!-- Google Fonts & Fontshare for premium curated typefaces -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -94,18 +94,27 @@
       position: sticky;
       top: 1rem;
       z-index: 100;
-      background: rgba(6, 14, 30, 0.94);
+      background: rgba(6, 14, 30, 0.95);
       backdrop-filter: blur(24px);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 0.85rem 1.1rem;
       margin-bottom: 2.5rem;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
       box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 20px var(--cyan-glow);
     }
+
+    .toolbar-inputs-row {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      align-items: center;
+    }
+
+    .flex-1 { flex: 1; }
+    .hero-group { flex: 0 0 260px; }
 
     .toolbar-group {
       display: flex;
@@ -119,6 +128,7 @@
       letter-spacing: 0.14em;
       color: var(--cyan);
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .toolbar-input {
@@ -130,13 +140,109 @@
       font-size: 0.85rem;
       font-family: inherit;
       outline: none;
-      min-width: 260px;
+      width: 100%;
       transition: border-color 0.2s;
     }
 
     .toolbar-input:focus {
       border-color: var(--cyan);
       box-shadow: 0 0 10px rgba(0, 186, 227, 0.3);
+    }
+
+    /* Preset row */
+    .preset-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    .preset-pills {
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding: 0.15rem 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .preset-pills::-webkit-scrollbar { display: none; }
+
+    .preset-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.05em;
+      padding: 0.32rem 0.65rem;
+      background: rgba(0, 186, 227, 0.08);
+      border: 1px solid rgba(0, 186, 227, 0.25);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .preset-pill:hover, .preset-pill.active {
+      background: var(--cyan);
+      color: #030816;
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 186, 227, 0.4);
+    }
+
+    /* Bottom row of controls */
+    .toolbar-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 0.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .size-range {
+      accent-color: var(--cyan);
+      width: 80px;
+      cursor: pointer;
+    }
+
+    .size-display {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--cyan);
+      min-width: 32px;
+    }
+
+    .case-group {
+      display: flex;
+      gap: 0.2rem;
+    }
+
+    .case-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 0.22rem 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .case-btn:hover, .case-btn.active {
+      background: rgba(0, 186, 227, 0.2);
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
 
     .filters {
@@ -590,36 +696,172 @@
       letter-spacing: 0.12em;
       text-align: center;
     }
+
+    /* Dynamic font specimen character strip */
+    .font-specimen-strip {
+      padding: 0.55rem 1rem;
+      background: rgba(0, 0, 0, 0.28);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .specimen-letters {
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      color: rgba(252, 252, 252, 0.78);
+      word-break: break-all;
+      line-height: 1.35;
+    }
+    .specimen-nums {
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: rgba(0, 186, 227, 0.75);
+      word-break: break-all;
+    }
+
+    /* Mobile media queries */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem 0.75rem 5rem;
+      }
+      header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+      }
+      header h1 {
+        font-size: 1.45rem;
+      }
+      .toolbar {
+        position: relative;
+        top: 0;
+        padding: 0.75rem 0.85rem;
+        gap: 0.65rem;
+        margin-bottom: 1.5rem;
+      }
+      .toolbar-inputs-row {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .hero-group {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+      .toolbar-group {
+        width: 100%;
+      }
+      .toolbar-input {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px; /* prevent iOS auto-zoom */
+      }
+      .preset-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+      .toolbar-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+      }
+      .controls-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .filters {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 0.3rem;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+      }
+      .filters::-webkit-scrollbar { display: none; }
+      .filter-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+      .grid, .pair-grid, .mono-grid {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+      }
+      .card {
+        border-radius: 10px;
+      }
+      .mock-dock {
+        padding: 0.85rem 0.9rem;
+      }
+      .display-preview {
+        padding: 0.75rem 0.9rem;
+      }
+      .display-preview .headline {
+        font-size: 1.25rem;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="content">
 
   <header>
-    <div class="label">// EXPERIMENTAL TYPOGRAPHY LAB // YAHYA.CLICK</div>
+    <div class="label">// FONTS & TYPOGRAPHY LAB // YAHYA.CLICK</div>
     <h1>Michroma & The Eurostile Space-Age Family</h1>
     <p>Michroma belongs to the iconic <strong>Microgramma / Eurostile Extended</strong> lineage — 1960s NASA telemetry, 2001: A Space Odyssey & sci-fi cockpit consoles. Below are its closest siblings side-by-side.</p>
   </header>
 
   <!-- Interactive Control Bar -->
   <div class="toolbar">
-    <div class="toolbar-group">
-      <span class="toolbar-label">Live Preview Text:</span>
-      <input type="text" id="liveText" class="toolbar-input" value="APIFY // REGIONAL DATA RADAR" placeholder="Type anything to test fonts..." />
+    <!-- Row 1: Live Inputs -->
+    <div class="toolbar-inputs-row">
+      <div class="toolbar-group flex-1">
+        <span class="toolbar-label">Preview Text:</span>
+        <input type="text" id="liveText" class="toolbar-input" value="The quick brown fox jumps over the lazy dog" placeholder="Type anything to test fonts..." />
+      </div>
+      <div class="toolbar-group hero-group">
+        <span class="toolbar-label">Hero Title:</span>
+        <input type="text" id="liveHero" class="toolbar-input" value="YAHYA CORE" placeholder="Hero headline..." />
+      </div>
     </div>
-    <div class="toolbar-group">
-      <span class="toolbar-label">Hero Title:</span>
-      <input type="text" id="liveHero" class="toolbar-input" style="min-width:180px;" value="YAHYA CORE" placeholder="Hero headline..." />
+
+    <!-- Row 2: Pangram & Presets -->
+    <div class="preset-row">
+      <span class="toolbar-label">Pangram Presets:</span>
+      <div class="preset-pills">
+        <button class="preset-pill active" onclick="setPreset('The quick brown fox jumps over the lazy dog')">🦊 Pangram (All Letters)</button>
+        <button class="preset-pill" onclick="setPreset('THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG')">🦊 PANGRAM (ALL CAPS)</button>
+        <button class="preset-pill" onclick="setPreset('ABCDEFGHIJKLMNOPQRSTUVWXYZ · 0123456789')">🔤 A-Z & 0-9</button>
+        <button class="preset-pill" onclick="setPreset('CLIMAMEDIX // TERRA & SPATIAL RADAR')">🪐 Planet Title</button>
+        <button class="preset-pill" onclick="setPreset('APIFY // REGIONAL DATA RADAR')">🛰️ Apify Scraper</button>
+        <button class="preset-pill" onclick="setPreset('LATENCY: 12ms // 60 FPS // R2 STORAGE')">⚡ HUD Telemetry</button>
+      </div>
     </div>
-    <div class="filters">
-      <button class="filter-btn highlight active" data-filter="michroma">★ MICHROMA SIBLINGS (10)</button>
-      <button class="filter-btn" data-filter="all">ALL FONTS (38)</button>
-      <button class="filter-btn" data-filter="scifi">SCI-FI / TECH</button>
-      <button class="filter-btn" data-filter="brutalist">BRUTALIST</button>
-      <button class="filter-btn" data-filter="clean">CLEAN MODERN</button>
-      <button class="filter-btn" data-filter="condensed">TALL / CONDENSED</button>
-      <button class="filter-btn" data-filter="mono">MONOSPACE</button>
-      <button class="filter-btn" data-filter="pairs">PAIRINGS</button>
+
+    <!-- Row 3: Size, Case & Category Filters -->
+    <div class="toolbar-bottom-row">
+      <div class="controls-group">
+        <div class="toolbar-group">
+          <span class="toolbar-label">Size:</span>
+          <input type="range" id="sizeSlider" min="12" max="32" value="16" class="size-range" />
+          <span id="sizeValue" class="size-display">16px</span>
+        </div>
+        <div class="case-group">
+          <button class="case-btn active" data-case="none" onclick="setCase('none')">Aa</button>
+          <button class="case-btn" data-case="uppercase" onclick="setCase('uppercase')">AA</button>
+          <button class="case-btn" data-case="lowercase" onclick="setCase('lowercase')">aa</button>
+        </div>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn highlight active" data-filter="michroma">★ MICHROMA (10)</button>
+        <button class="filter-btn" data-filter="all">ALL (38)</button>
+        <button class="filter-btn" data-filter="scifi">SCI-FI</button>
+        <button class="filter-btn" data-filter="brutalist">BRUTALIST</button>
+        <button class="filter-btn" data-filter="clean">CLEAN</button>
+        <button class="filter-btn" data-filter="condensed">TALL</button>
+        <button class="filter-btn" data-filter="mono">MONO</button>
+        <button class="filter-btn" data-filter="pairs">PAIRS</button>
+      </div>
     </div>
   </div>
 
@@ -2008,7 +2250,7 @@
     </div>
   </div>
 
-  <footer>FONT LAB // YAHYA.CLICK — INTERACTIVE TYPOGRAPHY EXPLORER</footer>
+  <footer>FONTS // YAHYA.CLICK — INTERACTIVE TYPOGRAPHY EXPLORER</footer>
 
 </div>
 
@@ -2021,16 +2263,85 @@
   const liveHero = document.getElementById('liveHero');
   const targets = document.querySelectorAll('.preview-target');
   const heroes = document.querySelectorAll('.preview-hero');
+  const sizeSlider = document.getElementById('sizeSlider');
+  const sizeValue = document.getElementById('sizeValue');
+  const caseBtns = document.querySelectorAll('.case-btn');
 
-  liveInput.addEventListener('input', (e) => {
-    const val = e.target.value || 'APIFY // REGIONAL DATA RADAR';
+  function updatePreviewText(val) {
     targets.forEach(el => el.textContent = val);
+  }
+
+  if (liveInput) {
+    liveInput.addEventListener('input', (e) => {
+      updatePreviewText(e.target.value || 'The quick brown fox jumps over the lazy dog');
+    });
+  }
+
+  if (liveHero) {
+    liveHero.addEventListener('input', (e) => {
+      const val = e.target.value || 'YAHYA CORE';
+      heroes.forEach(el => el.textContent = val);
+    });
+  }
+
+  // Preset button handler
+  window.setPreset = function(text) {
+    if (liveInput) {
+      liveInput.value = text;
+      updatePreviewText(text);
+    }
+    document.querySelectorAll('.preset-pill').forEach(pill => {
+      const sample = text.slice(0, 8).toUpperCase();
+      pill.classList.toggle('active', pill.textContent.toUpperCase().includes(sample));
+    });
+  };
+
+  // Case transform handler
+  window.setCase = function(mode) {
+    caseBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-case') === mode);
+    });
+    targets.forEach(el => {
+      el.style.textTransform = mode;
+    });
+    heroes.forEach(el => {
+      el.style.textTransform = mode;
+    });
+  };
+
+  // Font size slider handler
+  if (sizeSlider && sizeValue) {
+    sizeSlider.addEventListener('input', (e) => {
+      const px = e.target.value + 'px';
+      sizeValue.textContent = px;
+      targets.forEach(el => {
+        el.style.fontSize = px;
+      });
+    });
+  }
+
+  // Inject specimen character strip into every card
+  document.querySelectorAll('.card').forEach(card => {
+    const fontName = card.getAttribute('data-font');
+    if (!fontName) return;
+    const strip = document.createElement('div');
+    strip.className = 'font-specimen-strip';
+    strip.innerHTML = `
+      <div class="specimen-letters" style="font-family: '${fontName}', sans-serif;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</div>
+      <div class="specimen-nums" style="font-family: '${fontName}', sans-serif;">0123456789 &bull; !@#$%^&*()_+-=[]{}|;:,.</div>
+    `;
+    const displayPreview = card.querySelector('.display-preview');
+    if (displayPreview) {
+      card.insertBefore(strip, displayPreview);
+    } else {
+      card.appendChild(strip);
+    }
   });
 
-  liveHero.addEventListener('input', (e) => {
-    const val = e.target.value || 'YAHYA CORE';
-    heroes.forEach(el => el.textContent = val);
-  });
+  // Initial populate with pangram
+  if (liveInput && liveInput.value) {
+    updatePreviewText(liveInput.value);
+  }
 
   // Filter Buttons
   const filterBtns = document.querySelectorAll('.filter-btn');
