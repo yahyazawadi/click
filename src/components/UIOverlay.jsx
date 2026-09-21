@@ -1,6 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PresentationDock } from './PresentationDock';
 
+// ── Mobile FAB + Bottom Sheet ────────────────────────────────────────────────
+function MobileNavFab({ stages, onSelectTarget }) {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (id) => {
+    setOpen(false);
+    onSelectTarget(id);
+  };
+
+  return (
+    <>
+      {/* FAB — bottom-center */}
+      <button
+        className="mob-fab"
+        onClick={() => setOpen(true)}
+        aria-label="Open project list"
+      >
+        <span className="mob-fab-icon">≡</span>
+        <span className="mob-fab-label">PROJECTS</span>
+        <span className="mob-fab-count">{stages.length}</span>
+      </button>
+
+      {/* Sheet backdrop */}
+      {open && (
+        <div
+          className="mob-sheet-backdrop"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Bottom sheet */}
+      <div className={`mob-sheet${open ? ' mob-sheet--open' : ''}`} role="dialog" aria-modal="true">
+        <div className="mob-sheet-handle" />
+        <div className="mob-sheet-header">
+          <span className="mob-sheet-title">PROJECTS</span>
+          <button className="mob-sheet-close" onClick={() => setOpen(false)} aria-label="Close">✕</button>
+        </div>
+        <div className="mob-sheet-list">
+          {stages.map((stage, idx) => (
+            <button
+              key={stage.id}
+              className="mob-sheet-row"
+              onClick={() => handleSelect(stage.id)}
+            >
+              <span className="mob-sheet-row-num">{String(idx).padStart(2, '0')}</span>
+              <span className="mob-sheet-row-info">
+                <span className="mob-sheet-row-title">{stage.title}</span>
+                {stage.category && (
+                  <span className="mob-sheet-row-cat">{stage.category}</span>
+                )}
+              </span>
+              <span className="mob-sheet-row-arrow">›</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Main UIOverlay ────────────────────────────────────────────────────────────
 export function UIOverlay({
   selectedTarget,
   selectedProject,
@@ -50,8 +112,8 @@ export function UIOverlay({
           </div>
         </header>
 
-        {/* Overview Timeline Bar (Visible when in macro overview orbit) */}
-        {!selectedTarget && (
+        {/* Overview bar: desktop only */}
+        {!selectedTarget && !isMobile && (
           <div className="overview-presentation-bar">
             {isBottomHintEnabled && (
               <div className="bottom-hint-tag">
@@ -73,6 +135,11 @@ export function UIOverlay({
           </div>
         )}
       </div>
+
+      {/* Mobile overview: FAB + bottom sheet (shown when no project selected) */}
+      {isMobile && !selectedTarget && (
+        <MobileNavFab stages={stages} onSelectTarget={onSelectTarget} />
+      )}
 
       {/* Standalone Reusable Floating Presentation Command Dock */}
       <PresentationDock

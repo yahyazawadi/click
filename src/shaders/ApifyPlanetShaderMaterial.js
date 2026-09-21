@@ -6,14 +6,14 @@ export const ApifyPlanetShaderMaterial = shaderMaterial(
   {
     uTime:          0,
     uPerfTier:      0.0,
-    uApifyBlue:     new THREE.Color('#246DFF'), // Official Apify Electric Royal Blue
-    uApifyBlueDeep: new THREE.Color('#0A4CD2'), // Deep Oceanic Blue
-    uApifyGreen:    new THREE.Color('#20A34E'), // Official Apify Vivid Emerald Green
-    uApifyGreenLit: new THREE.Color('#2EE26D'), // Bright Emerald Highland
-    uApifyOrange:   new THREE.Color('#F86606'), // Official Apify Solar Orange
-    uApifyAmber:    new THREE.Color('#FFA347'), // Warm Luminous Amber
-    uCrispWhite:    new THREE.Color('#FFFFFF'), // Pure Crisp Data Highlight
-    uAtmosphere:    new THREE.Color('#246DFF'), // Outer Limb Glow
+    uApifyBlue:     new THREE.Color('#246DFF'),
+    uApifyBlueDeep: new THREE.Color('#0A4CD2'),
+    uApifyGreen:    new THREE.Color('#20A34E'),
+    uApifyGreenLit: new THREE.Color('#2EE26D'),
+    uApifyOrange:   new THREE.Color('#F86606'),
+    uApifyAmber:    new THREE.Color('#FFA347'),
+    uCrispWhite:    new THREE.Color('#FFFFFF'),
+    uAtmosphere:    new THREE.Color('#246DFF'),
   },
 
   // ── Vertex Shader ──────────────────────────────────────────────────────────
@@ -51,7 +51,6 @@ export const ApifyPlanetShaderMaterial = shaderMaterial(
     varying vec3 vWorldPosition;
     varying vec3 vPosition;
 
-    // ── 3D Simplex Value Noise ───────────────────────────────────────────────
     vec3 hash3(vec3 p) {
       p = vec3(dot(p, vec3(127.1, 311.7,  74.7)),
                dot(p, vec3(269.5, 183.3, 246.1)),
@@ -87,58 +86,55 @@ export const ApifyPlanetShaderMaterial = shaderMaterial(
 
     void main() {
       vec3 norm = normalize(vPosition);
-      float lat = norm.y; // -1 to +1
+      float t = uTime * 0.06;
 
-      float t = uTime * 0.08;
+      // ── Base: Very dark charcoal-navy — the core Apify "dark mode" brand ──────
+      // #1A1E2E deep slate, slightly tinted blue
+      vec3 darkBase  = vec3(0.09, 0.11, 0.18);
+      vec3 midBlue   = vec3(0.11, 0.18, 0.38); // midnight blue highlight zones
 
-      // ── Layer 1: Continental FBM Warping (Apify Blue vs Apify Green) ─────────
-      vec3 p1 = norm * 2.6 + vec3(t * 0.5, t * 0.2, 0.0);
-      float cont = fbm(p1);
+      // Large-scale surface variation: two-tone dark, barely perceptible topology
+      vec3  p1   = norm * 2.2 + vec3(t * 0.3, t * 0.1, 0.0);
+      float topo = fbm(p1) * 0.5 + 0.5;            // 0..1
+      vec3  baseSurface = mix(darkBase, midBlue, smoothstep(0.35, 0.72, topo));
 
-      // Sharp, vibrant continents (Green) over rich oceanic basins (Blue)
-      float landMask = smoothstep(-0.04, 0.14, cont);
-      vec3 oceanCol = mix(uApifyBlueDeep, uApifyBlue, smoothstep(-0.4, 0.1, cont));
-      vec3 landCol  = mix(uApifyGreen, uApifyGreenLit, smoothstep(0.12, 0.45, cont));
+      // ── Circuit-board teal veins — Apify blue at low intensity ───────────────
+      // Fine, grid-like lines that pulse very subtly — data-stream feel
+      vec3  p2    = norm * 6.8 - vec3(t * 0.55, t * 0.25, 0.0);
+      float vein  = smoothstep(0.60, 0.68, abs(fbm(p2)));  // narrow bright lines
+      float vein2 = smoothstep(0.58, 0.65, abs(noise(norm * 9.5 + vec3(0.0, t * 0.4, t * 0.2))));
+      float veins = clamp(vein * 0.6 + vein2 * 0.4, 0.0, 1.0);
 
-      vec3 baseSurface = mix(oceanCol, landCol, landMask);
+      // Teal-leaning version of Apify blue (desaturated, refined)
+      vec3 veinColor = vec3(0.12, 0.38, 0.82); // #1E60D0 — calm, not screaming
+      baseSurface = mix(baseSurface, veinColor, veins * 0.55);
 
-      // ── Layer 2: Solar Orange Energy Belts & Geodesic Veins ──────────────────
-      // Dynamic scraper data streams traversing the equator & continental faults
-      vec3 p2 = norm * 3.8 - vec3(t * 0.7, t * 0.4, 0.0);
-      float orangeStream = smoothstep(0.24, 0.40, abs(fbm(p2)));
-      float orangeSwirl  = smoothstep(0.18, 0.32, noise(norm * 5.2 + vec3(0.0, t * 0.6, t * 0.3)));
-      float orangeTotal  = clamp(orangeStream * 0.7 + orangeSwirl * 0.5, 0.0, 1.0);
+      // ── Hairline orange fault lines — extremely subtle, just alive ────────────
+      vec3  p3      = norm * 11.0 + vec3(t * 0.9, 0.0, t * 0.5);
+      float fault   = smoothstep(0.70, 0.74, abs(noise(p3)));
+      baseSurface   = mix(baseSurface, uApifyOrange * 0.45, fault * 0.18);
 
-      // Blend Solar Orange into planetary channels & faultlines
-      baseSurface = mix(baseSurface, uApifyOrange, orangeTotal * 0.75);
-      baseSurface += uApifyAmber * orangeSwirl * 0.35;
+      // ── Lighting: moody directional — high contrast but not blown out ─────────
+      vec3  lightDir = normalize(vec3(18.0, 12.0, 22.0) - vWorldPosition);
+      float diff     = max(0.0, dot(vWorldNormal, lightDir));
+      // Weighted: 0.45 ambient keeps it dark, 0.65 directional gives drama
+      baseSurface *= (0.45 + diff * 0.65);
 
-      // ── Layer 3: Crisp Polar Data Caps (North & South Poles) ─────────────────
-      float poleDist = abs(lat);
-      float polarCap = smoothstep(0.78, 0.92, poleDist + noise(norm * 4.0) * 0.08);
-      baseSurface = mix(baseSurface, uCrispWhite, polarCap * 0.85);
+      // ── Specular — tight, cool-white glint on the facing hemisphere ───────────
+      vec3  viewDir = normalize(cameraPosition - vWorldPosition);
+      vec3  halfDir = normalize(lightDir + viewDir);
+      float spec    = pow(max(0.0, dot(vWorldNormal, halfDir)), 64.0);
+      baseSurface  += vec3(0.55, 0.72, 1.0) * spec * 0.55; // cool blue-white specular
 
-      // ── Layer 4: Cirrus Data Streams (Pure White Highlights) ─────────────────
-      float whitePulse = smoothstep(0.38, 0.55, fbm(norm * 4.6 + vec3(t * 0.9, 0.0, t * 0.5)));
-      baseSurface += uCrispWhite * whitePulse * 0.4;
-
-      // ── Layer 5: High-Vibrancy Lighting (Guarantees Rich Vibrant Colors) ─────
-      // Avoid dark muddy shadows by using strong high-key ambient + directional
-      vec3 lightDir = normalize(vec3(20.0, 15.0, 25.0) - vWorldPosition);
-      float diff = max(0.0, dot(vWorldNormal, lightDir));
-      // 0.60 ambient + 0.55 directional ensures the planet is ALWAYS bright and vivid
-      baseSurface *= (0.60 + diff * 0.55);
-
-      // Specular shine on the electric blue oceans
-      vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-      vec3 halfDir = normalize(lightDir + viewDir);
-      float spec   = pow(max(0.0, dot(vWorldNormal, halfDir)), 32.0);
-      baseSurface += uApifyAmber * spec * (1.0 - landMask) * 0.65;
-
-      // ── Layer 6: Dual-Tone Radiant Fresnel Limb Glow ─────────────────────────
-      float fresnel = pow(1.0 - max(dot(vWorldNormal, viewDir), 0.0), 2.2);
-      vec3 limbGlow = mix(uApifyBlue, uApifyOrange, clamp(norm.y * 0.5 + 0.5, 0.0, 1.0));
-      baseSurface += limbGlow * fresnel * 0.85;
+      // ── Fresnel limb glow — single-tone blue, whisper of orange at equator ────
+      float fresnel   = pow(1.0 - max(dot(vWorldNormal, viewDir), 0.0), 3.2);
+      float equator   = 1.0 - abs(norm.y);            // bright at equator
+      vec3  limbColor = mix(
+        vec3(0.14, 0.38, 0.95),   // rich blue at poles
+        vec3(0.97, 0.40, 0.02),   // very restrained orange at equator
+        smoothstep(0.0, 1.0, equator * 0.35)
+      );
+      baseSurface += limbColor * fresnel * 0.55;
 
       gl_FragColor = vec4(baseSurface, 1.0);
     }

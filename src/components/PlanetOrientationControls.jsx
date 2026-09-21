@@ -33,6 +33,11 @@ export function PlanetOrientationControls({
   const handlePitchPointerDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    try {
+      e.target.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
     setIsDraggingPitch(true);
     updatePitchFromPointer(e.clientY);
   };
@@ -52,6 +57,11 @@ export function PlanetOrientationControls({
   const handleYawPointerDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    try {
+      e.target.setPointerCapture?.(e.pointerId);
+    } catch {
+      // ignore
+    }
     setIsDraggingYaw(true);
     updateYawFromPointer(e.clientX);
   };
@@ -103,12 +113,15 @@ export function PlanetOrientationControls({
     <>
       {/* ── 1. Vertical Slider (Left Side: Pitch Up/Down) ── */}
       <div
+        className="orientation-controls-container"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         style={{
           position: 'fixed',
           left: isMobile ? '14px' : '32px',
           top: isMobile ? '42%' : '46%',
           transform: 'translateY(-50%)',
-          zIndex: 140,
+          zIndex: 35,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -183,12 +196,15 @@ export function PlanetOrientationControls({
 
       {/* ── 2. Horizontal Slider (Top Header: Yaw Left/Right) ── */}
       <div
+        className="orientation-controls-container"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         style={{
           position: 'fixed',
           left: '50%',
-          top: isMobile ? '20px' : '28px',
+          top: isMobile ? '64px' : '28px',
           transform: 'translateX(-50%)',
-          zIndex: 140,
+          zIndex: 35,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',

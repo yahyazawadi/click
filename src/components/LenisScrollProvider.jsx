@@ -3,11 +3,21 @@ import React, { useEffect, useRef } from 'react';
 export function LenisScrollProvider({ children, onIndexChange, totalIndices = 9 }) {
   const currentIndexRef = useRef(0);
   const isCooldownRef = useRef(false);
+  const isInteractiveTouchRef = useRef(false);
 
   useEffect(() => {
+    const isInteractive = (target) => {
+      return Boolean(
+        target?.closest?.(
+          '.mini-dock, .mob-sheet, .ui-overlay, .orientation-controls-container, .fps-profiler-overlay, button, a'
+        )
+      );
+    };
+
     const handleWheel = (e) => {
       // Ignore when Ctrl key is pressed (used for Desktop Ctrl + Wheel zoom)
-      if (e.ctrlKey || isCooldownRef.current) return;
+      // or when wheel occurs inside interactive UI elements (dock, specs drawer, etc)
+      if (e.ctrlKey || isCooldownRef.current || isInteractive(e.target)) return;
       
       const delta = e.deltaY;
       if (Math.abs(delta) < 10) return; // Ignore micro-vibrations
@@ -39,13 +49,25 @@ export function LenisScrollProvider({ children, onIndexChange, totalIndices = 9 
     let touchStartY = 0;
 
     const handleTouchStart = (e) => {
+      if (isInteractive(e.target)) {
+        isInteractiveTouchRef.current = true;
+        return;
+      }
+      isInteractiveTouchRef.current = false;
       if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
       }
     };
 
     const handleTouchEnd = (e) => {
-      if (isCooldownRef.current || !e.changedTouches || e.changedTouches.length !== 1) return;
+      if (
+        isInteractiveTouchRef.current ||
+        isCooldownRef.current ||
+        !e.changedTouches ||
+        e.changedTouches.length !== 1
+      ) {
+        return;
+      }
       const touchEndY = e.changedTouches[0].clientY;
       const diffY = touchStartY - touchEndY;
 

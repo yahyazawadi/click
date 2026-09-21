@@ -74,75 +74,116 @@ export function PresentationDock({
   const stageTotal = String(totalStages).padStart(2, "0");
 
   return (
-    <div className={`mini-dock${isSecretLove ? " secret-love-theme" : ""}`}>
+    <>
+      {/* Tap outside to close specs drawer without hitting planets */}
+      {expanded && (
+        <div
+          className="mini-dock-backdrop"
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded(false);
+          }}
+          aria-hidden="true"
+        />
+      )}
 
-      {/* ── COMPACT ROW (always visible) ── */}
-      <div className="mini-dock-row">
+      <div
+        className={`mini-dock${isSecretLove ? " secret-love-theme" : ""}`}
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
 
-        {/* Left: Title + Short Desc */}
-        <div className="mini-dock-identity">
-          <span className="mini-dock-category">{category}</span>
-          <span className="mini-dock-title">{title}</span>
-          <span className="mini-dock-desc">{shortDesc}</span>
-        </div>
+        {/* ── COMPACT ROW (always visible) ── */}
+        <div className="mini-dock-row">
 
-        {/* Center: Actions */}
-        <div className="mini-dock-actions">
-          {liveUrl && (
-            <a
-              href={liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mini-btn primary"
-            >
-              Launch ↗
-            </a>
-          )}
-          {githubUrl && (
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mini-btn secondary"
-            >
-              Code ↗
-            </a>
-          )}
-          {specs?.length > 0 && (
+          {/* Left: Title + Short Desc */}
+          <div className="mini-dock-identity">
+            <span className="mini-dock-category">{category}</span>
+            <span className="mini-dock-title">{title}</span>
+            <span className="mini-dock-desc">{shortDesc}</span>
+          </div>
+
+          {/* Center: Actions */}
+          <div className="mini-dock-actions">
+            {liveUrl && (
+              <a
+                href={liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mini-btn primary"
+              >
+                Launch ↗
+              </a>
+            )}
+            {githubUrl && (
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mini-btn secondary"
+              >
+                Code ↗
+              </a>
+            )}
+            {specs?.length > 0 && (
+              <button
+                className={`mini-btn ghost${expanded ? " active" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpanded((v) => !v);
+                }}
+              >
+                {expanded ? "— Less" : "+ Specs"}
+              </button>
+            )}
+          </div>
+
+          {/* Right: Nav */}
+          <div className="mini-dock-nav">
+            <span className="mini-dock-counter">{stageNum} / {stageTotal}</span>
             <button
-              className={`mini-btn ghost${expanded ? " active" : ""}`}
-              onClick={() => setExpanded((v) => !v)}
+              className="mini-nav-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (currentStageIndex > 0) onSelectTarget(stages[currentStageIndex - 1].id);
+                else onReturn();
+              }}
             >
-              {expanded ? "— Less" : "+ Specs"}
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
+                <path d="M6 1L1 6L6 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-          )}
+            <button
+              className="mini-nav-btn"
+              disabled={currentStageIndex >= stages.length - 1}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (currentStageIndex < stages.length - 1)
+                  onSelectTarget(stages[currentStageIndex + 1].id);
+              }}
+            >
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
+                <path d="M1 1L6 6L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button
+              className="mini-close-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (expanded) {
+                  setExpanded(false);
+                } else {
+                  onReturn();
+                }
+              }}
+              title={expanded ? "Close specs" : "Return to orbit"}
+            >
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
+                <path d="M1 1L8 8M8 1L1 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-
-        {/* Right: Nav */}
-        <div className="mini-dock-nav">
-          <span className="mini-dock-counter">{stageNum} / {stageTotal}</span>
-          <button
-            className="mini-nav-btn"
-            onClick={() => {
-              if (currentStageIndex > 0) onSelectTarget(stages[currentStageIndex - 1].id);
-              else onReturn();
-            }}
-          >
-            ‹
-          </button>
-          <button
-            className="mini-nav-btn"
-            disabled={currentStageIndex >= stages.length - 1}
-            onClick={() => {
-              if (currentStageIndex < stages.length - 1)
-                onSelectTarget(stages[currentStageIndex + 1].id);
-            }}
-          >
-            ›
-          </button>
-          <button className="mini-close-btn" onClick={onReturn}>✕</button>
-        </div>
-      </div>
 
       {/* ── EXPANDABLE SPECS DRAWER ── */}
       <div className={`mini-dock-drawer${expanded ? " open" : ""}`}>
@@ -184,6 +225,32 @@ export function PresentationDock({
               ))}
             </div>
           )}
+
+          {/* Mobile Action Buttons (Launch & Code) */}
+          {(liveUrl || githubUrl) && (
+            <div className="mini-drawer-mobile-actions">
+              {liveUrl && (
+                <a
+                  href={liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mini-btn primary"
+                >
+                  Launch ↗
+                </a>
+              )}
+              {githubUrl && (
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mini-btn secondary"
+                >
+                  Code ↗
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -193,7 +260,10 @@ export function PresentationDock({
           <button
             key={stage.id}
             className={`rail-seg${stage.id === selectedTarget ? " active" : ""}`}
-            onClick={() => onSelectTarget(stage.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectTarget(stage.id);
+            }}
             title={stage.title}
           >
             <span className="rail-seg-line" />
@@ -202,5 +272,6 @@ export function PresentationDock({
       </div>
 
     </div>
+    </>
   );
 }

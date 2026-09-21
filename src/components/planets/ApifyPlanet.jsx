@@ -113,11 +113,11 @@ function ApifyEmblem({ size, planetRadius, isMobile }) {
 
   return (
     <group position={[0, 0, planetRadius * 0.99]}>
-      {/* Local Specular Point Light for Lustrous Highlights */}
+      {/* Local cool-white point light — premium, not neon */}
       <pointLight
         ref={lightRef}
-        color={C.amberWarm}
-        intensity={2.8}
+        color="#b8d0ff"
+        intensity={1.8}
         distance={size * 3.2}
         position={[0, 0, size * 0.4]}
       />
@@ -145,9 +145,9 @@ function ApifyEmblem({ size, planetRadius, isMobile }) {
           ref={greenMatRef}
           color={C.emeraldGreen}
           emissive={C.emeraldGreen}
-          emissiveIntensity={1.4}
-          roughness={0.06}
-          metalness={0.88}
+          emissiveIntensity={0.7}
+          roughness={0.12}
+          metalness={0.85}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -162,9 +162,9 @@ function ApifyEmblem({ size, planetRadius, isMobile }) {
           ref={blueMatRef}
           color={C.electricBlue}
           emissive={C.electricBlue}
-          emissiveIntensity={1.4}
-          roughness={0.06}
-          metalness={0.88}
+          emissiveIntensity={0.7}
+          roughness={0.12}
+          metalness={0.85}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -179,20 +179,20 @@ function ApifyEmblem({ size, planetRadius, isMobile }) {
           ref={orangeMatRef}
           color={C.solarOrange}
           emissive={C.solarOrange}
-          emissiveIntensity={1.7}
-          roughness={0.05}
-          metalness={0.90}
+          emissiveIntensity={0.9}
+          roughness={0.10}
+          metalness={0.88}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* 5. Holographic Foundation Pulse Ring */}
+      {/* 5. Holographic Foundation Pulse Ring — subtle blue */}
       <mesh ref={pulseRef} position={[0, 0, 0.004]}>
         <ringGeometry args={[planetRadius * 0.22, planetRadius * 0.26, 48]} />
         <meshBasicMaterial
-          color={C.solarOrange}
+          color={C.electricBlue}
           transparent
-          opacity={0.8}
+          opacity={0.5}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -203,9 +203,6 @@ function ApifyEmblem({ size, planetRadius, isMobile }) {
 // ── Main Apify Planet Component ──────────────────────────────────────────────
 export function ApifyPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
   const planetRef    = useRef();
-  const ring1Ref     = useRef();
-  const ring2Ref     = useRef();
-  const ring3Ref     = useRef();
   const shaderMatRef = useRef();
 
   const planetRadius = size * 0.85;
@@ -222,17 +219,6 @@ export function ApifyPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
     // Steady planetary rotation
     if (planetRef.current) {
       planetRef.current.rotation.y += safeDelta * 0.18;
-    }
-
-    // Counter-rotating data rings (representing concurrent scraper worker threads)
-    if (ring1Ref.current) {
-      ring1Ref.current.rotation.z += safeDelta * 0.24;
-    }
-    if (ring2Ref.current) {
-      ring2Ref.current.rotation.z -= safeDelta * 0.18;
-    }
-    if (ring3Ref.current) {
-      ring3Ref.current.rotation.z += safeDelta * 0.12;
     }
   });
 
@@ -259,82 +245,21 @@ export function ApifyPlanet({ size, isMobile, perfTierFloat = 0.0 }) {
           />
         </mesh>
 
-        {/* ── Radiant Electric Blue Atmospheric Halo ── */}
+        {/* ── Single deep-blue atmospheric halo — calm, premium ── */}
         <mesh>
-          <sphereGeometry args={[planetRadius * 1.042, 32, 32]} />
+          <sphereGeometry args={[planetRadius * 1.048, 32, 32]} />
           <meshStandardMaterial
-            color={C.electricBlue}
-            emissive={C.electricBlue}
-            emissiveIntensity={0.36}
+            color="#1a3a7a"
+            emissive="#1a3a7a"
+            emissiveIntensity={0.22}
             transparent
-            opacity={0.16}
-            side={THREE.BackSide}
-          />
-        </mesh>
-
-        {/* ── Solar Orange Outer Exosphere Rim ── */}
-        <mesh>
-          <sphereGeometry args={[planetRadius * 1.072, 24, 24]} />
-          <meshStandardMaterial
-            color={C.solarOrange}
-            emissive={C.solarOrange}
-            emissiveIntensity={0.30}
-            transparent
-            opacity={0.12}
+            opacity={0.13}
             side={THREE.BackSide}
           />
         </mesh>
 
         {/* ── Apify 3D Monolith Emblem (Mounted at Equator Face) ── */}
         <ApifyEmblem size={size} planetRadius={planetRadius} isMobile={isMobile} />
-      </group>
-
-      {/* ── Orbiting Data Rings (Scraper Pipeline Threads) ── */}
-      <group rotation={[0.65, 0.45, -0.2]}>
-        {/* Inner Emerald Stream Ring */}
-        <mesh ref={ring1Ref}>
-          <ringGeometry args={[planetRadius * 1.22, planetRadius * 1.25, 64]} />
-          <meshStandardMaterial
-            color={C.emeraldGreen}
-            emissive={C.emeraldGreen}
-            emissiveIntensity={1.2}
-            roughness={0.15}
-            metalness={0.85}
-            transparent
-            opacity={0.75}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Outer Orange Solar Sweep Ring */}
-        <mesh ref={ring2Ref} rotation={[0.2, 0.25, 0]}>
-          <ringGeometry args={[planetRadius * 1.34, planetRadius * 1.38, 64]} />
-          <meshStandardMaterial
-            color={C.solarOrange}
-            emissive={C.solarOrange}
-            emissiveIntensity={1.4}
-            roughness={0.15}
-            metalness={0.85}
-            transparent
-            opacity={0.7}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Outer Electric Blue Telemetry Orbit */}
-        <mesh ref={ring3Ref} rotation={[-0.25, 0.15, 0]}>
-          <ringGeometry args={[planetRadius * 1.46, planetRadius * 1.485, 64]} />
-          <meshStandardMaterial
-            color={C.electricBlue}
-            emissive={C.electricBlue}
-            emissiveIntensity={1.3}
-            roughness={0.1}
-            metalness={0.9}
-            transparent
-            opacity={0.65}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
       </group>
     </group>
   );
