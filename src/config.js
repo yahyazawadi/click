@@ -221,6 +221,7 @@ export const SYSTEM_CONFIG = {
       color: '#00BAE3',
       category: 'MULTI-TENANT SAAS PLATFORM',
       shortDesc: 'Enterprise barber shop SaaS — multi-tenant bookings, RBAC, WhatsApp bot, and real-time concurrency.',
+      liveUrl: 'https://barber-multi-tenant.pages.dev/',
       fullDesc: 'Full-stack multi-tenant platform for barbershops. Feature-based React + Supabase architecture with PostgreSQL RLS, 20-key granular RBAC, transaction-scoped advisory locks for concurrent bookings, WhatsApp Edge Functions for automated confirmations, and a Super Admin live device lab.',
       tags: ['SUPABASE', 'POSTGRESQL RLS', 'RBAC', 'WHATSAPP BOT', 'REACT', 'TYPESCRIPT'],
       specs: [
