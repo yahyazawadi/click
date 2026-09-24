@@ -40,13 +40,13 @@ Run these search terms into Upwork job search or Apify job scrapers. Sort by **N
 
 ## 3. Job Qualification Gate (Scoring Rubric)
 
-### ✅ TARGET (High Probability of Success):
+### TARGET (High Probability of Success):
 1. **Budget**: Fixed-price $50 – $300, or Hourly $18 – $25/hr.
 2. **Proposals**: Less than 15 proposals submitted (bidding within the first 30 minutes of posting gives 5x higher hire rate).
 3. **Client Quality**: Payment verified, 4.5+ star client feedback, or high hire-rate history.
 4. **Task Scope**: Clear, solvable problem (e.g. "Three.js model not loading", "Setup WhatsApp webhook", "Supabase RLS policy issue", "Build interactive landing section").
 
-### ❌ AUTO-DISQUALIFY (Avoid at all costs):
+### AUTO-DISQUALIFY (Avoid at all costs):
 - Vague "Build full social network / entire marketplace for $50".
 - Clients with average review rating < 4.0 stars (toxic review risk).
 - Job posts requiring communication outside Upwork before a contract is funded (violates TOS).
