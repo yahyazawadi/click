@@ -37,7 +37,7 @@ function CanvasReadyNotifier({ onReady }) {
 }
 
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
-function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier, onAutoDemoteTier, isAppLoaded = false }) {
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, totalProjects = 8, gpuTier, onAutoDemoteTier, isAppLoaded = false }) {
   const stableTimer = useRef(0);
   const lowFpsTimer = useRef(0);
   const fpsAcc = useRef(0);
@@ -204,7 +204,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     }
 
     // Unlock next planet once FPS has stayed continuously stable for requiredDuration
-    if (stableTimer.current >= requiredDuration) {
+    if (unlockedCount < totalProjects && stableTimer.current >= requiredDuration) {
       stableTimer.current = 0;
       onUnlockNext();
     }
@@ -384,7 +384,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
 
   const handleUnlockNext = () => {
     setUnlockedCount((prev) => {
-      const nextCount = Math.min(activeProjects.length, prev + 1);
+      if (prev >= activeProjects.length) return prev;
+      const nextCount = prev + 1;
       const unlockedProject = activeProjects[nextCount - 1];
       if (unlockedProject) {
         fpsLogger.logUnlock({ planetId: unlockedProject.id, unlockedCount: nextCount });
@@ -653,6 +654,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 onMetricsUpdate={setMetrics}
                 selectedTarget={selectedTarget}
                 unlockedCount={unlockedCount}
+                totalProjects={activeProjects.length}
                 gpuTier={gpuTier}
                 onAutoDemoteTier={handleAutoDemoteTier}
                 isAppLoaded={isAppLoaded}

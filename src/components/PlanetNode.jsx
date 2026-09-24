@@ -86,7 +86,9 @@ export function PlanetNode({
   const groupRef = useRef();
   const [hovered, setHovered] = useState(false);
   const [isNearby, setIsNearby] = useState(false);
-  const currentScaleRef = useRef(isUnlocked ? 1.0 : 0.0);
+  const baseScaleMultiplier = isMobile ? 1.35 : 1.0;
+  const currentScaleRef = useRef(isUnlocked ? baseScaleMultiplier : 0.0);
+  const orbitSpeedFactorRef = useRef(1.0);
   const [shouldRenderMesh, setShouldRenderMesh] = useState(isUnlocked);
 
   const angleRef = useRef(project.startAngle || 0);
@@ -104,7 +106,15 @@ export function PlanetNode({
     if (!ring) return;
 
     const safeDelta = Math.min(delta, 0.1);
-    angleRef.current += safeDelta * (ring.speed || 0.1);
+
+    // Smoothly ease orbital motion to 0 during inspection to eliminate camera chase & motion sickness
+    const targetOrbitFactor = hasSelection ? 0.0 : 1.0;
+    orbitSpeedFactorRef.current = THREE.MathUtils.lerp(
+      orbitSpeedFactorRef.current,
+      targetOrbitFactor,
+      Math.min(1.0, safeDelta * 3.0)
+    );
+    angleRef.current += safeDelta * (ring.speed || 0.1) * orbitSpeedFactorRef.current;
 
     const theta = angleRef.current;
     const r = ring.radius;
@@ -113,8 +123,8 @@ export function PlanetNode({
     euler.current.set(ring.tiltX || 0, ring.tiltY || 0, ring.tiltZ || 0);
     localPos.current.applyEuler(euler.current);
 
-    // Smooth scale lerp for progressive fade-in
-    const targetScale = isUnlocked ? 1.0 : 0.0;
+    // Mobile only: scale planets up 35% for touchable readability. Desktop remains strictly 1.0.
+    const targetScale = isUnlocked ? (isMobile ? 1.35 : 1.0) : 0.0;
     currentScaleRef.current = THREE.MathUtils.lerp(currentScaleRef.current, targetScale, Math.min(1.0, safeDelta * 5.0));
 
     if (groupRef.current) {

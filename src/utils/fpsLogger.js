@@ -142,7 +142,7 @@ class FPSLogger {
       planetId,
       unlockedCount,
     };
-    console.log(`[Telemetry] UNLOCK: ${planetId} (Count ${unlockedCount}/10)`);
+    console.log(`[Telemetry] UNLOCK: ${planetId} (Count ${unlockedCount})`);
     this.unlockEvents.push(evt);
   }
 

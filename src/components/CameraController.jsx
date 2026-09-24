@@ -39,40 +39,50 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
     }
 
     if (!selectedTarget) {
-      // DEFAULT OVERVIEW: Pull straight back to radius 18 * zoomFactor at the locked angle
-      // (Expanded distance so planets and orbits appear with broad breathing room)
-      const radius = (isMobile ? 16 : 18) * zoomFactor;
+      // DEFAULT OVERVIEW:
+      // Mobile: pull back to radius 24 so the narrow portrait viewport can comfortably frame the orbits
+      // Desktop: remains untouched at radius 18
+      const radius = (isMobile ? 24 : 18) * zoomFactor;
+      const camHeight = (isMobile ? 9.5 : 7) * zoomFactor;
 
       targetCamPos.current.set(
         Math.cos(macroAngle.current) * radius + (isMobile ? 0 : pointer.x * 2.5),
-        7 * zoomFactor + (isMobile ? 0 : pointer.y * 2.0),
+        camHeight + (isMobile ? 0 : pointer.y * 2.0),
         Math.sin(macroAngle.current) * radius
       );
-      targetLookAt.current.set(0, 0, 0);
+      targetLookAt.current.set(0, isMobile ? 0.6 : 0, 0);
     } else if (selectedTarget === 'core') {
-      // CORE FOCUS: Offset camera to right so core sphere is beautifully framed in the open left area beside the drawer
-      const coreZ = (isMobile ? 10.0 : 6.8) * zoomFactor;
+      // CORE FOCUS: Offset camera so core sphere is framed nicely beside UI
+      const coreZ = (isMobile ? 8.5 : 6.8) * zoomFactor;
       const coreX = isMobile ? 0 : 2.5;
-      const coreY = isMobile ? -1.5 : 0;
+      const coreY = isMobile ? -0.8 : 0;
       targetCamPos.current.set(coreX, coreY, coreZ);
-      targetLookAt.current.set(0, 0, 0);
+      targetLookAt.current.set(0, isMobile ? -0.2 : 0, 0);
     } else if (selectedTarget && targetPlanetPosRef && targetPlanetPosRef.current) {
-      // PLANET FOCUS: Horizontal sightline through planet into Nebulae, with planet framed high in upper sky above dock
-      const distOffset = (isMobile ? 5.2 : 3.8) * zoomFactor;
+      // PLANET FOCUS:
+      // Mobile: distance 6.2 (prevents feeling claustrophobic/too close)
+      // Desktop: remains untouched at 3.8
+      const distOffset = (isMobile ? 6.2 : 3.8) * zoomFactor;
       const targetPos = targetPlanetPosRef.current;
       const targetQuat = targetPlanetQuatRef?.current || new THREE.Quaternion();
 
       // Center of background Nebulae in scene space
       const nebulaCenter = new THREE.Vector3(0, 0, -55).applyQuaternion(targetQuat);
 
-      // Strictly horizontal sightline in X-Z plane (Y=0 eliminates vertical camera drift/tipping)
-      const viewDir = new THREE.Vector3(
+      // Sightline:
+      // On mobile: strictly radial outward from center (0,0,0) through planet.
+      // Guarantees camera is always outside the orbit looking in — sun core never blocks the view!
+      // On desktop: original sightline toward the background nebulae.
+      const outwardDir = new THREE.Vector3(targetPos.x, 0, targetPos.z).normalize();
+      if (outwardDir.lengthSq() < 0.001) outwardDir.set(0, 0, 1);
+
+      const viewDir = isMobile ? outwardDir : new THREE.Vector3(
         targetPos.x - nebulaCenter.x,
         0,
         targetPos.z - nebulaCenter.z
       ).normalize();
 
-      const camOffsetY = (isMobile ? 0.6 : 0.88) * zoomFactor;
+      const camOffsetY = (isMobile ? 0.75 : 0.88) * zoomFactor;
 
       // Position camera along horizontal sightline with clean elevation
       targetCamPos.current.set(
@@ -81,10 +91,12 @@ export function CameraController({ selectedTarget, targetPlanetPosRef, targetPla
         targetPos.z + viewDir.z * distOffset
       );
 
-      // Balanced vertical look-at offset (-0.78): keeps planet centered in open viewport with ample clearance from both top header and bottom dock
+      // Vertical look-at offset:
+      // On mobile: -0.42 centers the planet in the open golden zone between top header/slider and bottom dock
+      // Desktop: remains untouched at -0.78
       targetLookAt.current.set(
         targetPos.x,
-        targetPos.y - (isMobile ? 1.3 : 0.78),
+        targetPos.y - (isMobile ? 0.42 : 0.78),
         targetPos.z
       );
     } else {

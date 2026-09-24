@@ -91,9 +91,12 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
     }
 
     const rotSpeed = CORE_CONFIG.rotationSpeed !== undefined ? CORE_CONFIG.rotationSpeed : 0.15;
+    const baseRadius = CORE_CONFIG.radius || 1.8;
+    // Mobile only: scale core to 1.1 so it doesn't overpower the portrait viewport. Desktop remains untouched at 1.8.
+    const coreScale = isMobile ? 1.1 : baseRadius;
+
     if (innerCoreRef.current) {
       innerCoreRef.current.rotation.y += delta * rotSpeed;
-      const coreScale = CORE_CONFIG.radius || 1.8;
       innerCoreRef.current.scale.set(coreScale / 1.8, coreScale / 1.8, coreScale / 1.8);
     }
 
@@ -113,7 +116,8 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
       ringRef1.current.rotation.z += delta * (ring1.speedZ !== undefined ? ring1.speedZ : 0.15);
 
       const radMult = ring1.radiusMultiplier || 1.5;
-      ringRef1.current.scale.set(radMult / 1.5, radMult / 1.5, radMult / 1.5);
+      const ringScale1 = (coreScale / 1.8) * (radMult / 1.5);
+      ringRef1.current.scale.set(ringScale1, ringScale1, ringScale1);
     }
     if (matRef1.current && ring1) {
       colors.ring1Color.set(ring1.color || '#FF0A2B');
@@ -140,7 +144,8 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
       ringRef2.current.rotation.z += delta * (ring2.speedZ !== undefined ? ring2.speedZ : 0.10);
 
       const radMult2 = ring2.radiusMultiplier || 1.7;
-      ringRef2.current.scale.set(radMult2 / 1.7, radMult2 / 1.7, radMult2 / 1.7);
+      const ringScale2 = (coreScale / 1.8) * (radMult2 / 1.7);
+      ringRef2.current.scale.set(ringScale2, ringScale2, ringScale2);
     }
     if (matRef2.current && ring2) {
       colors.ring2Color.set(ring2.color || '#B3002D');
