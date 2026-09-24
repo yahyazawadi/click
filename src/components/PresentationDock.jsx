@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SYSTEM_CONFIG } from "../config";
+import { WhatsAppBotModal } from "./WhatsAppBotModal";
 
 export function PresentationDock({
   selectedTarget,
@@ -10,6 +11,7 @@ export function PresentationDock({
   isSecretLove = false,
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [waModalOpen, setWaModalOpen] = useState(false);
 
   const isCore = selectedTarget === "core";
   const isOpen = selectedTarget === "core" || Boolean(selectedProject);
@@ -60,9 +62,9 @@ export function PresentationDock({
     ? SYSTEM_CONFIG.core.aboutText
     : selectedProject?.shortDesc;
   const liveUrl = selectedProject?.liveUrl;
-  const liveLabel = selectedProject?.liveLabel || "Launch ↗";
+  const liveLabel = selectedProject?.liveLabel || "Launch ";
   const secondaryUrl = selectedProject?.secondaryUrl || selectedProject?.githubUrl;
-  const secondaryLabel = selectedProject?.secondaryLabel || (selectedProject?.githubUrl ? "Code ↗" : "Deploy ↗");
+  const secondaryLabel = selectedProject?.secondaryLabel || (selectedProject?.githubUrl ? "Code " : "Deploy ");
   const specs = isCore ? SYSTEM_CONFIG.core.stats : selectedProject?.specs;
   const tags = isCore
     ? ["FULL-STACK", "SPATIAL WEB", "3D WEBGL", "REACT"]
@@ -136,6 +138,17 @@ export function PresentationDock({
                 }}
               >
                 {expanded ? "— Less" : "+ Specs"}
+              </button>
+            )}
+            {selectedProject?.id === "proj-whatsapp" && (
+              <button
+                className="mini-btn wa-live-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setWaModalOpen(true);
+                }}
+              >
+                Live Flow 
               </button>
             )}
           </div>
@@ -274,6 +287,9 @@ export function PresentationDock({
       </div>
 
     </div>
+
+      {/* WhatsApp Bot Interactive Modal */}
+      <WhatsAppBotModal isOpen={waModalOpen} onClose={() => setWaModalOpen(false)} />
     </>
   );
 }
