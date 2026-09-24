@@ -161,21 +161,22 @@ export function PlanetOrientationControls({
             touchAction: 'none',
           }}
         >
-          {/* Light Blue Glowing Circular Thumb */}
+          {/* Light Blue Glowing Circular Thumb with mobile touch-target expansion */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               bottom: `${Math.max(0, Math.min(1, pitchPercent)) * 100}%`,
               transform: 'translate(-50%, 50%)',
-              width: '16px',
-              height: '16px',
+              width: isMobile ? '20px' : '16px',
+              height: isMobile ? '20px' : '16px',
               borderRadius: '50%',
               background: '#40c8ff',
-              boxShadow: '0 0 10px #00bae3, 0 0 2px #ffffff',
+              boxShadow: '0 0 12px #00bae3, 0 0 2px #ffffff',
               border: '2px solid #ffffff',
               cursor: 'grab',
               transition: isDraggingPitch ? 'none' : 'transform 0.1s ease-out',
+              touchAction: 'none',
             }}
           />
         </div>
@@ -243,21 +244,22 @@ export function PlanetOrientationControls({
             touchAction: 'none',
           }}
         >
-          {/* Light Blue Glowing Circular Thumb */}
+          {/* Light Blue Glowing Circular Thumb with mobile touch-target expansion */}
           <div
             style={{
               position: 'absolute',
               top: '50%',
               left: `${Math.max(0, Math.min(1, yawPercent)) * 100}%`,
               transform: 'translate(-50%, -50%)',
-              width: '16px',
-              height: '16px',
+              width: isMobile ? '20px' : '16px',
+              height: isMobile ? '20px' : '16px',
               borderRadius: '50%',
               background: '#40c8ff',
-              boxShadow: '0 0 10px #00bae3, 0 0 2px #ffffff',
+              boxShadow: '0 0 12px #00bae3, 0 0 2px #ffffff',
               border: '2px solid #ffffff',
               cursor: 'grab',
               transition: isDraggingYaw ? 'none' : 'transform 0.1s ease-out',
+              touchAction: 'none',
             }}
           />
         </div>

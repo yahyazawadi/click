@@ -114,7 +114,7 @@ export function UIOverlay({
       {/* Top Navbar Layer */}
       <div className="ui-overlay">
         <header className="top-header">
-          <ContactPanel onReturn={onReturn} />
+          <ContactPanel onReturn={onReturn} selectedTarget={selectedTarget} />
 
           <div className="top-right-hud">
             <div

@@ -4,7 +4,7 @@ import { EnhancedStarfield } from './EnhancedStarfield';
 import { DualNebulaBackground } from './DualNebulaBackground';
 import { SYSTEM_CONFIG } from '../config';
 
-export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0, nebulaPath1 = 1, nebulaPath2 = 3 }) {
+export function CosmicBackground({ isMobile, isMobileDualNebula = false, enabled = true, perfTierFloat = 0.0, nebulaPath1 = 1, nebulaPath2 = 3 }) {
   const starsRef = useRef();
 
   // Very slow background rotation for deep space ambiance (skipped on LOW tier)
@@ -19,7 +19,15 @@ export function CosmicBackground({ isMobile, enabled = true, perfTierFloat = 0.0
 
   return (
     <>
-      {enabled && <DualNebulaBackground isMobile={isMobile} perfTierFloat={perfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />}
+      {enabled && (
+        <DualNebulaBackground 
+          isMobile={isMobile} 
+          isMobileDualNebula={isMobileDualNebula} 
+          perfTierFloat={perfTierFloat} 
+          nebulaPath1={nebulaPath1} 
+          nebulaPath2={nebulaPath2} 
+        />
+      )}
       <group ref={starsRef}>
         <EnhancedStarfield
           radius={100}

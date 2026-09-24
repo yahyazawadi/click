@@ -28,6 +28,8 @@ export function FpsProfilerOverlay({
   isNebulaEnabled = true,
   isBottomHintEnabled = true,
   onToggleBottomHint,
+  isMobileDualNebula = false,
+  onToggleMobileDualNebula,
   // GPU tier props
   gpuTier = 'high',
   onSetTier,
@@ -617,33 +619,38 @@ export function FpsProfilerOverlay({
       className="telemetry-profiler-container"
       style={{
         position: 'fixed',
-        top: '12px',
-        right: '12px',
-        width: '360px',
-        maxHeight: '92vh',
+        top: isMobile ? '8px' : '12px',
+        right: isMobile ? '8px' : '12px',
+        left: isMobile ? '8px' : 'auto',
+        width: isMobile ? 'calc(100vw - 16px)' : '360px',
+        maxWidth: isMobile ? 'calc(100vw - 16px)' : '360px',
+        maxHeight: isMobile ? 'calc(100dvh - 16px)' : '92vh',
         zIndex: 9999,
         background: 'rgba(7, 17, 36, 0.97)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid var(--primary-cyan)',
-        boxShadow: '0 0 25px rgba(0, 186, 227, 0.3)',
-        borderRadius: '10px',
-        padding: '0.85rem',
+        boxShadow: 'none',
+        borderRadius: isMobile ? '8px' : '10px',
+        padding: isMobile ? '0.65rem 0.55rem' : '0.85rem',
         fontFamily: 'var(--font-mono)',
         color: 'var(--text-pure)',
-        fontSize: '0.72rem',
+        fontSize: isMobile ? '0.67rem' : '0.72rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.65rem',
+        gap: isMobile ? '0.5rem' : '0.65rem',
         overflowX: 'hidden',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        boxSizing: 'border-box'
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,186,227,0.3)', paddingBottom: '0.4rem', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', letterSpacing: '0.04em', fontSize: isMobile ? '0.66rem' : '0.72rem', whiteSpace: 'nowrap' }}>
             TELEMETRY & LIVE TUNER
           </span>
-          <span style={{ fontSize: '0.52rem', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '1px 4px', borderRadius: '3px', border: '1px solid rgba(0, 255, 170, 0.3)' }}>
+          <span style={{ fontSize: isMobile ? '0.48rem' : '0.52rem', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '1px 4px', borderRadius: '3px', border: '1px solid rgba(0, 255, 170, 0.3)', whiteSpace: 'nowrap' }}>
             AUTO-SAVED
           </span>
         </div>
@@ -716,16 +723,16 @@ export function FpsProfilerOverlay({
 
       {/* Frame Time Mini Graph */}
       <div>
-        <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)', marginBottom: '2px' }}>
+        <div style={{ fontSize: isMobile ? '0.6rem' : '0.65rem', color: 'var(--secondary-blue)', marginBottom: '2px' }}>
           FRAME TIME GRAPH (ms) - 16.6ms target
         </div>
-        <canvas ref={canvasRef} width={320} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', maxWidth: '100%', display: 'block' }} />
+        <canvas ref={canvasRef} width={320} height={45} style={{ borderRadius: '4px', border: '1px solid rgba(0,186,227,0.2)', width: '100%', maxWidth: '100%', height: '42px', display: 'block', boxSizing: 'border-box' }} />
       </div>
 
       {/* GPU Tier Switcher */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-        <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)' }}>GPU TIER OVERRIDE:</div>
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
+        <div style={{ fontSize: isMobile ? '0.6rem' : '0.65rem', color: 'var(--secondary-blue)' }}>GPU TIER OVERRIDE:</div>
+        <div style={{ display: 'flex', gap: isMobile ? '0.3rem' : '0.4rem' }}>
           {['high', 'med', 'low'].map((tier) => {
             const isActive = gpuTier === tier;
             const col = TIER_COLORS[tier];
@@ -735,8 +742,8 @@ export function FpsProfilerOverlay({
                 onClick={() => onSetTier && onSetTier(tier)}
                 style={{
                   flex: 1,
-                  padding: '0.35rem',
-                  fontSize: '0.63rem',
+                  padding: isMobile ? '0.3rem 0.15rem' : '0.35rem',
+                  fontSize: isMobile ? '0.58rem' : '0.63rem',
                   fontFamily: 'var(--font-mono)',
                   fontWeight: isActive ? 'bold' : 'normal',
                   border: `1px solid ${isActive ? col : '#444'}`,
@@ -757,21 +764,23 @@ export function FpsProfilerOverlay({
       </div>
 
       {/* Diagnostic Toggles */}
-      <div style={{ display: 'flex', gap: '0.4rem', flexDirection: 'column' }}>
-        <div style={{ fontSize: '0.65rem', color: 'var(--secondary-blue)' }}>DIAGNOSTIC ISOLATION TOGGLES:</div>
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
+      <div style={{ display: 'flex', gap: '0.35rem', flexDirection: 'column' }}>
+        <div style={{ fontSize: isMobile ? '0.6rem' : '0.65rem', color: 'var(--secondary-blue)' }}>DIAGNOSTIC ISOLATION TOGGLES:</div>
+        <div style={{ display: 'flex', gap: isMobile ? '0.3rem' : '0.4rem' }}>
           <button 
             onClick={onToggleFavicon}
             style={{
               flex: 1,
-              padding: '0.35rem',
-              fontSize: '0.63rem',
+              padding: isMobile ? '0.32rem 0.15rem' : '0.35rem',
+              fontSize: isMobile ? '0.56rem' : '0.63rem',
               fontFamily: 'var(--font-mono)',
               border: '1px solid ' + (isFaviconEnabled ? '#00BAE3' : '#555'),
               background: isFaviconEnabled ? 'rgba(0, 186, 227, 0.15)' : 'transparent',
               color: isFaviconEnabled ? '#00BAE3' : '#888',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
             FAVICON: {isFaviconEnabled ? 'ON' : 'OFF'}
@@ -781,14 +790,16 @@ export function FpsProfilerOverlay({
             onClick={onToggleNebula}
             style={{
               flex: 1,
-              padding: '0.35rem',
-              fontSize: '0.63rem',
+              padding: isMobile ? '0.32rem 0.15rem' : '0.35rem',
+              fontSize: isMobile ? '0.56rem' : '0.63rem',
               fontFamily: 'var(--font-mono)',
               border: '1px solid ' + (isNebulaEnabled ? '#00BAE3' : '#555'),
               background: isNebulaEnabled ? 'rgba(0, 186, 227, 0.15)' : 'transparent',
               color: isNebulaEnabled ? '#00BAE3' : '#888',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
             NEBULA: {isNebulaEnabled ? 'ON' : 'OFF'}
@@ -798,19 +809,55 @@ export function FpsProfilerOverlay({
             onClick={onToggleBottomHint}
             style={{
               flex: 1,
-              padding: '0.35rem',
-              fontSize: '0.63rem',
+              padding: isMobile ? '0.32rem 0.15rem' : '0.35rem',
+              fontSize: isMobile ? '0.56rem' : '0.63rem',
               fontFamily: 'var(--font-mono)',
               border: '1px solid ' + (isBottomHintEnabled ? '#00BAE3' : '#555'),
               background: isBottomHintEnabled ? 'rgba(0, 186, 227, 0.15)' : 'transparent',
               color: isBottomHintEnabled ? '#00BAE3' : '#888',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
             HINT: {isBottomHintEnabled ? 'ON' : 'OFF'}
           </button>
         </div>
+
+        {/* Mobile Dual Nebula Mode Switcher */}
+        {isMobile && isNebulaEnabled && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '3px' }}>
+            <button 
+              onClick={onToggleMobileDualNebula}
+              style={{
+                width: '100%',
+                padding: '0.34rem 0.5rem',
+                fontSize: '0.58rem',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: isMobileDualNebula ? 'bold' : 'normal',
+                border: '1px solid ' + (isMobileDualNebula ? '#00ffaa' : 'rgba(0, 186, 227, 0.4)'),
+                background: isMobileDualNebula ? 'rgba(0, 255, 170, 0.15)' : 'rgba(0, 186, 227, 0.06)',
+                color: isMobileDualNebula ? '#00ffaa' : 'var(--secondary-blue)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: isMobileDualNebula ? '0 0 10px rgba(0, 255, 170, 0.25)' : 'none',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>MOBILE NEBULA MODE:</span>
+              <span style={{ fontWeight: 'bold' }}>{isMobileDualNebula ? '2 CLOUDS (HIGH QUALITY)' : '1 CLOUD (60 FPS)'}</span>
+            </button>
+            <div style={{ fontSize: '0.5rem', color: '#7799bb', paddingLeft: '2px', lineHeight: 1.3 }}>
+              {isMobileDualNebula 
+                ? '⚡ Rendering both Crimson & Cyan clouds. Best on modern high-end phones.' 
+                : '🛡️ Single cloud active for maximum battery & sustained 60 FPS fill-rate.'}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
@@ -825,8 +872,8 @@ export function FpsProfilerOverlay({
         gap: '0.5rem'
       }}>
         {/* Main Category Header & History Actions */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+          <span style={{ fontWeight: 'bold', color: 'var(--primary-cyan)', fontSize: isMobile ? '0.64rem' : '0.68rem', letterSpacing: '0.04em' }}>
             LIVE TUNER CONTROLS
           </span>
           <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -838,8 +885,8 @@ export function FpsProfilerOverlay({
                 background: historyStack.length > 0 ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
                 color: historyStack.length > 0 ? 'var(--primary-cyan)' : '#555',
                 border: '1px solid ' + (historyStack.length > 0 ? 'var(--primary-cyan)' : '#444'),
-                padding: '0.2rem 0.3rem',
-                fontSize: '0.58rem',
+                padding: isMobile ? '0.2rem 0.25rem' : '0.2rem 0.3rem',
+                fontSize: isMobile ? '0.54rem' : '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: historyStack.length > 0 ? 'pointer' : 'default',
@@ -857,8 +904,8 @@ export function FpsProfilerOverlay({
                 background: redoStack.length > 0 ? 'rgba(0, 186, 227, 0.2)' : 'transparent',
                 color: redoStack.length > 0 ? 'var(--primary-cyan)' : '#555',
                 border: '1px solid ' + (redoStack.length > 0 ? 'var(--primary-cyan)' : '#444'),
-                padding: '0.2rem 0.3rem',
-                fontSize: '0.58rem',
+                padding: isMobile ? '0.2rem 0.25rem' : '0.2rem 0.3rem',
+                fontSize: isMobile ? '0.54rem' : '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: redoStack.length > 0 ? 'pointer' : 'default',
@@ -875,8 +922,8 @@ export function FpsProfilerOverlay({
                 background: resetStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.15)',
                 color: resetStatus ? '#000' : 'var(--secondary-blue)',
                 border: '1px solid ' + (resetStatus ? '#00ffaa' : 'rgba(93, 186, 225, 0.4)'),
-                padding: '0.2rem 0.3rem',
-                fontSize: '0.58rem',
+                padding: isMobile ? '0.2rem 0.25rem' : '0.2rem 0.3rem',
+                fontSize: isMobile ? '0.54rem' : '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -894,8 +941,8 @@ export function FpsProfilerOverlay({
                 background: copiedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: copiedStatus ? '#000' : 'var(--primary-cyan)',
                 border: '1px solid var(--primary-cyan)',
-                padding: '0.2rem 0.3rem',
-                fontSize: '0.58rem',
+                padding: isMobile ? '0.2rem 0.25rem' : '0.2rem 0.3rem',
+                fontSize: isMobile ? '0.54rem' : '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -912,8 +959,8 @@ export function FpsProfilerOverlay({
                 background: pastedStatus ? '#00ffaa' : 'rgba(0, 186, 227, 0.2)',
                 color: pastedStatus ? '#000' : 'var(--primary-cyan)',
                 border: '1px solid var(--primary-cyan)',
-                padding: '0.2rem 0.3rem',
-                fontSize: '0.58rem',
+                padding: isMobile ? '0.2rem 0.25rem' : '0.2rem 0.3rem',
+                fontSize: isMobile ? '0.54rem' : '0.58rem',
                 fontFamily: 'var(--font-mono)',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -926,7 +973,7 @@ export function FpsProfilerOverlay({
         </div>
 
         {/* Master Category Tabs (CORE PLANET | ORBIT RINGS | NEBULA) */}
-        <div style={{ display: 'flex', gap: '0.3rem' }}>
+        <div style={{ display: 'flex', gap: isMobile ? '0.2rem' : '0.3rem' }}>
           {[
             { key: 'core', label: 'CORE PLANET', color: '#00BAE3' },
             { key: 'rings', label: 'ORBIT RINGS', color: '#5DBAE1' },
@@ -939,8 +986,8 @@ export function FpsProfilerOverlay({
                 onClick={() => setActiveMainTab(key)}
                 style={{
                   flex: 1,
-                  padding: '0.4rem 0.2rem',
-                  fontSize: '0.62rem',
+                  padding: isMobile ? '0.35rem 0.15rem' : '0.4rem 0.2rem',
+                  fontSize: isMobile ? '0.56rem' : '0.62rem',
                   fontFamily: 'var(--font-mono)',
                   fontWeight: isActive ? 'bold' : 'normal',
                   border: `1px solid ${isActive ? color : '#444'}`,
@@ -949,6 +996,8 @@ export function FpsProfilerOverlay({
                   borderRadius: '4px',
                   cursor: 'pointer',
                   boxShadow: isActive ? `0 0 10px ${color}33` : 'none',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center',
                 }}
               >
                 {label}
@@ -963,7 +1012,7 @@ export function FpsProfilerOverlay({
         {activeMainTab === 'core' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
             {/* Core Sub-Tabs in a clean 2x2 Grid so NEAR RINGS is instantly visible! */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? '0.25rem' : '0.3rem' }}>
               {[
                 { key: 'surface', label: 'SURFACE & COLORS' },
                 { key: 'innerRings', label: 'NEAR / INNER RINGS' },
@@ -976,8 +1025,8 @@ export function FpsProfilerOverlay({
                     key={key}
                     onClick={() => setActiveCoreSubTab(key)}
                     style={{
-                      padding: '0.35rem 0.25rem',
-                      fontSize: '0.58rem',
+                      padding: isMobile ? '0.32rem 0.15rem' : '0.35rem 0.25rem',
+                      fontSize: isMobile ? '0.53rem' : '0.58rem',
                       fontFamily: 'var(--font-mono)',
                       border: '1px solid ' + (isActive ? 'var(--primary-cyan)' : '#333'),
                       background: isActive ? 'rgba(0, 186, 227, 0.25)' : 'rgba(0, 0, 0, 0.3)',
@@ -986,6 +1035,8 @@ export function FpsProfilerOverlay({
                       cursor: 'pointer',
                       fontWeight: isActive ? 'bold' : 'normal',
                       boxShadow: isActive ? '0 0 8px rgba(0, 186, 227, 0.3)' : 'none',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center',
                     }}
                   >
                     {label}
@@ -1059,15 +1110,15 @@ export function FpsProfilerOverlay({
                     ].map(({ label, key }) => {
                       const hexVal = CORE_CONFIG.colors[key];
                       return (
-                        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '0.56rem', color: '#aaa' }}>{label}:</span>
+                        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+                          <span style={{ fontSize: '0.54rem', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}:</span>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                             <input
                               type="color"
                               value={hexVal}
                               onMouseDown={pushHistorySnapshot}
                               onChange={(e) => updateCoreParam('colors', key, e.target.value, false)}
-                              style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                              style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0 }}
                             />
                             <input
                               type="text"
@@ -1076,6 +1127,7 @@ export function FpsProfilerOverlay({
                               onChange={(e) => updateCoreParam('colors', key, e.target.value, false)}
                               style={{
                                 width: '100%',
+                                minWidth: 0,
                                 background: 'rgba(0, 0, 0, 0.4)',
                                 border: '1px solid #444',
                                 color: '#fff',
@@ -1407,15 +1459,15 @@ export function FpsProfilerOverlay({
                   ].map(({ label, key }) => {
                     const hexVal = currentCoreRing[key] || '#FF0A2B';
                     return (
-                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.56rem', color: '#aaa' }}>{label}:</span>
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+                        <span style={{ fontSize: '0.54rem', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}:</span>
                         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                           <input
                             type="color"
                             value={hexVal}
                             onMouseDown={pushHistorySnapshot}
                             onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value, false)}
-                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0 }}
                           />
                           <input
                             type="text"
@@ -1424,6 +1476,7 @@ export function FpsProfilerOverlay({
                             onChange={(e) => updateCoreRingParam(activeCoreRing, key, e.target.value, false)}
                             style={{
                               width: '100%',
+                              minWidth: 0,
                               background: 'rgba(0, 0, 0, 0.4)',
                               border: '1px solid #444',
                               color: '#fff',
@@ -1449,7 +1502,7 @@ export function FpsProfilerOverlay({
         {activeMainTab === 'rings' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
             {/* Ring Selector Sub-Tabs */}
-            <div style={{ display: 'flex', gap: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: isMobile ? '0.2rem' : '0.25rem' }}>
               {[0, 1, 2, 'global'].map((tabKey) => {
                 const isActive = activeOrbitRingTab === tabKey;
                 const label = tabKey === 'global' ? 'GLOBAL' : `RING ${tabKey}`;
@@ -1459,15 +1512,17 @@ export function FpsProfilerOverlay({
                     onClick={() => setActiveOrbitRingTab(tabKey)}
                     style={{
                       flex: 1,
-                      padding: '0.3rem 0.2rem',
-                      fontSize: '0.6rem',
+                      padding: isMobile ? '0.28rem 0.12rem' : '0.3rem 0.2rem',
+                      fontSize: isMobile ? '0.54rem' : '0.6rem',
                       fontFamily: 'var(--font-mono)',
                       border: '1px solid ' + (isActive ? 'var(--secondary-blue)' : '#444'),
                       background: isActive ? 'rgba(93, 186, 225, 0.2)' : 'transparent',
                       color: isActive ? 'var(--secondary-blue)' : '#888',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                      fontWeight: isActive ? 'bold' : 'normal'
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center'
                     }}
                   >
                     {label}
@@ -1550,7 +1605,7 @@ export function FpsProfilerOverlay({
                       value={currentRing.color || '#00BAE3'}
                       onMouseDown={pushHistorySnapshot}
                       onChange={(e) => updateOrbitRingParam(activeOrbitRingTab, 'color', e.target.value, false)}
-                      style={{ width: '24px', height: '24px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                      style={{ width: '24px', height: '24px', border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0 }}
                     />
                     <input
                       type="text"
@@ -1559,6 +1614,7 @@ export function FpsProfilerOverlay({
                       onChange={(e) => updateOrbitRingParam(activeOrbitRingTab, 'color', e.target.value, false)}
                       style={{
                         flex: 1,
+                        minWidth: 0,
                         background: 'rgba(0, 0, 0, 0.4)',
                         border: '1px solid #444',
                         color: '#fff',
@@ -1660,6 +1716,40 @@ export function FpsProfilerOverlay({
                 NEBULA 2 (BLUE)
               </button>
             </div>
+
+            {/* Quick notice when inspecting Nebula 2 on mobile with single cloud active */}
+            {isMobile && !isMobileDualNebula && activeNebulaTab === 'nebula2' && (
+              <div style={{
+                background: 'rgba(255, 187, 0, 0.12)',
+                border: '1px solid rgba(255, 187, 0, 0.4)',
+                borderRadius: '4px',
+                padding: '0.35rem 0.5rem',
+                fontSize: '0.55rem',
+                color: '#ffbb00',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span>Nebula 2 is hidden on mobile to conserve 60 FPS.</span>
+                <button
+                  onClick={onToggleMobileDualNebula}
+                  style={{
+                    background: '#ffbb00',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '3px',
+                    padding: '2px 6px',
+                    fontWeight: 'bold',
+                    fontSize: '0.52rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  ENABLE DUAL
+                </button>
+              </div>
+            )}
 
             {/* Refresh / Generate New Nebula Button */}
             <button
@@ -1924,15 +2014,15 @@ export function FpsProfilerOverlay({
                     const colorField = key.replace('color_', '');
                     const hexVal = currentNebula.colors[colorField];
                     return (
-                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.58rem', color: '#aaa' }}>{label}:</span>
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+                        <span style={{ fontSize: '0.54rem', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}:</span>
                         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                           <input
                             type="color"
                             value={hexVal}
                             onMouseDown={pushHistorySnapshot}
                             onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
-                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            style={{ width: '22px', height: '22px', border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0 }}
                           />
                           <input
                             type="text"
@@ -1941,6 +2031,7 @@ export function FpsProfilerOverlay({
                             onChange={(e) => updateNebulaParam(activeNebulaTab, key, e.target.value)}
                             style={{
                               width: '100%',
+                              minWidth: 0,
                               background: 'rgba(0, 0, 0, 0.4)',
                               border: '1px solid #444',
                               color: '#fff',

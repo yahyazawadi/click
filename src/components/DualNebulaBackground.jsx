@@ -56,6 +56,7 @@ function syncNebulaUniforms(mat, config, timeAcc, path, perfTierFloat) {
 
 export function DualNebulaBackground({ 
   isMobile, 
+  isMobileDualNebula = false,
   perfTierFloat = 0.0, 
   nebulaPath1 = NEBULA_CONFIG.nebula1.path, 
   nebulaPath2 = NEBULA_CONFIG.nebula2.path 
@@ -64,6 +65,8 @@ export function DualNebulaBackground({
   const matRefLayer2 = useRef();
   const timeAcc1 = useRef(0);
   const timeAcc2 = useRef(0);
+
+  const isNebula2Visible = (!isMobile || isMobileDualNebula) && perfTierFloat < 0.8;
 
   useFrame((state, delta) => {
     // Clamp delta to 0.1s max to prevent sudden leaps on tab blur/focus/reload
@@ -74,10 +77,12 @@ export function DualNebulaBackground({
     timeAcc1.current += safeDelta * speed1;
     syncNebulaUniforms(matRefLayer1.current, n1, timeAcc1.current, nebulaPath1, perfTierFloat);
 
-    const n2 = NEBULA_CONFIG.nebula2;
-    const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
-    timeAcc2.current += safeDelta * speed2;
-    syncNebulaUniforms(matRefLayer2.current, n2, timeAcc2.current, nebulaPath2, perfTierFloat);
+    if (isNebula2Visible) {
+      const n2 = NEBULA_CONFIG.nebula2;
+      const speed2 = n2.speed !== undefined ? n2.speed : 0.12;
+      timeAcc2.current += safeDelta * speed2;
+      syncNebulaUniforms(matRefLayer2.current, n2, timeAcc2.current, nebulaPath2, perfTierFloat);
+    }
   });
 
   // Memoize colors ONCE — sourced from config.js for easy experimentation!
@@ -130,8 +135,8 @@ export function DualNebulaBackground({
         />
       </mesh>
 
-      {/* NEBULA 2 (SECONDARY): Luminous Cyan / Electric Teal Gas Cloud (desktop only to preserve 60 FPS mobile fill-rate) */}
-      <mesh visible={!isMobile && perfTierFloat < 0.8} position={[20, -5, -15]} rotation={[-0.06, -0.2, 0.08]}>
+      {/* NEBULA 2 (SECONDARY): Luminous Cyan / Electric Teal Gas Cloud */}
+      <mesh visible={isNebula2Visible} position={[20, -5, -15]} rotation={[-0.06, -0.2, 0.08]}>
         <planeGeometry args={[850, 560]} />
         <nebulaMaterial
           ref={matRefLayer2}

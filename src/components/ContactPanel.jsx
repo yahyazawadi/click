@@ -8,14 +8,14 @@ const EMAIL     = 'me@yahya.click';
 const TELEGRAM  = 'https://t.me/+970597733750';
 const LINKEDIN  = 'https://www.linkedin.com/in/yahya-amoudi/';
 
-// ─── Official Brand SVGs (inline) ─────────────────────────────────────────────
+// ─── Official Brand SVGs (all unified in cyan/blue #00BAE3) ───────────────────
 
 function UpworkIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 512 512" fill="none" aria-hidden="true">
+    <svg width="22" height="14" viewBox="82 172 346 220" fill="none" aria-hidden="true">
       <path
         d="M345.516 181.708c-42.168 0-65.774 27.481-72.532 55.773-7.658-14.416-13.335-33.698-17.75-51.628H196.94v72.531c0 26.31-11.984 45.772-35.41 45.772-23.427 0-36.852-19.462-36.852-45.772l.27-72.531H91.34v72.531c0 21.174 6.848 40.366 19.372 54.061 12.884 14.146 30.454 21.534 50.817 21.534 40.545 0 68.837-31.085 68.837-75.595V209.64c4.235 16.038 14.326 46.853 33.608 73.884l-18.02 102.625h34.148l11.893-72.712c3.875 3.244 8.02 6.127 12.434 8.74 11.443 7.208 24.508 11.263 38.023 11.713 0 0 2.073.09 3.154.09 41.807 0 75.054-32.346 75.054-76.045 0-43.7-33.337-76.226-75.144-76.226m0 122.358c-25.86 0-42.979-20.003-47.754-27.752 6.127-49.015 24.057-64.512 47.754-64.512 23.426 0 41.626 18.741 41.626 46.132 0 27.39-18.2 46.132-41.626 46.132"
-        fill="#14A800"
+        fill="#00BAE3"
         fillRule="nonzero"
       />
     </svg>
@@ -93,7 +93,7 @@ function checkIsContactRoute() {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
-export function ContactPanel({ onReturn }) {
+export function ContactPanel({ onReturn, selectedTarget }) {
   const [open, setOpen] = useState(() => checkIsContactRoute());
   const [isUpwork] = useState(() => checkIsUpworkSource());
   const [showHint, setShowHint] = useState(() => {
@@ -207,8 +207,8 @@ export function ContactPanel({ onReturn }) {
         </span>
       </button>
 
-      {/* Option 3: First-visit onboarding hint chip */}
-      {showHint && !open && (
+      {/* Option 3: First-visit onboarding hint chip (suppressed when viewing a project) */}
+      {showHint && !open && !selectedTarget && (
         <div
           className="contact-onboard-hint"
           onClick={() => {
@@ -268,7 +268,7 @@ export function ContactPanel({ onReturn }) {
         {isUpwork && (
           <div className="upwork-tos-notice" role="note">
             <span className="upwork-notice-icon">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00BAE3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </span>

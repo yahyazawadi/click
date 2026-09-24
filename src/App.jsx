@@ -212,8 +212,20 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [unlockedCount, setUnlockedCount] = useState(2);
   const [currentFps, setCurrentFps] = useState(60);
   const [metrics, setMetrics] = useState({ onePercentLow: 60, stutterCount: 0 });
-  const [isFaviconEnabled, setIsFaviconEnabled] = useState(true);
-  const [isNebulaEnabled, setIsNebulaEnabled] = useState(true);
+  const [isFaviconEnabled, setIsFaviconEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('yahya_favicon_enabled');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
+  const [isNebulaEnabled, setIsNebulaEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('yahya_nebula_enabled');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
   const [isBottomHintEnabled, setIsBottomHintEnabled] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('yahya_bottom_hint_enabled');
@@ -221,12 +233,49 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     }
     return true;
   });
+  const [isMobileDualNebula, setIsMobileDualNebula] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('yahya_mobile_dual_nebula');
+      return saved !== null ? saved === 'true' : false;
+    }
+    return false;
+  });
+
+  const handleToggleFavicon = () => {
+    setIsFaviconEnabled((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yahya_favicon_enabled', String(next));
+      }
+      return next;
+    });
+  };
+
+  const handleToggleNebula = () => {
+    setIsNebulaEnabled((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yahya_nebula_enabled', String(next));
+      }
+      return next;
+    });
+  };
 
   const handleToggleBottomHint = () => {
     setIsBottomHintEnabled((prev) => {
       const next = !prev;
       if (typeof window !== 'undefined') {
         localStorage.setItem('yahya_bottom_hint_enabled', String(next));
+      }
+      return next;
+    });
+  };
+
+  const handleToggleMobileDualNebula = () => {
+    setIsMobileDualNebula((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('yahya_mobile_dual_nebula', String(next));
       }
       return next;
     });
@@ -587,7 +636,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={effectivePerfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />
+                <CosmicBackground isMobile={isMobile} isMobileDualNebula={isMobileDualNebula} enabled={isNebulaEnabled} perfTierFloat={effectivePerfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />
 
                 {/* Central Sphere Core */}
                 <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={effectivePerfTierFloat} isSelected={selectedTarget === 'core'} />
@@ -671,9 +720,11 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
           isFaviconEnabled={isFaviconEnabled}
           isNebulaEnabled={isNebulaEnabled}
           isBottomHintEnabled={isBottomHintEnabled}
-          onToggleFavicon={() => setIsFaviconEnabled((prev) => !prev)}
-          onToggleNebula={() => setIsNebulaEnabled((prev) => !prev)}
+          isMobileDualNebula={isMobileDualNebula}
+          onToggleFavicon={handleToggleFavicon}
+          onToggleNebula={handleToggleNebula}
           onToggleBottomHint={handleToggleBottomHint}
+          onToggleMobileDualNebula={handleToggleMobileDualNebula}
           gpuTier={gpuTier}
           onSetTier={handleSetTier}
           isOpen={isProfilerOpen}

@@ -1378,11 +1378,29 @@
 
 /* Telemetry Profiler Modal & Custom Scrollbar */
 .telemetry-profiler-container {
+  box-sizing: border-box !important;
+  box-shadow: none !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 186, 227, 0.4) rgba(7, 17, 36, 0.6);
+  -webkit-overflow-scrolling: touch;
 }
+
+@media (max-width: 600px) {
+  .telemetry-profiler-container {
+    top: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    padding: 0.65rem 0.55rem !important;
+    font-size: 0.67rem !important;
+    border-radius: 8px !important;
+  }
+}
+
 
 .telemetry-profiler-container::-webkit-scrollbar {
   width: 4px;
