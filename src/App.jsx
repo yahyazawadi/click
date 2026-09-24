@@ -616,14 +616,13 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         <div className="canvas-container">
           <Canvas
             dpr={isMobile
-              // Mobile: cap DPR at 1.05 — phone screens are already 350–450 PPI so 1.0x is sharp.
-              // Capping from 2.75→1.05 eliminates ~85% of pixel fill-rate cost on flagged phone.
-              ? [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1.0, 1.05)]
+              // Mobile: cap DPR at 1.5 — delivers clean silhouette curvature while avoiding high native fill rates (e.g. 2.75x)
+              ? [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1.0, 1.5)]
               : (gpuTier === 'low' ? [1, 1.25] : [1, 1.75])}
             camera={{ position: [0, 120, 300], fov: 45 }}
             gl={{
-              // Disable MSAA on mobile: 4× MSAA quadruples tile-resolve bandwidth on TBDR GPUs (kills ~15 FPS on phones).
-              antialias: !isMobile,
+              // Hardware MSAA for smooth polygon and sphere silhouettes
+              antialias: true,
               alpha: false,
               powerPreference: 'high-performance',
               localClippingEnabled: false,
