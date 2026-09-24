@@ -338,7 +338,7 @@ export const SYSTEM_CONFIG = {
       category: 'DISTRIBUTED CRAWLERS & OCR PIPELINES',
       shortDesc: 'Automated data intelligence network — Damascus sports radar & West Bank scanner with Apify web actors, OCR, and Cloudflare R2.',
       fullDesc: 'Distributed web data harvesting and document OCR infrastructure. Coordinates multi-actor Apify web crawlers, headless browser clusters, high-speed OCR pipelines, and Cloudflare R2 object storage to monitor regional sports facilities, hardware inventories, and real-time market prices with automated deduplication and live webhook dispatches.',
-      liveUrl: 'https://laptop-lookups.super-yahyaaa.workers.dev/',
+      liveUrl: 'https://laptops.yahya.click/',
       liveLabel: 'Laptops ↗',
       secondaryUrl: 'https://gyms-sham.super-yahyaaa.workers.dev/',
       secondaryLabel: 'Gyms ↗',

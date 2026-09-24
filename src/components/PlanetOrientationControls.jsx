@@ -7,23 +7,20 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
  * - Light blue glowing circular thumbs + rounded rectangular tracks
  * - Double-click track/thumb to snap-reset to 0
  */
+// Pitch and Yaw range: 6 full rotations ([-6π, +6π]) for extended multi-spin control
+const MAX_PITCH = Math.PI * 6;
+const MAX_YAW = Math.PI * 6;
+
 export function PlanetOrientationControls({
   orientation = { pitch: 0, yaw: 0 },
   onChange,
   isMobile = false,
   visible = true,
 }) {
-  if (!visible) return null;
-
   const verticalTrackRef = useRef(null);
   const horizontalTrackRef = useRef(null);
   const [isDraggingPitch, setIsDraggingPitch] = useState(false);
   const [isDraggingYaw, setIsDraggingYaw] = useState(false);
-
-  // Pitch range: 6 full rotations ([-6π, +6π]) for extended multi-spin control
-  const MAX_PITCH = Math.PI * 6;
-  // Yaw range: 6 full rotations ([-6π, +6π])
-  const MAX_YAW = Math.PI * 6;
 
   // Normalized percentages [0..1] with center at 0.5 (0 rad)
   const pitchPercent = (orientation.pitch / (MAX_PITCH * 2)) + 0.5;
@@ -108,6 +105,8 @@ export function PlanetOrientationControls({
     e.stopPropagation();
     onChange((prev) => ({ ...prev, yaw: 0 }));
   };
+
+  if (!visible) return null;
 
   return (
     <>
