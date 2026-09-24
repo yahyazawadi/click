@@ -64,7 +64,7 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false, isDismis
         width: '360px',
         maxWidth: 'calc(100vw - 48px)',
         zIndex: 9998,
-        fontFamily: 'var(--font-mono)',
+        fontFamily: 'var(--font-sub)',
         pointerEvents: 'auto',
         borderRadius: '10px',
         overflow: 'hidden',
@@ -80,7 +80,7 @@ export function PerformanceWarning({ currentFps = 60, isMobile = false, isDismis
         {/* Header with Title and Close Button */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{
-            fontFamily: 'var(--font-sans)',
+            fontFamily: 'var(--font-title)',
             fontSize: '0.85rem',
             fontWeight: 700,
             letterSpacing: '0.08em',

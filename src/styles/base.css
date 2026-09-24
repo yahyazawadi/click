@@ -1,0 +1,334 @@
+/* =========================================================================
+   GLOBAL TYPOGRAPHY CONTROL CENTER (عدل خطوط الموقع كامل من هنا)
+   Change the two variables below to update all typography site-wide:
+   1. --font-title : Headings, brand names, trigger pills, card titles, modal headers
+   2. --font-sub   : Subtitles, descriptions, body text, lists, captions, badges
+   ========================================================================= */
+:root {
+  /* 1. Title Font (العناوين والبراند والأزرار الرئيسية) */
+  --font-title: 'Chakra Petch', 'Space Grotesk', sans-serif;
+
+  /* 2. Subtitle & Body Font (العناوين الفرعية والنصوص والتفاصيل) */
+  --font-sub: 'Chakra Petch', 'Space Grotesk', sans-serif;
+
+  /* 3. Monospace (عداد الفريمات والإحداثيات والبيانات الفنية فقط) */
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Global Fallbacks & Aliases */
+  --font-sans: var(--font-sub);
+
+  --bg-void: #071124;
+  --deep-shadow: #003268;
+  --primary-cyan: #00BAE3;
+  --secondary-blue: #5DBAE1;
+  --text-pure: #FCFCFC;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 186, 227, 0.4) rgba(7, 17, 36, 0.6);
+}
+
+/* Kill all focus rings and selection highlights globally */
+button:focus,
+button:focus-visible,
+a:focus,
+a:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none !important;
+}
+
+/* Global Custom Webkit Scrollbar (Matching Telemetry Profiler HUD) */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(7, 17, 36, 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 186, 227, 0.45);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-cyan);
+  box-shadow: 0 0 8px var(--primary-cyan);
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-void);
+  color: var(--text-pure);
+  font-family: var(--font-sub);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation; /* Disables double-tap zoom on mobile/touch */
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+}
+
+p, span, li, a, button, input, textarea {
+  font-family: inherit;
+}
+
+/* 3D Canvas Background Container */
+.canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  touch-action: none; /* Prevents canvas pinch/double-click zoom */
+}
+
+/* HTML UI Overlay Layer */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem 2.5rem;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ui-overlay * {
+  pointer-events: auto;
+}
+
+/* Prevent FOUT (Flash of Unstyled Text) during font loading */
+.fonts-loading .ui-overlay,
+.fonts-loading .contact-onboard-hint,
+.fonts-loading .orientation-controls-container {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+/* Header Navbar */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--primary-cyan);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 16px var(--primary-cyan); }
+}
+
+.brand-title {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--text-pure);
+  margin: 0;
+}
+
+.top-right-hud {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.header-status {
+  font-size: 0.75rem;
+  color: var(--secondary-blue);
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+
+.fps-hud-counter {
+  height: 32px;
+  min-width: 96px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(7, 17, 36, 0.7);
+  border: 1px solid rgba(0, 186, 227, 0.35);
+  border-radius: 6px;
+  padding: 0 0.65rem;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 12px rgba(0, 186, 227, 0.15);
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  outline: none;
+  line-height: 1;
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.fps-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--primary-cyan);
+  transition: transform 0.3s ease, color 0.2s ease;
+  flex-shrink: 0;
+  display: block;
+}
+
+.fps-hud-counter:hover .fps-icon {
+  transform: rotate(45deg);
+}
+
+.fps-icon.stable {
+  color: #00BAE3;
+  filter: drop-shadow(0 0 5px rgba(0, 186, 227, 0.7));
+}
+
+.fps-icon.warning {
+  color: #FF4500;
+  filter: drop-shadow(0 0 5px rgba(255, 69, 0, 0.7));
+}
+
+.fps-val {
+  color: var(--text-pure);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(1.5px); /* Optical cap-height vertical alignment with gear icon */
+}
+
+.fps-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  width: 3ch;
+  text-align: right;
+  letter-spacing: 0;
+}
+
+.fps-unit {
+  white-space: pre;
+}
+
+.fps-badge {
+  color: var(--secondary-blue);
+  opacity: 0.75;
+  font-size: 0.65rem;
+  border-left: 1px solid rgba(93, 186, 225, 0.3);
+  padding-left: 0.4rem;
+}
+
+/* Return to Orbit Floating Action Button */
+.return-btn {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 50, 104, 0.6);
+  border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0, 186, 227, 0.2);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.return-btn:hover {
+  background: var(--primary-cyan);
+  color: #000;
+  box-shadow: 0 0 30px var(--primary-cyan);
+}
+
+/* Subtitles / Click Hint Overlay */
+.bottom-hint {
+  align-self: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--secondary-blue);
+  opacity: 0.7;
+  text-transform: uppercase;
+  background: rgba(7, 17, 36, 0.6);
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(93, 186, 225, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+/* ── Mobile Layout Adjustments (<= 680px) ────────────────────────────────── */
+@media (max-width: 680px) {
+  .ui-overlay {
+    padding: 1rem 1.15rem;
+  }
+
+  .fps-hud-counter {
+    height: 30px;
+    width: 62px;
+    min-width: 62px;
+    padding: 0 0.55rem;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    justify-content: center;
+  }
+
+  .fps-num {
+    width: 3ch;
+    text-align: center;
+    letter-spacing: 0;
+  }
+
+  .fps-val {
+    transform: translateY(1.5px);
+  }
+
+  .fps-unit {
+    display: none;
+  }
+}
+

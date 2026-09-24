@@ -44,11 +44,27 @@
         }
       }, true);
     </script>
-    <!-- Google Fonts: Orbitron (Title), Chakra Petch (Subtext), JetBrains Mono, Space Grotesk -->
+    <!-- Google Fonts: Chakra Petch, JetBrains Mono, Orbitron, Space Grotesk (display=block prevents flash of unstyled font) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=block" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=block" rel="stylesheet">
+    <script>
+      (function() {
+        document.documentElement.classList.add('fonts-loading');
+        if ('fonts' in document) {
+          Promise.race([
+            document.fonts.ready,
+            new Promise(function(resolve) { setTimeout(resolve, 800); })
+          ]).then(function() {
+            document.documentElement.classList.remove('fonts-loading');
+            document.documentElement.classList.add('fonts-ready');
+          });
+        } else {
+          document.documentElement.classList.remove('fonts-loading');
+        }
+      })();
+    </script>
     <style>
       html, body, #root {
         width: 100%;

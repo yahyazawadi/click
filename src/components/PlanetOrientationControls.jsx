@@ -134,7 +134,7 @@ export function PlanetOrientationControls({
         <span
           style={{
             fontSize: '9px',
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-mono)',
             letterSpacing: '1.2px',
             color: 'rgba(64, 200, 255, 0.7)',
             textTransform: 'uppercase',
@@ -184,7 +184,7 @@ export function PlanetOrientationControls({
         <span
           style={{
             fontSize: '9px',
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-mono)',
             letterSpacing: '1.2px',
             color: 'rgba(64, 200, 255, 0.7)',
             textTransform: 'uppercase',
@@ -216,7 +216,7 @@ export function PlanetOrientationControls({
         <span
           style={{
             fontSize: '9px',
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-mono)',
             letterSpacing: '1.2px',
             color: 'rgba(64, 200, 255, 0.7)',
             textTransform: 'uppercase',
@@ -266,7 +266,7 @@ export function PlanetOrientationControls({
         <span
           style={{
             fontSize: '9px',
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-mono)',
             letterSpacing: '1.2px',
             color: 'rgba(64, 200, 255, 0.7)',
             textTransform: 'uppercase',

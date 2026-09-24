@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PresentationDock } from './PresentationDock';
+import { ContactPanel } from './ContactPanel';
 
 // ── Mobile FAB + Bottom Sheet ────────────────────────────────────────────────
 function MobileNavFab({ stages, onSelectTarget }) {
@@ -62,6 +63,26 @@ function MobileNavFab({ stages, onSelectTarget }) {
   );
 }
 
+function SettingsIcon({ className }) {
+  return (
+    <svg
+      className={className}
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
 // ── Main UIOverlay ────────────────────────────────────────────────────────────
 export function UIOverlay({
   selectedTarget,
@@ -93,10 +114,7 @@ export function UIOverlay({
       {/* Top Navbar Layer */}
       <div className="ui-overlay">
         <header className="top-header">
-          <div className="brand-box" onClick={onReturn} title="Return to Orbit Overview">
-            <div className="brand-dot"></div>
-            <h1 className="brand-title">YAHYA.CLICK</h1>
-          </div>
+          <ContactPanel onReturn={onReturn} />
 
           <div className="top-right-hud">
             <div
@@ -105,9 +123,8 @@ export function UIOverlay({
               style={{ cursor: 'pointer' }}
               title="Click to toggle Telemetry Profiler HUD (~)"
             >
-              <span className={`fps-indicator ${isFpsStable ? 'stable' : 'warning'}`} />
-              <span className="fps-val">{currentFps} FPS</span>
-              <span className="fps-badge">{isMobile ? 'MOB-30' : '60Hz'}</span>
+              <SettingsIcon className={`fps-icon ${isFpsStable ? 'stable' : 'warning'}`} />
+              <span className="fps-val"><span className="fps-num">{currentFps}</span><span className="fps-unit"> FPS</span></span>
             </div>
           </div>
         </header>
