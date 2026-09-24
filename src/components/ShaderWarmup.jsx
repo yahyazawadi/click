@@ -23,6 +23,9 @@
 import { useEffect, useState } from 'react';
 import '../shaders/ScissorMoonShaderMaterial';
 import '../shaders/ClimamedixEarthShaderMaterial';
+import '../shaders/ApifyPlanetShaderMaterial';
+import '../shaders/PlaywrightPlanetShaderMaterial';
+import '../shaders/HeartPlanetShaderMaterial';
 
 export function ShaderWarmup({ perfTierFloat = 0.0 }) {
   // step 0 = not started, 1 = shaders visible, 99 = done (removed)
@@ -33,8 +36,8 @@ export function ShaderWarmup({ perfTierFloat = 0.0 }) {
       // 300ms: scene is rendered and stable → compile shaders
       setTimeout(() => setStep(1), 300),
 
-      // 600ms: 2-3 frames have passed → shaders are compiled → remove warmup mesh
-      setTimeout(() => setStep(99), 600),
+      // 700ms: frames have passed → shaders are compiled → remove warmup mesh
+      setTimeout(() => setStep(99), 700),
     ];
 
     return () => timers.forEach(clearTimeout);
@@ -59,6 +62,18 @@ export function ShaderWarmup({ perfTierFloat = 0.0 }) {
           <mesh frustumCulled={false}>
             <sphereGeometry args={[1, 4, 4]} />
             <climamedixCloudShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <apifyPlanetShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <playwrightPlanetShaderMaterial uPerfTier={perfTierFloat} />
+          </mesh>
+          <mesh frustumCulled={false}>
+            <sphereGeometry args={[1, 4, 4]} />
+            <heartPlanetShaderMaterial uPerfTier={perfTierFloat} />
           </mesh>
         </group>
       )}

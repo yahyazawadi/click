@@ -39,6 +39,7 @@ function CanvasReadyNotifier({ onReady }) {
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
 function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, totalProjects = 8, gpuTier, onAutoDemoteTier, isAppLoaded = false }) {
   const stableTimer = useRef(0);
+  const timeSinceLastUnlock = useRef(0);
   const lowFpsTimer = useRef(0);
   const fpsAcc = useRef(0);
   const frameCount = useRef(0);
@@ -66,6 +67,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
         fpsAcc.current = 0;
         frameCount.current = 0;
         stableTimer.current = 0;
+        timeSinceLastUnlock.current = 0;
         lowFpsTimer.current = 0;
         lastSnapshotTime.current = Date.now();
       }
@@ -123,22 +125,26 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     // Uses an EMA so a single lucky 38ms frame does NOT reset the 1.5s accumulator.
     // Ignore when tab is hidden or when delta > 0.25s (tab switch / background throttle)
     const isTabActive = typeof document !== 'undefined' && !document.hidden && document.visibilityState !== 'hidden';
-    if (isAppLoaded && isTabActive && safeDelta < 0.25 && gpuTier !== 'low') {
-      if (safeDelta >= 0.040) {
-        // Frame below 25 FPS — accumulate
-        lowFpsTimer.current += safeDelta;
-      } else {
-        // Frame above 25 FPS — only decay slowly (don't fully reset on a single fast frame)
-        lowFpsTimer.current = Math.max(0, lowFpsTimer.current - safeDelta * 0.5);
-      }
-      if (lowFpsTimer.current >= 2.0) {
-        lowFpsTimer.current = 0;
-        if (typeof onAutoDemoteTier === 'function') {
-          onAutoDemoteTier();
+    if (isAppLoaded && isTabActive && safeDelta < 0.25) {
+      timeSinceLastUnlock.current += safeDelta;
+      if (gpuTier !== 'low') {
+        if (safeDelta >= 0.040) {
+          // Frame below 25 FPS — accumulate
+          lowFpsTimer.current += safeDelta;
+        } else {
+          // Frame above 25 FPS — only decay slowly (don't fully reset on a single fast frame)
+          lowFpsTimer.current = Math.max(0, lowFpsTimer.current - safeDelta * 0.5);
+        }
+        if (lowFpsTimer.current >= 2.0) {
+          lowFpsTimer.current = 0;
+          if (typeof onAutoDemoteTier === 'function') {
+            onAutoDemoteTier();
+          }
         }
       }
     } else if (!isTabActive || safeDelta >= 0.25) {
       lowFpsTimer.current = 0;
+      timeSinceLastUnlock.current = 0;
     }
 
     fpsAcc.current += safeDelta;
@@ -204,8 +210,14 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     }
 
     // Unlock next planet once FPS has stayed continuously stable for requiredDuration
-    if (unlockedCount < totalProjects && stableTimer.current >= requiredDuration) {
+    // OR if fallback duration (2.5s on mobile, 3.0s on desktop) elapses so budget/throttled devices never get stuck
+    const fallbackDuration = isMobile ? 2.5 : 3.0;
+    const isUnlockedByFps = stableTimer.current >= requiredDuration;
+    const isUnlockedByFallback = isAppLoaded && isTabActive && timeSinceLastUnlock.current >= fallbackDuration;
+
+    if (unlockedCount < totalProjects && (isUnlockedByFps || isUnlockedByFallback)) {
       stableTimer.current = 0;
+      timeSinceLastUnlock.current = 0;
       onUnlockNext();
     }
   });
