@@ -121,31 +121,20 @@ export function PlanetNode({
       groupRef.current.position.copy(localPos.current);
       groupRef.current.scale.setScalar(currentScaleRef.current);
 
-      if (isSelected) {
-        if (targetPlanetPosRef) {
-          groupRef.current.getWorldPosition(worldPos.current);
-          targetPlanetPosRef.current.copy(worldPos.current);
+      if (isSelected || showTitle) {
+        groupRef.current.getWorldPosition(worldPos.current);
+        if (isSelected) {
+          if (targetPlanetPosRef) targetPlanetPosRef.current.copy(worldPos.current);
+          if (targetPlanetQuatRef) {
+            groupRef.current.getWorldQuaternion(worldQuat.current);
+            targetPlanetQuatRef.current.copy(worldQuat.current);
+          }
         }
-        if (targetPlanetQuatRef) {
-          groupRef.current.getWorldQuaternion(worldQuat.current);
-          targetPlanetQuatRef.current.copy(worldQuat.current);
-        }
+        // Distance-gated label: only evaluate when title is active
+        const distToCamera = worldPos.current.distanceTo(state.camera.position);
+        const nearby = distToCamera < 8.5;
+        if (nearby !== isNearby) setIsNearby(nearby);
       }
-
-      // Frustum Culling / Viewport Check: Skip rendering when planet is offscreen
-      groupRef.current.getWorldPosition(worldPos.current);
-      projScreenMatrix.current.multiplyMatrices(state.camera.projectionMatrix, state.camera.matrixWorldInverse);
-      frustum.current.setFromProjectionMatrix(projScreenMatrix.current);
-      // Sphere radius check (size + margin) - zero allocation
-      const boundingRadius = (project.size || 0.5) * 2.5;
-      boundingSphereRef.current.set(worldPos.current, boundingRadius);
-      const isVisibleInFrustum = frustum.current.intersectsSphere(boundingSphereRef.current);
-      groupRef.current.visible = isVisibleInFrustum;
-
-      // Distance-gated label: only show title when planet is close to camera
-      const distToCamera = worldPos.current.distanceTo(state.camera.position);
-      const nearby = distToCamera < 8.5;
-      if (nearby !== isNearby) setIsNearby(nearby);
     }
 
     if (currentScaleRef.current > 0.02 && !shouldRenderMesh) {

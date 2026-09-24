@@ -20,6 +20,9 @@ const HIGH_TIER_PATTERNS = [
   /rtx\s*a\d{3,4}/i,           // RTX A4000, A5000
   /gtx\s*(10[7-9]0|1660|20[6-8]0|30[5-9]0)/i, // GTX 1070/1080/1660, etc.
   /rx\s*[567]\d{3}/i,          // RX 5700, 6600, 6700, 7800, 7900
+  /apple\s*(gpu|a1[4-9]|m[1234])/i, // Apple Silicon / modern iPhone/iPad GPU
+  /adreno\s*(6[4-9]\d|7\d{2}|8\d{2})/i, // Modern high-performance Adreno
+  /mali-g(7[1-9]\d|68|7[78])/i, // Flagship Mali G77/G78/G710/G715/G720
   /quadro\s*r/i,
   /tesla/i,
 ];
@@ -34,6 +37,8 @@ const MED_TIER_PATTERNS = [
   /iris\s*xe/i,                       // Intel Iris Xe
   /intel.*graphics/i,                 // Intel UHD/HD/Arc Mobile
   /apple\s*m[1234]/i,                 // Apple Silicon integrated
+  /adreno\s*6[1-3]\d/i,               // Mid-range Adreno (610, 618, 620)
+  /mali-g(5[2-7]|6[1-7])/i,           // Mid-range Mali G52/G57/G68
   /gtx\s*(10[56]0|1650|9[67]0)/i,     // Entry/mid GTX (1050, 1060, 1650)
   /rx\s*(4[78]0|5[789]0)/i,           // Older mid RX (RX 480, 580)
 ];
@@ -42,8 +47,9 @@ const LOW_TIER_PATTERNS = [
   /intel.*hd\s*graphics\s*[0-6]/i,
   /intel.*uhd\s*graphics\s*[0-6]/i,
   /intel.*iris.*plus/i,
-  /mali/i,
-  /adreno\s*[0-5]/i,
+  /mali-(4\d\d|t\d\d\d)/i,            // Legacy ARM Mali 400 / T-series
+  /mali-g(31|51)/i,                  // Ultra low-end Mali
+  /adreno\s*[0-5]\d{2}/i,             // Legacy Adreno 3xx/4xx/5xx
   /powervr/i,
   /videocore/i,
   /llvmpipe/i,

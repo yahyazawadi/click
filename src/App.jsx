@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import { SYSTEM_CONFIG, NEBULA_CONFIG, SECRET_LOVE_PROJECTS } from './config';
@@ -16,12 +16,28 @@ import { BatteryWarning } from './components/BatteryWarning';
 import { PerformanceWarning } from './components/PerformanceWarning';
 import { FpsProfilerOverlay } from './components/FpsProfilerOverlay';
 import { ShaderWarmup } from './components/ShaderWarmup';
+import { CosmicLoadingScreen } from './components/CosmicLoadingScreen';
 import { fpsLogger } from './utils/fpsLogger';
 import { tierToFloat } from './utils/detectGpuTier.js';
 
 import { useFrame } from '@react-three/fiber';
+
+// Notifies when WebGL canvas has drawn initial frames and is active
+function CanvasReadyNotifier({ onReady }) {
+  const frameCount = useRef(0);
+  useFrame(() => {
+    if (frameCount.current < 2) {
+      frameCount.current += 1;
+      if (frameCount.current === 2) {
+        onReady();
+      }
+    }
+  });
+  return null;
+}
+
 // FPS-Stabilized Progressive Planet Unloader / Loader Controller & Telemetry Observer
-function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier, onAutoDemoteTier }) {
+function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMetricsUpdate, selectedTarget, unlockedCount, gpuTier, onAutoDemoteTier, isAppLoaded = false }) {
   const stableTimer = useRef(0);
   const lowFpsTimer = useRef(0);
   const fpsAcc = useRef(0);
@@ -101,7 +117,7 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
     // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s on active tab, demote GPU tier!
     // Ignore when tab is hidden or when delta > 0.25s (tab switch / background throttle)
     const isTabActive = typeof document !== 'undefined' && !document.hidden && document.visibilityState !== 'hidden';
-    if (isTabActive && safeDelta >= 0.040 && gpuTier !== 'low') {
+    if (isAppLoaded && isTabActive && safeDelta >= 0.040 && gpuTier !== 'low') {
       lowFpsTimer.current += safeDelta;
       if (lowFpsTimer.current >= 1.5) {
         lowFpsTimer.current = 0;
@@ -225,6 +241,10 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
   const [isTierManuallyLocked, setIsTierManuallyLocked] = useState(false);
   // Real-time 3D Planet Pitch/Yaw Orientation (controlled via slim HUD sliders)
   const [planetOrientation, setPlanetOrientation] = useState({ pitch: 0, yaw: 0 });
+
+  // WebGL Warmup & Loading Curtain Synchronization
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
+  const [isAppLoaded, setIsAppLoaded] = useState(false);
 
   // Secret URL trigger detection (?love or #love or /love)
   const [isLoveMode, setIsLoveMode] = useState(() => {
@@ -517,7 +537,13 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
     scrollToPlanetIndex(0);
   };
 
+  const handleAppLoaded = useCallback(() => {
+    setIsAppLoaded(true);
+  }, []);
+
   const selectedProject = activeProjects.find((p) => p.id === selectedTarget);
+
+  const effectivePerfTierFloat = isMobile ? Math.max(perfTierFloat, 0.5) : perfTierFloat;
 
   return (
     <LenisScrollProvider onIndexChange={handleScrollIndexChange} totalIndices={totalIndices}>
@@ -525,9 +551,9 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
-            dpr={gpuTier === 'low' ? [0.75, 0.85] : [1, 1.25]}
+            dpr={isMobile ? [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1.5, 1.5)] : (gpuTier === 'low' ? [1, 1.25] : [1, 1.75])}
             camera={{ position: [0, 120, 300], fov: 45 }}
-            gl={{ antialias: gpuTier !== 'low' && !isMobile, alpha: false, powerPreference: 'high-performance', localClippingEnabled: true }}
+            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', localClippingEnabled: false, stencil: false }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >
@@ -539,8 +565,11 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
             <pointLight position={[-12, -12, -12]} intensity={0.6} color={SYSTEM_CONFIG.colors.deepShadow} />
 
             <Suspense fallback={null}>
+              {/* Notifier to sync loading screen when initial frames are rendered */}
+              <CanvasReadyNotifier onReady={() => setIsCanvasReady(true)} />
+
               {/* Pre-compile heavy custom GLSL shaders gradually after page load */}
-              <ShaderWarmup perfTierFloat={perfTierFloat} />
+              <ShaderWarmup perfTierFloat={effectivePerfTierFloat} />
 
               {/* Dynamic FPS-Stabilized Progressive Planet Unlocker & Telemetry Observer */}
               <ProgressivePlanetController
@@ -552,15 +581,16 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                 unlockedCount={unlockedCount}
                 gpuTier={gpuTier}
                 onAutoDemoteTier={handleAutoDemoteTier}
+                isAppLoaded={isAppLoaded}
               />
 
               {/* Manual Drag & Spin (Rotates system + background together) */}
               <SceneRotator disabled={!!selectedTarget}>
                 {/* Background Nebulae & Stars */}
-                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={perfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />
+                <CosmicBackground isMobile={isMobile} enabled={isNebulaEnabled} perfTierFloat={effectivePerfTierFloat} nebulaPath1={nebulaPath1} nebulaPath2={nebulaPath2} />
 
                 {/* Central Sphere Core */}
-                <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={perfTierFloat} isSelected={selectedTarget === 'core'} />
+                <SystemCore isMobile={isMobile} onSelect={handleSelect} perfTierFloat={effectivePerfTierFloat} isSelected={selectedTarget === 'core'} />
 
                 {/* Tilted Macro Orbital Rings */}
                 {SYSTEM_CONFIG.rings.map((ring) => (
@@ -587,7 +617,7 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
                       showTitle={activeTitles.includes(proj.id)}
                       targetPlanetPosRef={targetPlanetPosRef}
                       targetPlanetQuatRef={targetPlanetQuatRef}
-                      perfTierFloat={perfTierFloat}
+                      perfTierFloat={effectivePerfTierFloat}
                       planetOrientation={planetOrientation}
                     />
                   );
@@ -654,7 +684,11 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         <BatteryWarning isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
         <PerformanceWarning currentFps={currentFps} isMobile={isMobile} isDismissed={warningDismissed} onDismiss={handleDismissWarning} />
 
-
+        {/* Cosmic Warmup Curtain & Loading Sequence */}
+        <CosmicLoadingScreen
+          isReady={isCanvasReady}
+          onFinished={handleAppLoaded}
+        />
 
       </div>
     </LenisScrollProvider>

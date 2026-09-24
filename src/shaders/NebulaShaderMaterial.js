@@ -224,12 +224,17 @@ export const NebulaMaterial = shaderMaterial(
         q1.x = fbm(seedUv + vec2(0.0,  uTime * 0.014));
         q1.y = fbm(seedUv + vec2(3.7,  uTime * 0.010));
         qLen = length(q1);
-        vec2 r1;
-        r1.x = fbm(seedUv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
-        r1.y = fbm(seedUv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
         float base1 = fbm(seedUv + uWarp * q1);
-        float deep1 = fbm(seedUv + uWarp * r1 * 0.5);
-        density = mix(base1, deep1, 0.32);
+        if (uPerfTier >= 0.4) {
+          // Fast path for mobile & med/low tier: single warp pass saves 3 FBM evaluations per pixel
+          density = base1;
+        } else {
+          vec2 r1;
+          r1.x = fbm(seedUv + uWarp * q1 * 0.65 + vec2(2.1, uTime * 0.007));
+          r1.y = fbm(seedUv + uWarp * q1 * 0.65 + vec2(7.4, uTime * 0.009));
+          float deep1 = fbm(seedUv + uWarp * r1 * 0.5);
+          density = mix(base1, deep1, 0.32);
+        }
         pathBrightness = 1.0;
         pathScatter = 0.35;
 
@@ -367,8 +372,8 @@ export const NebulaMaterial = shaderMaterial(
       col *= (uBrightness * pathBrightness);
 
       // 8. Embedded young star field
-      //    Stars appear bright-white with blue tint (T-Tauri / O-type newborns)
-      float stars = starField(vUv, uStarCount, uTime);
+      //    Skip on med/low tiers (EnhancedStarfield already renders true 3D stars)
+      float stars = uPerfTier >= 0.4 ? 0.0 : starField(vUv, uStarCount, uTime);
       // Stars only show where there IS gas (inside nebula) and are brightest on dust pillars
       float starMask = organicMask * planeEdgeFade;
       vec3 starColor = mix(vec3(0.9, 0.95, 1.0), vec3(1.0, 0.9, 0.7),

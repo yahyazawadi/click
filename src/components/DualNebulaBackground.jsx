@@ -130,8 +130,8 @@ export function DualNebulaBackground({
         />
       </mesh>
 
-      {/* NEBULA 2 (SECONDARY): Luminous Cyan / Electric Teal Gas Cloud */}
-      <mesh visible={perfTierFloat < 1.0} position={[20, -5, -15]} rotation={[-0.06, -0.2, 0.08]}>
+      {/* NEBULA 2 (SECONDARY): Luminous Cyan / Electric Teal Gas Cloud (desktop only to preserve 60 FPS mobile fill-rate) */}
+      <mesh visible={!isMobile && perfTierFloat < 0.8} position={[20, -5, -15]} rotation={[-0.06, -0.2, 0.08]}>
         <planeGeometry args={[850, 560]} />
         <nebulaMaterial
           ref={matRefLayer2}

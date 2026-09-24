@@ -167,6 +167,8 @@ export function FpsProfilerOverlay({
     }
   };
 
+  const handleGenerateNewNebulaRef = useRef(null);
+
   // Keyboard shortcut listener (~ Tilde, Ctrl+Z Undo, Ctrl+Y Redo, Ctrl+Shift+R / Alt+R Re-Roll Seeds)
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -193,7 +195,7 @@ export function FpsProfilerOverlay({
         if (typeof e.stopImmediatePropagation === 'function') {
           e.stopImmediatePropagation();
         }
-        handleGenerateNewNebula();
+        handleGenerateNewNebulaRef.current?.();
       }
     };
     window.addEventListener('keydown', handleKeyDown, { capture: true });
@@ -384,6 +386,7 @@ export function FpsProfilerOverlay({
     setRerender((v) => v + 1);
     setTimeout(() => setGeneratedStatus(false), 1500);
   };
+  handleGenerateNewNebulaRef.current = handleGenerateNewNebula;
 
   const copyTextToClipboard = async (text) => {
     try {

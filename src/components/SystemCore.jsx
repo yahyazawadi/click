@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CORE_CONFIG, SYSTEM_CONFIG } from '../config';
@@ -32,6 +32,42 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
     ring2Emissive:  new THREE.Color(CORE_CONFIG.innerRings?.ring2?.emissive || '#B3002D'),
   }), []);
 
+  // Sync static and config uniforms only on mount or config change
+  useEffect(() => {
+    const mat = shaderMatRef.current;
+    if (!mat) return;
+    const u = mat.uniforms;
+    if (!u) return;
+
+    if (u.uDeepOcean?.value?.set) u.uDeepOcean.value.set(CORE_CONFIG.colors.deepOcean);
+    if (u.uMidOcean?.value?.set) u.uMidOcean.value.set(CORE_CONFIG.colors.midOcean);
+    if (u.uCloudBand?.value?.set) u.uCloudBand.value.set(CORE_CONFIG.colors.cloudBand);
+    if (u.uStormHighlight?.value?.set) u.uStormHighlight.value.set(CORE_CONFIG.colors.stormHighlight);
+    if (u.uAtmosphere?.value?.set) u.uAtmosphere.value.set(CORE_CONFIG.colors.atmosphere);
+    if (u.uContinentColor?.value?.set) u.uContinentColor.value.set(CORE_CONFIG.colors.continentColor);
+    if (u.uCoastColor?.value?.set) u.uCoastColor.value.set(CORE_CONFIG.colors.coastColor);
+
+    if (u.uCloudDriftSpeed) u.uCloudDriftSpeed.value = CORE_CONFIG.clouds.driftSpeed;
+    if (u.uCloudScale) u.uCloudScale.value = CORE_CONFIG.clouds.scale;
+    if (u.uBandFrequency) u.uBandFrequency.value = CORE_CONFIG.clouds.bandFrequency;
+    if (u.uBandWarp) u.uBandWarp.value = CORE_CONFIG.clouds.bandWarp;
+    if (u.uStormIntensity) u.uStormIntensity.value = CORE_CONFIG.clouds.stormIntensity;
+
+    if (u.uContinentDriftSpeed) u.uContinentDriftSpeed.value = CORE_CONFIG.continents.driftSpeed;
+    if (u.uContinentScale) u.uContinentScale.value = CORE_CONFIG.continents.scale;
+    if (u.uSeaLevel) u.uSeaLevel.value = CORE_CONFIG.continents.seaLevel;
+
+    if (u.uAtmosphereFresnelPower) u.uAtmosphereFresnelPower.value = CORE_CONFIG.atmosphere.fresnelPower;
+    if (u.uAtmosphereFresnelIntensity) u.uAtmosphereFresnelIntensity.value = CORE_CONFIG.atmosphere.fresnelIntensity;
+
+    if (u.uSpecularIntensity) u.uSpecularIntensity.value = CORE_CONFIG.lighting.specularIntensity;
+    if (u.uSpecularShininess) u.uSpecularShininess.value = CORE_CONFIG.lighting.specularShininess;
+    if (u.uAmbientLight) u.uAmbientLight.value = CORE_CONFIG.lighting.ambientLight;
+    if (u.uDiffuseLight) u.uDiffuseLight.value = CORE_CONFIG.lighting.diffuseLight;
+    if (u.uPolarFade) u.uPolarFade.value = CORE_CONFIG.lighting.polarFade;
+    if (u.uPerfTier) u.uPerfTier.value = perfTierFloat;
+  }, [perfTierFloat]);
+
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
     const safeDelta = Math.min(delta, 0.1);
@@ -44,39 +80,13 @@ export function SystemCore({ onSelect, isMobile, perfTierFloat = 0.0, isSelected
       shaderMatRef.current.uTime = time;
       shaderMatRef.current.uCloudPhase = cloudPhase.current;
       shaderMatRef.current.uContinentPhase = continentPhase.current;
+      shaderMatRef.current.uPerfTier = perfTierFloat;
 
-      // Direct GPU Uniform Synchronization in-place every frame
       const u = shaderMatRef.current.uniforms;
       if (u) {
         if (u.uCloudPhase) u.uCloudPhase.value = cloudPhase.current;
         if (u.uContinentPhase) u.uContinentPhase.value = continentPhase.current;
-
-        if (u.uDeepOcean?.value?.set) u.uDeepOcean.value.set(CORE_CONFIG.colors.deepOcean);
-        if (u.uMidOcean?.value?.set) u.uMidOcean.value.set(CORE_CONFIG.colors.midOcean);
-        if (u.uCloudBand?.value?.set) u.uCloudBand.value.set(CORE_CONFIG.colors.cloudBand);
-        if (u.uStormHighlight?.value?.set) u.uStormHighlight.value.set(CORE_CONFIG.colors.stormHighlight);
-        if (u.uAtmosphere?.value?.set) u.uAtmosphere.value.set(CORE_CONFIG.colors.atmosphere);
-        if (u.uContinentColor?.value?.set) u.uContinentColor.value.set(CORE_CONFIG.colors.continentColor);
-        if (u.uCoastColor?.value?.set) u.uCoastColor.value.set(CORE_CONFIG.colors.coastColor);
-
-        if (u.uCloudDriftSpeed) u.uCloudDriftSpeed.value = CORE_CONFIG.clouds.driftSpeed;
-        if (u.uCloudScale) u.uCloudScale.value = CORE_CONFIG.clouds.scale;
-        if (u.uBandFrequency) u.uBandFrequency.value = CORE_CONFIG.clouds.bandFrequency;
-        if (u.uBandWarp) u.uBandWarp.value = CORE_CONFIG.clouds.bandWarp;
-        if (u.uStormIntensity) u.uStormIntensity.value = CORE_CONFIG.clouds.stormIntensity;
-
-        if (u.uContinentDriftSpeed) u.uContinentDriftSpeed.value = CORE_CONFIG.continents.driftSpeed;
-        if (u.uContinentScale) u.uContinentScale.value = CORE_CONFIG.continents.scale;
-        if (u.uSeaLevel) u.uSeaLevel.value = CORE_CONFIG.continents.seaLevel;
-
-        if (u.uAtmosphereFresnelPower) u.uAtmosphereFresnelPower.value = CORE_CONFIG.atmosphere.fresnelPower;
-        if (u.uAtmosphereFresnelIntensity) u.uAtmosphereFresnelIntensity.value = CORE_CONFIG.atmosphere.fresnelIntensity;
-
-        if (u.uSpecularIntensity) u.uSpecularIntensity.value = CORE_CONFIG.lighting.specularIntensity;
-        if (u.uSpecularShininess) u.uSpecularShininess.value = CORE_CONFIG.lighting.specularShininess;
-        if (u.uAmbientLight) u.uAmbientLight.value = CORE_CONFIG.lighting.ambientLight;
-        if (u.uDiffuseLight) u.uDiffuseLight.value = CORE_CONFIG.lighting.diffuseLight;
-        if (u.uPolarFade) u.uPolarFade.value = CORE_CONFIG.lighting.polarFade;
+        if (u.uPerfTier) u.uPerfTier.value = perfTierFloat;
       }
     }
 
