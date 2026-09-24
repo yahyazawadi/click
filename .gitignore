@@ -27,3 +27,7 @@ dist-ssr
 .session-memory/
 *.private-doc.md
 
+# Independent workspace repository (has own remote: yahyazawadi/camillia)
+paper-notes/
+
+
