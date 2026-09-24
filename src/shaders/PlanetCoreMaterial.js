@@ -122,8 +122,9 @@ export const PlanetCoreMaterial = shaderMaterial(
     }
 
     // Adaptive 3D FBM — octave count by tier:
-    //   high/med → 3 octaves (crisp planetary details)
-    //   low      → 2 octaves
+    //   high (< 0.3) → 3 octaves (crisp planetary details)
+    //   med  (< 0.8) → 2 octaves (mobile / medium GPU balance)
+    //   low  (>= 0.8)→ 2 octaves
     float fbm(vec3 p) {
       float v = 0.0;
       float a = 0.5;
@@ -132,7 +133,7 @@ export const PlanetCoreMaterial = shaderMaterial(
          -0.80,  0.60,  0.00,
           0.48,  0.64,  0.60
       );
-      int count = uPerfTier >= 0.8 ? 2 : 3;
+      int count = uPerfTier < 0.3 ? 3 : 2;
       for (int i = 0; i < 3; i++) {
         if (i >= count) break;
         v += a * noise(p);

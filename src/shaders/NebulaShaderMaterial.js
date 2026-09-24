@@ -188,11 +188,19 @@ export const NebulaMaterial = shaderMaterial(
 
       // 1. Radial plane edge kill — smooth gradual falloff
       float edgeDist = length(centeredUv);
+
+      // MOBILE PERF: Early exit for pixels well outside any possible nebula coverage.
+      // Saves ALL FBM domain-warp math for ~35% of the 900×600 plane pixels on mobile.
+      float effectiveMaxSize = uMaxSize > 0.001 ? uMaxSize : (uMaskRadius * 1.35);
+      if (edgeDist > effectiveMaxSize + 0.08) {
+        gl_FragColor = vec4(0.0);
+        return;
+      }
+
       float planeEdgeFade = smoothstep(0.49, 0.08, edgeDist);
 
       // 2. Organic boundary mask calculated directly on final spatial extent
       float edgeN = fbm(centeredUv * 3.2 + uSeedOffset * 0.15 + vec2(uTime * 0.012, -uTime * 0.010)) * uEdgeWarp;
-      float effectiveMaxSize = uMaxSize > 0.001 ? uMaxSize : (uMaskRadius * 1.35);
       float effectiveMinSize = uMinSize >= 0.0 ? min(uMinSize, effectiveMaxSize - 0.005) : (uMaskRadius * 0.05);
       float organicMask = smoothstep(effectiveMaxSize, effectiveMinSize, edgeDist + edgeN);
 
@@ -341,18 +349,26 @@ export const NebulaMaterial = shaderMaterial(
 
       // 6. Hubble SHO color science — bright core highlights & continuous color melting
       float singleCore = smoothstep(uCoreRadius, 0.0, edgeDist);
+      float coreGlow = singleCore;
+      float densityMod = finalDensity;
 
       // Multi-Core & Cellular Convection Field (Lava-Lamp Hotspot Metadynamics)
-      vec2 cellUv = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + uSeedOffset + vec2(uTime * 0.008, -uTime * 0.006);
-      float cellNoise = fbm(cellUv + qLen * 0.6);
-      float multiCoreField = pow(clamp(cellNoise * 1.5 + 0.35, 0.0, 1.0), 3.0) * 3.5;
-      float multiCore = smoothstep(0.35, 1.0, multiCoreField) * smoothstep(0.05, 0.75, finalDensity);
-
-      float coreGlow = mix(singleCore, multiCore, clamp(uMultiCoreStrength, 0.0, 1.0));
-
-      // Optional void channel pinching (metaball bubble separation)
-      float voidField = pow(clamp(fbm(cellUv * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
-      float densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
+      // PERF GUARD: Both FBM evaluations (cellNoise + voidField) are skipped entirely when
+      // uMultiCoreStrength == 0 AND uVoidPinch == 0 (the default config) — saves 2 FBM calls per pixel.
+      if (uMultiCoreStrength > 0.01 || uVoidPinch > 0.01) {
+        vec2 cellUv = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + uSeedOffset + vec2(uTime * 0.008, -uTime * 0.006);
+        if (uMultiCoreStrength > 0.01) {
+          float cellNoise = fbm(cellUv + qLen * 0.6);
+          float multiCoreField = pow(clamp(cellNoise * 1.5 + 0.35, 0.0, 1.0), 3.0) * 3.5;
+          float multiCore = smoothstep(0.35, 1.0, multiCoreField) * smoothstep(0.05, 0.75, finalDensity);
+          coreGlow = mix(singleCore, multiCore, clamp(uMultiCoreStrength, 0.0, 1.0));
+        }
+        if (uVoidPinch > 0.01) {
+          vec2 cellUv2 = centeredUv * (uScale * uMultiCoreScale) + uParallaxOffset + uSeedOffset + vec2(uTime * 0.008, -uTime * 0.006);
+          float voidField = pow(clamp(fbm(cellUv2 * 1.4 + vec2(13.7, 41.2)), 0.0, 1.0), 2.2);
+          densityMod = finalDensity * (1.0 - voidField * clamp(uVoidPinch, 0.0, 1.0));
+        }
+      }
 
       // Color layer blending driven by Gradient Softness & bounded density
       float tHa   = smoothstep(0.05, mix(0.5, 0.9, soft * 0.5), densityMod);

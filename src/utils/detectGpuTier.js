@@ -202,10 +202,51 @@ const THRESH_MED  = 12.0;
 export function detectGpuTier() {
   try {
     if (typeof window !== 'undefined' && window.sessionStorage) {
-      const cached = sessionStorage.getItem('yahya_gpu_tier');
+      const cached = sessionStorage.getItem('yahya_gpu_tier_v2');
       if (cached === 'high' || cached === 'med' || cached === 'low') {
         return cached;
       }
+    }
+
+    // MOBILE PRE-CHECK: If this is clearly a touch mobile device, bypass the benchmark.
+    // The 600x400 offscreen benchmark always finishes in < 3ms on phones (tiny canvas with no
+    // GPU bandwidth pressure), which would always report 'high'. The telemetry log confirmed this:
+    // Brave masked the GPU renderer string, benchmark ran, phone was falsely classified as 'high'.
+    const isMobileDevice = typeof window !== 'undefined' &&
+      (('ontouchstart' in window && window.innerWidth < 768) ||
+       /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent));
+
+    if (isMobileDevice) {
+      const mobileProbeCanvas = document.createElement('canvas');
+      const mobileProbeGl = mobileProbeCanvas.getContext('webgl') || mobileProbeCanvas.getContext('experimental-webgl');
+      if (mobileProbeGl) {
+        const mobileGpuName = tryReadGpuName(mobileProbeGl);
+        if (mobileGpuName) {
+          const mobileResult = classifyByName(mobileGpuName);
+          // Only allow HIGH tier on mobile if GPU explicitly matches a known flagship pattern
+          // (e.g., Apple A16/M4, Adreno 750 — chips that genuinely handle desktop workloads)
+          if (mobileResult && mobileResult.tier === 'high') {
+            console.log(`[GpuTier] Mobile flagship GPU confirmed: "${mobileGpuName}" → TIER: HIGH`);
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+              sessionStorage.setItem('yahya_gpu_tier_v2', 'high');
+            }
+            return 'high';
+          }
+          if (mobileResult) {
+            console.log(`[GpuTier] Mobile GPU: "${mobileGpuName}" → TIER: ${mobileResult.tier.toUpperCase()}`);
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+              sessionStorage.setItem('yahya_gpu_tier_v2', mobileResult.tier);
+            }
+            return mobileResult.tier;
+          }
+        }
+      }
+      // All other mobile devices (masked GPU or mid-range): default to 'med', skip benchmark
+      console.log('[GpuTier] Mobile device detected (GPU masked or unrecognized) → TIER: MED (benchmark bypassed to prevent false HIGH)');
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem('yahya_gpu_tier_v2', 'med');
+      }
+      return 'med';
     }
 
     const probeCanvas = document.createElement('canvas');
@@ -217,7 +258,7 @@ export function detectGpuTier() {
         if (result) {
           console.log(`[GpuTier] GPU: "${gpuName}" → TIER: ${result.tier.toUpperCase()} (${result.reason})`);
           if (typeof window !== 'undefined' && window.sessionStorage) {
-            sessionStorage.setItem('yahya_gpu_tier', result.tier);
+            sessionStorage.setItem('yahya_gpu_tier_v2', result.tier);
           }
           return result.tier;
         }
@@ -227,12 +268,12 @@ export function detectGpuTier() {
       }
     }
 
-    // Benchmark path
+    // Benchmark path (desktop only — mobile was already handled above)
     const avgMs = runBenchmark();
     const tier = avgMs < THRESH_HIGH ? 'high' : avgMs < THRESH_MED ? 'med' : 'low';
     console.log(`[GpuTier] WebGL Benchmark: ${avgMs.toFixed(2)}ms/frame → TIER: ${tier.toUpperCase()} (Thresholds: high < ${THRESH_HIGH}ms, med < ${THRESH_MED}ms)`);
     if (typeof window !== 'undefined' && window.sessionStorage) {
-      sessionStorage.setItem('yahya_gpu_tier', tier);
+      sessionStorage.setItem('yahya_gpu_tier_v2', tier);
     }
     return tier;
   } catch (err) {

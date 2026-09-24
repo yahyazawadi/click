@@ -28,14 +28,17 @@ export function ScissorMoonPlanet({ color, size, isMobile, perfTierFloat = 0.0 }
   const bladeLen     = size * 1.6;
 
   // Scissor count by performance tier:
-  //   high (<0.3) → all 11
-  //   med  (<0.8) → 5
-  //   low  (>=0.8)→ 2
-  const positions = perfTierFloat >= 0.8
+  //   mobile → always 2 (draw calls were spiking to 67 on phone, telemetry confirmed)
+  //   high desktop (< 0.3) → all 11
+  //   med  desktop (< 0.8) → 5
+  //   low  desktop (>= 0.8) → 2
+  const positions = isMobile
     ? SCISSOR_POSITIONS.slice(0, 2)
-    : perfTierFloat >= 0.3
-      ? SCISSOR_POSITIONS.slice(0, 5)
-      : SCISSOR_POSITIONS;
+    : perfTierFloat >= 0.8
+      ? SCISSOR_POSITIONS.slice(0, 2)
+      : perfTierFloat >= 0.3
+        ? SCISSOR_POSITIONS.slice(0, 5)
+        : SCISSOR_POSITIONS;
 
   // Pre-compute position + quaternion for each scissor (places them flat against the sphere surface).
   const scissorDefs = useMemo(() => {

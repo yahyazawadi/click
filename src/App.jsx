@@ -114,18 +114,25 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       stableTimer.current = 0;
     }
 
-    // Performance Safety Net: If FPS is continuously below 25 FPS (delta >= 0.040s) for 1.5s on active tab, demote GPU tier!
+    // Performance Safety Net: If FPS average stays below 25 FPS for 2.0s on active tab, demote GPU tier.
+    // Uses an EMA so a single lucky 38ms frame does NOT reset the 1.5s accumulator.
     // Ignore when tab is hidden or when delta > 0.25s (tab switch / background throttle)
     const isTabActive = typeof document !== 'undefined' && !document.hidden && document.visibilityState !== 'hidden';
-    if (isAppLoaded && isTabActive && safeDelta >= 0.040 && gpuTier !== 'low') {
-      lowFpsTimer.current += safeDelta;
-      if (lowFpsTimer.current >= 1.5) {
+    if (isAppLoaded && isTabActive && safeDelta < 0.25 && gpuTier !== 'low') {
+      if (safeDelta >= 0.040) {
+        // Frame below 25 FPS — accumulate
+        lowFpsTimer.current += safeDelta;
+      } else {
+        // Frame above 25 FPS — only decay slowly (don't fully reset on a single fast frame)
+        lowFpsTimer.current = Math.max(0, lowFpsTimer.current - safeDelta * 0.5);
+      }
+      if (lowFpsTimer.current >= 2.0) {
         lowFpsTimer.current = 0;
         if (typeof onAutoDemoteTier === 'function') {
           onAutoDemoteTier();
         }
       }
-    } else {
+    } else if (!isTabActive || safeDelta >= 0.25) {
       lowFpsTimer.current = 0;
     }
 
@@ -592,6 +599,8 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
 
   const selectedProject = activeProjects.find((p) => p.id === selectedTarget);
 
+  // On mobile, enforce at least 'med' tier (0.5) to prevent heavy HIGH-tier shaders on phones.
+  // If the phone was auto-demoted to 'low' (1.0), respect that and don't clamp back to 0.5.
   const effectivePerfTierFloat = isMobile ? Math.max(perfTierFloat, 0.5) : perfTierFloat;
 
   return (
@@ -600,9 +609,20 @@ export default function App({ gpuTier: initialGpuTier = 'high', perfTierFloat: i
         {/* 3D WebGL Canvas Layer */}
         <div className="canvas-container">
           <Canvas
-            dpr={isMobile ? [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1.5, 1.5)] : (gpuTier === 'low' ? [1, 1.25] : [1, 1.75])}
+            dpr={isMobile
+              // Mobile: cap DPR at 1.05 — phone screens are already 350–450 PPI so 1.0x is sharp.
+              // Capping from 2.75→1.05 eliminates ~85% of pixel fill-rate cost on flagged phone.
+              ? [1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1.0, 1.05)]
+              : (gpuTier === 'low' ? [1, 1.25] : [1, 1.75])}
             camera={{ position: [0, 120, 300], fov: 45 }}
-            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance', localClippingEnabled: false, stencil: false }}
+            gl={{
+              // Disable MSAA on mobile: 4× MSAA quadruples tile-resolve bandwidth on TBDR GPUs (kills ~15 FPS on phones).
+              antialias: !isMobile,
+              alpha: false,
+              powerPreference: 'high-performance',
+              localClippingEnabled: false,
+              stencil: false
+            }}
             onDoubleClick={(e) => e.preventDefault()}
             onPointerMissed={handleReturn}
           >

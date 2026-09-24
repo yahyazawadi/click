@@ -15,7 +15,7 @@ export function CosmicBackground({ isMobile, isMobileDualNebula = false, enabled
     }
   });
 
-  const starCount = perfTierFloat >= 0.8 ? 600 : perfTierFloat >= 0.3 ? 1200 : (isMobile ? 1000 : 2500);
+  const starCount = perfTierFloat >= 0.8 ? 600 : perfTierFloat >= 0.3 ? 1200 : (isMobile ? 450 : 2500);
 
   return (
     <>

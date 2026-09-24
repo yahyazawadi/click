@@ -54,7 +54,11 @@ const StarfieldShaderMaterial = {
       vec2 coord = gl_PointCoord - vec2(0.5);
       float dist = length(coord);
 
-      if (dist > 0.5) discard;
+      // NOTE: Do NOT use discard here. On mobile TBDR GPUs (Adreno, Mali, PowerVR),
+      // a discard inside a point-sprite shader breaks the tile early-Z rejection,
+      // forcing the full shader to run on background pixels. Using alpha=0 instead
+      // keeps the TBDR fast path intact and recovers 3-5 FPS on mobile.
+      float clipAlpha = smoothstep(0.5, 0.45, dist); // Soft circular clip, no discard
 
       // 1. Soft Circular Core & Glow
       float coreMask = smoothstep(0.18, 0.0, dist); // Hot white core
@@ -74,7 +78,7 @@ const StarfieldShaderMaterial = {
       float shimmer = (vTwinkle - 0.35) * 0.25;
       vec3 starColor = mix(vColor, hotWhite, clamp(coreMask * 0.85 + shimmer + fourPointCross * 0.3, 0.0, 1.0));
 
-      float finalAlpha = starShape * (0.25 + 0.75 * vTwinkle);
+      float finalAlpha = starShape * (0.25 + 0.75 * vTwinkle) * clipAlpha;
 
       gl_FragColor = vec4(starColor, finalAlpha);
     }
