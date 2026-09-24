@@ -103,15 +103,20 @@ function ProgressivePlanetController({ onUnlockNext, isMobile, onFpsUpdate, onMe
       });
     }
 
-    // Rule: On phone, FPS must stay above 30 FPS (delta <= 0.034s) continuously for 2.0 seconds
-    // On desktop, FPS must stay above 45 FPS (delta <= 0.022s) continuously for 0.25 seconds
+    // Rule: On phone, FPS must stay MOSTLY above 30 FPS for 0.5 seconds to unlock the next planet.
+    // On desktop, FPS must stay above 45 FPS for 0.25 seconds.
+    // IMPORTANT: Uses decay on bad frames instead of hard-reset — a single shader-compile stutter
+    // (common on phones every ~0.4s) was wiping the 2.0s accumulator, permanently blocking unlocks.
     const thresholdDelta = isMobile ? 0.034 : 0.022;
-    const requiredDuration = isMobile ? 2.0 : 0.25;
+    const requiredDuration = isMobile ? 0.5 : 0.25;
 
     if (safeDelta <= thresholdDelta) {
+      // Good frame — accumulate
       stableTimer.current += safeDelta;
     } else {
-      stableTimer.current = 0;
+      // Bad frame — decay slowly instead of hard reset
+      // A single stutter should not erase 1.8s of proven stability
+      stableTimer.current = Math.max(0, stableTimer.current - safeDelta * 0.3);
     }
 
     // Performance Safety Net: If FPS average stays below 25 FPS for 2.0s on active tab, demote GPU tier.
